@@ -15,8 +15,7 @@ except ImportError:
 from chaingreen.rpc.rpc_server import start_rpc_server
 from chaingreen.server.outbound_message import NodeType
 from chaingreen.server.server import ChaingreenServer
-from chaingreen.server.upnp import upnp_remap_port
-from chaingreen.types.peer_info import PeerInfo
+from chaingreen.server.upnp import upnp
 from chaingreen.util.chaingreen_logging import initialize_logging
 from chaingreen.util.config import load_config, load_config_cli
 from chaingreen.util.setproctitle import setproctitle
@@ -127,7 +126,7 @@ class Service:
         await self._node._start(**kwargs)
 
         for port in self._upnp_ports:
-            upnp_remap_port(port)
+            upnp.remap(port)
 
         await self._server.start_server(self._on_connect_callback)
 
@@ -188,6 +187,9 @@ class Service:
                         await (await self._rpc_task)()
 
                 self._rpc_close_task = asyncio.create_task(close_rpc_server())
+
+            for port in self._upnp_ports:
+                upnp.release(port)
 
     async def wait_closed(self) -> None:
         await self._is_stopping.wait()
