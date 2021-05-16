@@ -90,7 +90,7 @@ class TestDaemon:
 
         read_handler = asyncio.create_task(reader(ws, message_queue))
         data = {}
-        payload = create_payload("get_blockchain_state", data, service_name, "chia_full_node")
+        payload = create_payload("get_blockchain_state", data, service_name, "chaingreen_full_node")
         await ws.send_str(payload)
 
         await asyncio.sleep(5)

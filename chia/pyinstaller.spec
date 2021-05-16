@@ -63,7 +63,7 @@ SERVERS = [
 
 # TODO: collapse all these entry points into one `chia_exec` entrypoint that accepts the server as a parameter
 
-entry_points = ["chia.cmds.chia"] + [f"chia.server.start_{s}" for s in SERVERS]
+entry_points = ["chia.cmds.chaingreen"] + [f"chia.server.start_{s}" for s in SERVERS]
 
 hiddenimports = []
 hiddenimports.extend(entry_points)
@@ -154,7 +154,7 @@ def add_binary(name, path_to_script, collect_args):
 
 COLLECT_ARGS = []
 
-add_binary("chia", f"{ROOT}/chia/cmds/chia.py", COLLECT_ARGS)
+add_binary("chaingreen", f"{ROOT}/chia/cmds/chaingreen.py", COLLECT_ARGS)
 add_binary("daemon", f"{ROOT}/chia/daemon/server.py", COLLECT_ARGS)
 
 for server in SERVERS:

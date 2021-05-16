@@ -244,7 +244,7 @@ def init(create_certs: Optional[Path], root_path: Path):
                 print(f"** Directory {create_certs} does not exist **")
         else:
             print(f"** {root_path} does not exist **")
-            print("** Please run `chia init` to migrate or create new config files **")
+            print("** Please run `chaingreen init` to migrate or create new config files **")
     else:
         return chia_init(root_path)
 
@@ -309,16 +309,16 @@ def chia_full_version_str() -> str:
 
 
 def chia_init(root_path: Path):
-    if os.environ.get("CHIA_ROOT", None) is not None:
+    if os.environ.get("CHAINGREEN_ROOT", None) is not None:
         print(
-            f"warning, your CHIA_ROOT is set to {os.environ['CHIA_ROOT']}. "
-            f"Please unset the environment variable and run chia init again\n"
+            f"warning, your CHAINGREEN_ROOT is set to {os.environ['CHAINGREEN_ROOT']}. "
+            f"Please unset the environment variable and run chaingreen init again\n"
             f"or manually migrate config.yaml"
         )
 
     print(f"Chia directory {root_path}")
     if root_path.is_dir() and Path(root_path / "config" / "config.yaml").exists():
-        # This is reached if CHIA_ROOT is set, or if user has run chia init twice
+        # This is reached if CHAINGREEN_ROOT is set, or if user has run chaingreen init twice
         # before a new update.
         check_keys(root_path)
         print(f"{root_path} already exists, no migration action taken")

@@ -42,7 +42,7 @@ class WalletRpcApi:
     def __init__(self, wallet_node: WalletNode):
         assert wallet_node is not None
         self.service = wallet_node
-        self.service_name = "chia_wallet"
+        self.service_name = "chaingreen_wallet"
 
     def get_routes(self) -> Dict[str, Callable]:
         return {
@@ -115,7 +115,7 @@ class WalletRpcApi:
             data["wallet_id"] = args[1]
         if args[2] is not None:
             data["additional_data"] = args[2]
-        return [create_payload_dict("state_changed", data, "chia_wallet", "wallet_ui")]
+        return [create_payload_dict("state_changed", data, "chaingreen_wallet", "wallet_ui")]
 
     async def _stop_wallet(self):
         """

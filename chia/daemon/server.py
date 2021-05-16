@@ -45,7 +45,7 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
-service_plotter = "chia plots create"
+service_plotter = "chaingreen plots create"
 
 
 async def fetch(url: str):
@@ -78,15 +78,15 @@ class PlotEvent(str, Enum):
 # determine if application is a script file or frozen exe
 if getattr(sys, "frozen", False):
     name_map = {
-        "chia": "chia",
-        "chia_wallet": "start_wallet",
-        "chia_full_node": "start_full_node",
-        "chia_harvester": "start_harvester",
-        "chia_farmer": "start_farmer",
-        "chia_introducer": "start_introducer",
-        "chia_timelord": "start_timelord",
-        "chia_timelord_launcher": "timelord_launcher",
-        "chia_full_node_simulator": "start_simulator",
+        "chaingreen": "chaingreen",
+        "chaingreen_wallet": "start_wallet",
+        "chaingreen_full_node": "start_full_node",
+        "chaingreen_harvester": "start_harvester",
+        "chaingreen_farmer": "start_farmer",
+        "chaingreen_introducer": "start_introducer",
+        "chaingreen_timelord": "start_timelord",
+        "chaingreen_timelord_launcher": "timelord_launcher",
+        "chaingreen_full_node_simulator": "start_simulator",
     }
 
     def executable_for_service(service_name: str) -> str:
@@ -729,8 +729,8 @@ def plotter_log_path(root_path: Path, id: str):
 
 
 def launch_plotter(root_path: Path, service_name: str, service_array: List[str], id: str):
-    # we need to pass on the possibly altered CHIA_ROOT
-    os.environ["CHIA_ROOT"] = str(root_path)
+    # we need to pass on the possibly altered CHAINGREEN_ROOT
+    os.environ["CHAINGREEN_ROOT"] = str(root_path)
     service_executable = executable_for_service(service_array[0])
 
     # Swap service name with name of executable
@@ -765,14 +765,14 @@ def launch_service(root_path: Path, service_command) -> Tuple[subprocess.Popen, 
     """
     Launch a child process.
     """
-    # set up CHIA_ROOT
+    # set up CHAINGREEN_ROOT
     # invoke correct script
     # save away PID
 
-    # we need to pass on the possibly altered CHIA_ROOT
-    os.environ["CHIA_ROOT"] = str(root_path)
+    # we need to pass on the possibly altered CHAINGREEN_ROOT
+    os.environ["CHAINGREEN_ROOT"] = str(root_path)
 
-    log.debug(f"Launching service with CHIA_ROOT: {os.environ['CHIA_ROOT']}")
+    log.debug(f"Launching service with CHAINGREEN_ROOT: {os.environ['CHAINGREEN_ROOT']}")
 
     lockfile = singleton(service_launch_lock_path(root_path, service_command))
     if lockfile is None:

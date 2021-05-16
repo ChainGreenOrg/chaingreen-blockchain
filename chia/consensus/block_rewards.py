@@ -25,10 +25,8 @@ def calculate_pool_reward(height: uint32) -> uint64:
     elif height < 20 * _blocks_per_year:
         return uint64(int((7 / 8) * 3.125 * _mojo_per_chia))
     elif height < 24 * _blocks_per_year:
-        return uint64(int((7 / 8) * 3.125 * _mojo_per_chia))
-    elif height < 28 * _blocks_per_year:
         return uint64(int((7 / 8) * 1.5625 * _mojo_per_chia))
-    elif height < 32 * _blocks_per_year:
+    elif height < 28 * _blocks_per_year:
         return uint64(int((7 / 8) * 0.78125 * _mojo_per_chia))
     else:
         return uint64(0)
@@ -54,10 +52,8 @@ def calculate_base_farmer_reward(height: uint32) -> uint64:
     elif height < 20 * _blocks_per_year:
         return uint64(int((1 / 8) * 3.125 * _mojo_per_chia))
     elif height < 24 * _blocks_per_year:
-        return uint64(int((1 / 8) * 3.125 * _mojo_per_chia))
-    elif height < 28 * _blocks_per_year:
         return uint64(int((1 / 8) * 1.5625 * _mojo_per_chia))
-    elif height < 32 * _blocks_per_year:
+    elif height < 28 * _blocks_per_year:
         return uint64(int((1 / 8) * 0.78125 * _mojo_per_chia))
     else:
         return uint64(0)

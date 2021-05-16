@@ -31,7 +31,7 @@ def plots_cmd(ctx: click.Context):
 
     root_path: Path = ctx.obj["root_path"]
     if not root_path.is_dir():
-        raise RuntimeError("Please initialize (or migrate) your config directory with 'chia init'")
+        raise RuntimeError("Please initialize (or migrate) your config directory with 'chaingreen init'")
     initialize_logging("", {"log_stdout": True}, root_path)
 
 
