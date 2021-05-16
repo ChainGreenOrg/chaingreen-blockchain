@@ -75,7 +75,7 @@ def configure(
     if testnet is not None:
         testnet_port = "58444"
         testnet_introducer = "beta1_introducer.chia.net"
-        testnet = "testnet7"
+        testnet = "testnet6"
         config["full_node"]["port"] = int(testnet_port)
         config["full_node"]["introducer_peer"]["port"] = int(testnet_port)
         config["farmer"]["full_node_peer"]["port"] = int(testnet_port)
