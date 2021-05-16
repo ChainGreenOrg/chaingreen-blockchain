@@ -14,18 +14,24 @@ def calculate_pool_reward(height: uint32) -> uint64:
     rates increase continuously.
     """
 
-    if height == 0:
-        return uint64(int((7 / 8) * 21000000 * _mojo_per_chia))
-    elif height < 3 * _blocks_per_year:
-        return uint64(int((7 / 8) * 2 * _mojo_per_chia))
-    elif height < 6 * _blocks_per_year:
-        return uint64(int((7 / 8) * 1 * _mojo_per_chia))
-    elif height < 9 * _blocks_per_year:
-        return uint64(int((7 / 8) * 0.5 * _mojo_per_chia))
+    if height < 4 * _blocks_per_year:
+        return uint64(int((7 / 8) * 50 * _mojo_per_chia))
+    elif height < 8 * _blocks_per_year:
+        return uint64(int((7 / 8) * 25 * _mojo_per_chia))
     elif height < 12 * _blocks_per_year:
-        return uint64(int((7 / 8) * 0.25 * _mojo_per_chia))
+        return uint64(int((7 / 8) * 12.5 * _mojo_per_chia))
+    elif height < 16 * _blocks_per_year:
+        return uint64(int((7 / 8) * 7.25 * _mojo_per_chia))
+    elif height < 20 * _blocks_per_year:
+        return uint64(int((7 / 8) * 3.125 * _mojo_per_chia))
+    elif height < 24 * _blocks_per_year:
+        return uint64(int((7 / 8) * 3.125 * _mojo_per_chia))
+    elif height < 28 * _blocks_per_year:
+        return uint64(int((7 / 8) * 1.5625 * _mojo_per_chia))
+    elif height < 32 * _blocks_per_year:
+        return uint64(int((7 / 8) * 0.78125 * _mojo_per_chia))
     else:
-        return uint64(int((7 / 8) * 0.125 * _mojo_per_chia))
+        return uint64(0)
 
 
 def calculate_base_farmer_reward(height: uint32) -> uint64:
@@ -37,15 +43,21 @@ def calculate_base_farmer_reward(height: uint32) -> uint64:
     (3 years, etc), due to fluctuations in difficulty. They will likely come early, if the network space and VDF
     rates increase continuously.
     """
-    if height == 0:
-        return uint64(int((1 / 8) * 21000000 * _mojo_per_chia))
-    elif height < 3 * _blocks_per_year:
-        return uint64(int((1 / 8) * 2 * _mojo_per_chia))
-    elif height < 6 * _blocks_per_year:
-        return uint64(int((1 / 8) * 1 * _mojo_per_chia))
-    elif height < 9 * _blocks_per_year:
-        return uint64(int((1 / 8) * 0.5 * _mojo_per_chia))
+    if height < 4 * _blocks_per_year:
+        return uint64(int((1 / 8) * 50 * _mojo_per_chia))
+    elif height < 8 * _blocks_per_year:
+        return uint64(int((1 / 8) * 25 * _mojo_per_chia))
     elif height < 12 * _blocks_per_year:
-        return uint64(int((1 / 8) * 0.25 * _mojo_per_chia))
+        return uint64(int((1 / 8) * 12.5 * _mojo_per_chia))
+    elif height < 16 * _blocks_per_year:
+        return uint64(int((1 / 8) * 7.25 * _mojo_per_chia))
+    elif height < 20 * _blocks_per_year:
+        return uint64(int((1 / 8) * 3.125 * _mojo_per_chia))
+    elif height < 24 * _blocks_per_year:
+        return uint64(int((1 / 8) * 3.125 * _mojo_per_chia))
+    elif height < 28 * _blocks_per_year:
+        return uint64(int((1 / 8) * 1.5625 * _mojo_per_chia))
+    elif height < 32 * _blocks_per_year:
+        return uint64(int((1 / 8) * 0.78125 * _mojo_per_chia))
     else:
-        return uint64(int((1 / 8) * 0.125 * _mojo_per_chia))
+        return uint64(0)
