@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import List, Any
 from unittest import TestCase
 
-from chia.full_node.bundle_tools import (
+from chaingreen.full_node.bundle_tools import (
     bundle_suitable_for_compression,
     compressed_coin_solution_entry_list,
     compressed_spend_bundle_solution,
@@ -11,13 +11,13 @@ from chia.full_node.bundle_tools import (
     simple_solution_generator,
     spend_bundle_to_serialized_coin_solution_entry_list,
 )
-from chia.full_node.generator import run_generator, create_generator_args
-from chia.types.blockchain_format.program import Program, SerializedProgram, INFINITE_COST
-from chia.types.generator_types import BlockGenerator, CompressorArg, GeneratorArg
-from chia.types.spend_bundle import SpendBundle
-from chia.util.byte_types import hexstr_to_bytes
-from chia.util.ints import uint32
-from chia.wallet.puzzles.load_clvm import load_clvm
+from chaingreen.full_node.generator import run_generator, create_generator_args
+from chaingreen.types.blockchain_format.program import Program, SerializedProgram, INFINITE_COST
+from chaingreen.types.generator_types import BlockGenerator, CompressorArg, GeneratorArg
+from chaingreen.types.spend_bundle import SpendBundle
+from chaingreen.util.byte_types import hexstr_to_bytes
+from chaingreen.util.ints import uint32
+from chaingreen.wallet.puzzles.load_clvm import load_clvm
 
 from tests.core.make_block_generator import make_spend_bundle
 

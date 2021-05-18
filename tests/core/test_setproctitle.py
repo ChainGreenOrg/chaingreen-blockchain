@@ -1,6 +1,6 @@
 import unittest
 
-from chia.util.setproctitle import setproctitle
+from chaingreen.util.setproctitle import setproctitle
 
 
 class TestSetProcTitle(unittest.TestCase):
