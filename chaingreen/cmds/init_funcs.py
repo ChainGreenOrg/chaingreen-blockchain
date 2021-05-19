@@ -316,7 +316,7 @@ def chia_init(root_path: Path):
             f"or manually migrate config.yaml"
         )
 
-    print(f"Chia directory {root_path}")
+    print(f"Chaingreen directory {root_path}")
     if root_path.is_dir() and Path(root_path / "config" / "config.yaml").exists():
         # This is reached if CHAINGREEN_ROOT is set, or if user has run chaingreen init twice
         # before a new update.

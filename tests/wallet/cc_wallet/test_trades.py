@@ -131,7 +131,7 @@ class TestCCTrades:
         assert success is True
         assert offer is not None
 
-        assert offer["chia"] == -10
+        assert offer["chaingreen"] == -10
         assert offer[colour] == 30
 
         success, trade, reason = await trade_manager_1.respond_to_offer(file_path)
@@ -197,7 +197,7 @@ class TestCCTrades:
 
         assert cc_wallet.get_colour() == cc_wallet_2.get_colour()
 
-        assert offer["chia"] == -10
+        assert offer["chaingreen"] == -10
         assert offer[colour] == 30
 
         success, trade, reason = await trade_manager_1.respond_to_offer(file_path)
@@ -272,7 +272,7 @@ class TestCCTrades:
         assert error is None
         assert success is True
         assert offer is not None
-        assert offer["chia"] == -1000
+        assert offer["chaingreen"] == -1000
 
         colour_2 = cc_a_2.get_colour()
         colour_3 = cc_a_3.get_colour()

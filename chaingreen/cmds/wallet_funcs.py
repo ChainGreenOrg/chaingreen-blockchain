@@ -23,7 +23,7 @@ def print_transaction(tx: TransactionRecord, verbose: bool, name) -> None:
     if verbose:
         print(tx)
     else:
-        chia_amount = Decimal(int(tx.amount)) / units["chia"]
+        chia_amount = Decimal(int(tx.amount)) / units["chaingreen"]
         to_address = encode_puzzle_hash(tx.to_puzzle_hash, name)
         print(f"Transaction {tx.name}")
         print(f"Status: {'Confirmed' if tx.confirmed else ('In mempool' if tx.is_in_mempool() else 'Pending')}")
@@ -75,8 +75,8 @@ async def send(args: dict, wallet_client: WalletRpcClient, fingerprint: int) -> 
     address = args["address"]
 
     print("Submitting transaction...")
-    final_amount = uint64(int(amount * units["chia"]))
-    final_fee = uint64(int(fee * units["chia"]))
+    final_amount = uint64(int(amount * units["chaingreen"]))
+    final_fee = uint64(int(fee * units["chaingreen"]))
     res = await wallet_client.send_transaction(wallet_id, final_amount, address, final_fee)
     tx_id = res.name
     start = time.time()
@@ -85,11 +85,11 @@ async def send(args: dict, wallet_client: WalletRpcClient, fingerprint: int) -> 
         tx = await wallet_client.get_transaction(wallet_id, tx_id)
         if len(tx.sent_to) > 0:
             print(f"Transaction submitted to nodes: {tx.sent_to}")
-            print(f"Do chia wallet get_transaction -f {fingerprint} -tx 0x{tx_id} to get status")
+            print(f"Do chaingreen wallet get_transaction -f {fingerprint} -tx 0x{tx_id} to get status")
             return None
 
     print("Transaction not yet submitted to nodes")
-    print(f"Do 'chia wallet get_transaction -f {fingerprint} -tx 0x{tx_id}' to get status")
+    print(f"Do 'chaingreen wallet get_transaction -f {fingerprint} -tx 0x{tx_id}' to get status")
 
 
 async def get_address(args: dict, wallet_client: WalletRpcClient, fingerprint: int) -> None:
@@ -118,15 +118,15 @@ async def print_balances(args: dict, wallet_client: WalletRpcClient, fingerprint
         else:
             print(f"Wallet ID {wallet_id} type {typ}")
             print(
-                f"   -Total Balance: {balances['confirmed_wallet_balance']/units['chia']} {address_prefix} "
+                f"   -Total Balance: {balances['confirmed_wallet_balance']/units['chaingreen']} {address_prefix} "
                 f"({balances['confirmed_wallet_balance']} mojo)"
             )
             print(
-                f"   -Pending Total Balance: {balances['unconfirmed_wallet_balance']/units['chia']} {address_prefix} "
+                f"   -Pending Total Balance: {balances['unconfirmed_wallet_balance']/units['chaingreen']} {address_prefix} "
                 f"({balances['unconfirmed_wallet_balance']} mojo)"
             )
             print(
-                f"   -Spendable: {balances['spendable_balance']/units['chia']} {address_prefix} "
+                f"   -Spendable: {balances['spendable_balance']/units['chaingreen']} {address_prefix} "
                 f"({balances['spendable_balance']} mojo)"
             )
 

@@ -338,7 +338,7 @@ class TradeManager:
         for key, value in result.items():
             wsm = self.wallet_state_manager
             wallet: Wallet = wsm.main_wallet
-            if key == "chia":
+            if key == "chaingreen":
                 continue
             self.log.info(f"value is {key}")
             exists = await wsm.get_wallet_for_colour(key)

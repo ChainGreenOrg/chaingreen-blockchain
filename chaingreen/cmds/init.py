@@ -20,7 +20,7 @@ def init_cmd(ctx: click.Context, create_certs: str):
     - Shut down all chia daemon processes with `chia stop all -d`
     - Run `chaingreen init -c [directory]` on your remote harvester,
       where [directory] is the the copy of your Farming Machine CA directory
-    - Get more details on remote harvester on Chia wiki:
+    - Get more details on remote harvester on Chaingreen wiki:
       https://github.com/Chia-Network/chia-blockchain/wiki/Farming-on-many-machines
     """
     from pathlib import Path

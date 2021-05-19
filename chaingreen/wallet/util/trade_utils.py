@@ -83,10 +83,10 @@ def get_discrepancies_for_spend_bundle(
                 coin_amount = coinsol.coin.amount
                 out_amount = get_output_amount_for_puzzle_and_solution(puzzle, solution)
                 diff = coin_amount - out_amount
-                if "chia" in cc_discrepancies:
-                    cc_discrepancies["chia"] = cc_discrepancies["chia"] + diff
+                if "chaingreen" in cc_discrepancies:
+                    cc_discrepancies["chaingreen"] = cc_discrepancies["chaingreen"] + diff
                 else:
-                    cc_discrepancies["chia"] = diff
+                    cc_discrepancies["chaingreen"] = diff
 
         return True, cc_discrepancies, None
     except Exception as e:
