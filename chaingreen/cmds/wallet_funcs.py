@@ -23,11 +23,11 @@ def print_transaction(tx: TransactionRecord, verbose: bool, name) -> None:
     if verbose:
         print(tx)
     else:
-        chia_amount = Decimal(int(tx.amount)) / units["chaingreen"]
+        chaingreen_amount = Decimal(int(tx.amount)) / units["chaingreen"]
         to_address = encode_puzzle_hash(tx.to_puzzle_hash, name)
         print(f"Transaction {tx.name}")
         print(f"Status: {'Confirmed' if tx.confirmed else ('In mempool' if tx.is_in_mempool() else 'Pending')}")
-        print(f"Amount: {chia_amount} {name}")
+        print(f"Amount: {chaingreen_amount} {name}")
         print(f"To address: {to_address}")
         print("Created at:", datetime.fromtimestamp(tx.created_at_time).strftime("%Y-%m-%d %H:%M:%S"))
         print("")
@@ -119,15 +119,15 @@ async def print_balances(args: dict, wallet_client: WalletRpcClient, fingerprint
             print(f"Wallet ID {wallet_id} type {typ}")
             print(
                 f"   -Total Balance: {balances['confirmed_wallet_balance']/units['chaingreen']} {address_prefix} "
-                f"({balances['confirmed_wallet_balance']} mojo)"
+                f"({balances['confirmed_wallet_balance']} mio)"
             )
             print(
                 f"   -Pending Total Balance: {balances['unconfirmed_wallet_balance']/units['chaingreen']} {address_prefix} "
-                f"({balances['unconfirmed_wallet_balance']} mojo)"
+                f"({balances['unconfirmed_wallet_balance']} mio)"
             )
             print(
                 f"   -Spendable: {balances['spendable_balance']/units['chaingreen']} {address_prefix} "
-                f"({balances['spendable_balance']} mojo)"
+                f"({balances['spendable_balance']} mio)"
             )
 
 
@@ -137,7 +137,7 @@ async def get_wallet(wallet_client: WalletRpcClient, fingerprint: int = None) ->
     else:
         fingerprints = await wallet_client.get_public_keys()
     if len(fingerprints) == 0:
-        print("No keys loaded. Run 'chia keys generate' or import a key")
+        print("No keys loaded. Run 'chaingreen keys generate' or import a key")
         return None
     if len(fingerprints) == 1:
         fingerprint = fingerprints[0]

@@ -10,7 +10,7 @@ from chaingreen.consensus.coinbase import create_puzzlehash_for_pk
 from chaingreen.ssl.create_ssl import generate_ca_signed_cert, get_chaingreen_ca_crt_key, make_ca_cert
 from chaingreen.util.bech32m import encode_puzzle_hash
 from chaingreen.util.config import (
-    create_default_chia_config,
+    create_default_chaingreen_config,
     initial_config_file,
     load_config,
     save_config,
@@ -50,7 +50,7 @@ def check_keys(new_root: Path) -> None:
     keychain: Keychain = Keychain()
     all_sks = keychain.get_all_private_keys()
     if len(all_sks) == 0:
-        print("No keys are present in the keychain. Generate them with 'chia keys generate'")
+        print("No keys are present in the keychain. Generate them with 'chaingreen keys generate'")
         return None
 
     config: Dict = load_config(new_root, "config.yaml")
@@ -246,10 +246,10 @@ def init(create_certs: Optional[Path], root_path: Path):
             print(f"** {root_path} does not exist **")
             print("** Please run `chaingreen init` to migrate or create new config files **")
     else:
-        return chia_init(root_path)
+        return chaingreen_init(root_path)
 
 
-def chia_version_number() -> Tuple[str, str, str, str]:
+def chaingreen_version_number() -> Tuple[str, str, str, str]:
     scm_full_version = __version__
     left_full_version = scm_full_version.split("+")
 
@@ -297,18 +297,18 @@ def chia_version_number() -> Tuple[str, str, str, str]:
     return major_release_number, minor_release_number, patch_release_number, dev_release_number
 
 
-def chia_minor_release_number():
-    res = int(chia_version_number()[2])
+def chaingreen_minor_release_number():
+    res = int(chaingreen_version_number()[2])
     print(f"Install release number: {res}")
     return res
 
 
-def chia_full_version_str() -> str:
-    major, minor, patch, dev = chia_version_number()
+def chaingreen_full_version_str() -> str:
+    major, minor, patch, dev = chaingreen_version_number()
     return f"{major}.{minor}.{patch}{dev}"
 
 
-def chia_init(root_path: Path):
+def chaingreen_init(root_path: Path):
     if os.environ.get("CHAINGREEN_ROOT", None) is not None:
         print(
             f"warning, your CHAINGREEN_ROOT is set to {os.environ['CHAINGREEN_ROOT']}. "
@@ -324,10 +324,10 @@ def chia_init(root_path: Path):
         print(f"{root_path} already exists, no migration action taken")
         return -1
 
-    create_default_chia_config(root_path)
+    create_default_chaingreen_config(root_path)
     create_all_ssl(root_path)
     check_keys(root_path)
     print("")
-    print("To see your keys, run 'chia keys show --show-mnemonic-seed'")
+    print("To see your keys, run 'chaingreen keys show --show-mnemonic-seed'")
 
     return 0

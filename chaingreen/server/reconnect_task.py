@@ -1,11 +1,11 @@
 import asyncio
 import socket
 
-from chaingreen.server.server import ChiaServer
+from chaingreen.server.server import ChaingreenServer
 from chaingreen.types.peer_info import PeerInfo
 
 
-def start_reconnect_task(server: ChiaServer, peer_info_arg: PeerInfo, log, auth: bool):
+def start_reconnect_task(server: ChaingreenServer, peer_info_arg: PeerInfo, log, auth: bool):
     """
     Start a background task that checks connection and reconnects periodically to a peer.
     """

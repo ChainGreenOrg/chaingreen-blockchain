@@ -430,14 +430,14 @@ class Wallet:
         await self.wallet_state_manager.add_pending_transaction(tx)
 
     # This is to be aggregated together with a coloured coin offer to ensure that the trade happens
-    async def create_spend_bundle_relative_chia(self, chia_amount: int, exclude: List[Coin]) -> SpendBundle:
+    async def create_spend_bundle_relative_chaingreen(self, chaingreen_amount: int, exclude: List[Coin]) -> SpendBundle:
         list_of_solutions = []
         utxos = None
 
         # If we're losing value then get coins with at least that much value
         # If we're gaining value then our amount doesn't matter
-        if chia_amount < 0:
-            utxos = await self.select_coins(abs(chia_amount), exclude)
+        if chaingreen_amount < 0:
+            utxos = await self.select_coins(abs(chaingreen_amount), exclude)
         else:
             utxos = await self.select_coins(0, exclude)
 
@@ -445,7 +445,7 @@ class Wallet:
 
         # Calculate output amount given sum of utxos
         spend_value = sum([coin.amount for coin in utxos])
-        chia_amount = spend_value + chia_amount
+        chaingreen_amount = spend_value + chaingreen_amount
 
         # Create coin solutions for each utxo
         output_created = None
@@ -453,7 +453,7 @@ class Wallet:
             puzzle = await self.puzzle_for_puzzle_hash(coin.puzzle_hash)
             if output_created is None:
                 newpuzhash = await self.get_new_puzzlehash()
-                primaries = [{"puzzlehash": newpuzhash, "amount": chia_amount}]
+                primaries = [{"puzzlehash": newpuzhash, "amount": chaingreen_amount}]
                 solution = self.make_solution(primaries=primaries)
                 output_created = coin
             list_of_solutions.append(CoinSolution(coin, puzzle, solution))

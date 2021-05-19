@@ -15,7 +15,7 @@ def initial_config_file(filename: Union[str, Path]) -> str:
     return pkg_resources.resource_string(__name__, f"initial-{filename}").decode()
 
 
-def create_default_chia_config(root_path: Path) -> None:
+def create_default_chaingreen_config(root_path: Path) -> None:
     for filename in ["config.yaml"]:
         default_config_file_data = initial_config_file(filename)
         path = config_path_for_filename(root_path, filename)

@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 from aiohttp import WSCloseCode, WSMessage, WSMsgType
 
-from chaingreen.cmds.init_funcs import chia_full_version_str
+from chaingreen.cmds.init_funcs import chaingreen_full_version_str
 from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
 from chaingreen.protocols.shared_protocol import Capability, Handshake
 from chaingreen.server.outbound_message import Message, NodeType, make_msg
@@ -23,7 +23,7 @@ from chaingreen.util.network import class_for_type, is_localhost
 LENGTH_BYTES: int = 4
 
 
-class WSChiaConnection:
+class WSChaingreenConnection:
     """
     Represents a connection to another node. Local host and port are ours, while peer host and
     port are the host and port of the peer that we are connected to. Node_id and connection_type are
@@ -69,7 +69,7 @@ class WSChiaConnection:
         self.is_outbound = is_outbound
         self.is_feeler = is_feeler
 
-        # ChiaConnection metrics
+        # ChaingreenConnection metrics
         self.creation_time = time.time()
         self.bytes_read = 0
         self.bytes_written = 0
@@ -110,7 +110,7 @@ class WSChiaConnection:
                 Handshake(
                     network_id,
                     protocol_version,
-                    chia_full_version_str(),
+                    chaingreen_full_version_str(),
                     uint16(server_port),
                     uint8(local_type.value),
                     [(uint16(Capability.BASE.value), "1")],
@@ -148,7 +148,7 @@ class WSChiaConnection:
                 Handshake(
                     network_id,
                     protocol_version,
-                    chia_full_version_str(),
+                    chaingreen_full_version_str(),
                     uint16(server_port),
                     uint8(local_type.value),
                     [(uint16(Capability.BASE.value), "1")],

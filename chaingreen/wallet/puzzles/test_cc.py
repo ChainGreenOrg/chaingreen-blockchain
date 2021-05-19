@@ -199,7 +199,7 @@ def test_spend_zero_coin(mod_code: Program, coin_checker_for_farmed_coin):
     assert len(eve_cc_list) == 1
     eve_cc_spendable = eve_cc_list[0]
 
-    # farm regular chia
+    # farm regular chaingreen
 
     farmed_coin = generate_farmed_coin(2, eve_inner_puzzle_hash, amount=500)
 

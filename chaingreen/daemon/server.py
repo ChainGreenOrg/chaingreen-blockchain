@@ -16,11 +16,11 @@ from typing import Any, Dict, List, Optional, TextIO, Tuple, cast
 
 from websockets import ConnectionClosedOK, WebSocketException, WebSocketServerProtocol, serve
 
-from chaingreen.cmds.init_funcs import chia_init
+from chaingreen.cmds.init_funcs import chaingreen_init
 from chaingreen.daemon.windows_signal import kill
 from chaingreen.server.server import ssl_context_for_root, ssl_context_for_server
 from chaingreen.ssl.create_ssl import get_mozzila_ca_crt
-from chaingreen.util.chia_logging import initialize_logging
+from chaingreen.util.chaingreen_logging import initialize_logging
 from chaingreen.util.config import load_config
 from chaingreen.util.json_util import dict_to_json_str
 from chaingreen.util.path import mkdir
@@ -672,7 +672,7 @@ class WebSocketServer:
 
         # TODO: fix this hack
         asyncio.get_event_loop().call_later(5, lambda *args: sys.exit(0))
-        log.info("chia daemon exiting in 5 seconds")
+        log.info("chaingreen daemon exiting in 5 seconds")
 
         response = {"success": True}
         return response
@@ -946,9 +946,9 @@ def singleton(lockfile: Path, text: str = "semaphore") -> Optional[TextIO]:
 
 
 async def async_run_daemon(root_path: Path) -> int:
-    chia_init(root_path)
+    chaingreen_init(root_path)
     config = load_config(root_path, "config.yaml")
-    setproctitle("chia_daemon")
+    setproctitle("chaingreen_daemon")
     initialize_logging("daemon", config["logging"], root_path)
     lockfile = singleton(daemon_launch_lock_path(root_path))
     crt_path = root_path / config["daemon_ssl"]["private_crt"]

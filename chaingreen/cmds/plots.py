@@ -14,9 +14,9 @@ def show_plots(root_path: Path):
     print("Directories where plots are being searched for:")
     print("Note that subdirectories must be added manually")
     print(
-        "Add with 'chia plots add -d [dir]' and remove with"
-        + " 'chia plots remove -d [dir]'"
-        + " Scan and check plots with 'chia plots check'"
+        "Add with 'chaingreen plots add -d [dir]' and remove with"
+        + " 'chaingreen plots remove -d [dir]'"
+        + " Scan and check plots with 'chaingreen plots check'"
     )
     print()
     for str_path in get_plot_directories(root_path):
@@ -27,7 +27,7 @@ def show_plots(root_path: Path):
 @click.pass_context
 def plots_cmd(ctx: click.Context):
     """Create, add, remove and check your plots"""
-    from chaingreen.util.chia_logging import initialize_logging
+    from chaingreen.util.chaingreen_logging import initialize_logging
 
     root_path: Path = ctx.obj["root_path"]
     if not root_path.is_dir():

@@ -5,7 +5,7 @@ import signal
 from sys import platform
 from typing import Any, Callable, List, Optional, Tuple
 
-from chaingreen.server.ssl_context import chia_ssl_ca_paths, private_ssl_ca_paths
+from chaingreen.server.ssl_context import chaingreen_ssl_ca_paths, private_ssl_ca_paths
 
 try:
     import uvloop
@@ -14,10 +14,10 @@ except ImportError:
 
 from chaingreen.rpc.rpc_server import start_rpc_server
 from chaingreen.server.outbound_message import NodeType
-from chaingreen.server.server import ChiaServer
+from chaingreen.server.server import ChaingreenServer
 from chaingreen.server.upnp import upnp_remap_port
 from chaingreen.types.peer_info import PeerInfo
-from chaingreen.util.chia_logging import initialize_logging
+from chaingreen.util.chaingreen_logging import initialize_logging
 from chaingreen.util.config import load_config, load_config_cli
 from chaingreen.util.setproctitle import setproctitle
 from chaingreen.util.ints import uint16
@@ -57,7 +57,7 @@ class Service:
         self._rpc_close_task: Optional[asyncio.Task] = None
         self._network_id: str = network_id
 
-        proctitle_name = f"chia_{service_name}"
+        proctitle_name = f"chaingreen_{service_name}"
         setproctitle(proctitle_name)
         self._log = logging.getLogger(service_name)
 
@@ -69,11 +69,11 @@ class Service:
 
         self._rpc_info = rpc_info
         private_ca_crt, private_ca_key = private_ssl_ca_paths(root_path, self.config)
-        chaingreen_ca_crt, chaingreen_ca_key = chia_ssl_ca_paths(root_path, self.config)
+        chaingreen_ca_crt, chaingreen_ca_key = chaingreen_ssl_ca_paths(root_path, self.config)
         inbound_rlp = self.config.get("inbound_rate_limit_percent")
         outbound_rlp = self.config.get("outbound_rate_limit_percent")
         assert inbound_rlp and outbound_rlp
-        self._server = ChiaServer(
+        self._server = ChaingreenServer(
             advertised_port,
             node,
             peer_api,
@@ -194,7 +194,7 @@ class Service:
 
         self._log.info("Waiting for socket to be closed (if opened)")
 
-        self._log.info("Waiting for ChiaServer to be closed")
+        self._log.info("Waiting for ChaingreenServer to be closed")
         await self._server.await_closed()
 
         if self._rpc_close_task:

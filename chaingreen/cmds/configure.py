@@ -96,7 +96,7 @@ def configure(
         print("Default full node port, introducer and network setting updated")
         change_made = True
     if change_made:
-        print("Restart any running chia services for changes to take effect")
+        print("Restart any running chaingreen services for changes to take effect")
         save_config(root_path, "config.yaml", config)
     return 0
 

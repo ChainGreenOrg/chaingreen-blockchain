@@ -120,7 +120,7 @@ class Keychain:
     testing: bool
     user: str
 
-    def __init__(self, user: str = "user-chia-1.8", testing: bool = False):
+    def __init__(self, user: str = "user-chaingreen-1.8", testing: bool = False):
         self.testing = testing
         self.user = user
 
@@ -129,9 +129,9 @@ class Keychain:
         The keychain stores keys under a different name for tests.
         """
         if self.testing:
-            return f"chia-{self.user}-test"
+            return f"chaingreen-{self.user}-test"
         else:
-            return f"chia-{self.user}"
+            return f"chaingreen-{self.user}"
 
     def _get_pk_and_entropy(self, user: str) -> Optional[Tuple[G1Element, bytes]]:
         """

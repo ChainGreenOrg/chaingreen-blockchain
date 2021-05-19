@@ -54,7 +54,7 @@ from chaingreen.wallet.wallet_puzzle_store import WalletPuzzleStore
 from chaingreen.wallet.wallet_sync_store import WalletSyncStore
 from chaingreen.wallet.wallet_transaction_store import WalletTransactionStore
 from chaingreen.wallet.wallet_user_store import WalletUserStore
-from chaingreen.server.server import ChiaServer
+from chaingreen.server.server import ChaingreenServer
 from chaingreen.wallet.did_wallet.did_wallet import DIDWallet
 
 
@@ -99,7 +99,7 @@ class WalletStateManager:
     coin_store: WalletCoinStore
     sync_store: WalletSyncStore
     weight_proof_handler: Any
-    server: ChiaServer
+    server: ChaingreenServer
 
     @staticmethod
     async def create(
@@ -107,7 +107,7 @@ class WalletStateManager:
         config: Dict,
         db_path: Path,
         constants: ConsensusConstants,
-        server: ChiaServer,
+        server: ChaingreenServer,
         name: str = None,
     ):
         self = WalletStateManager()

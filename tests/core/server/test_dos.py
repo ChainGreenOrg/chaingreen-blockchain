@@ -11,7 +11,7 @@ from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
 from chaingreen.server.outbound_message import make_msg
 from chaingreen.server.rate_limits import RateLimiter
 from chaingreen.server.server import ssl_context_for_client
-from chaingreen.server.ws_connection import WSChiaConnection
+from chaingreen.server.ws_connection import WSChaingreenConnection
 from chaingreen.types.peer_info import PeerInfo
 from chaingreen.util.ints import uint16, uint64
 from tests.setup_nodes import self_hostname, setup_simulators_and_wallets
@@ -153,8 +153,8 @@ class TestDos:
 
         assert len(server_1.all_connections) == 1
 
-        ws_con: WSChiaConnection = list(server_1.all_connections.values())[0]
-        ws_con_2: WSChiaConnection = list(server_2.all_connections.values())[0]
+        ws_con: WSChaingreenConnection = list(server_1.all_connections.values())[0]
+        ws_con_2: WSChaingreenConnection = list(server_2.all_connections.values())[0]
 
         ws_con.peer_host = "1.2.3.4"
         ws_con_2.peer_host = "1.2.3.4"
@@ -206,8 +206,8 @@ class TestDos:
 
         assert len(server_1.all_connections) == 1
 
-        ws_con: WSChiaConnection = list(server_1.all_connections.values())[0]
-        ws_con_2: WSChiaConnection = list(server_2.all_connections.values())[0]
+        ws_con: WSChaingreenConnection = list(server_1.all_connections.values())[0]
+        ws_con_2: WSChaingreenConnection = list(server_2.all_connections.values())[0]
 
         ws_con.peer_host = "1.2.3.4"
         ws_con_2.peer_host = "1.2.3.4"
@@ -255,8 +255,8 @@ class TestDos:
 
         assert len(server_1.all_connections) == 1
 
-        ws_con: WSChiaConnection = list(server_1.all_connections.values())[0]
-        ws_con_2: WSChiaConnection = list(server_2.all_connections.values())[0]
+        ws_con: WSChaingreenConnection = list(server_1.all_connections.values())[0]
+        ws_con_2: WSChaingreenConnection = list(server_2.all_connections.values())[0]
 
         ws_con.peer_host = "1.2.3.4"
         ws_con_2.peer_host = "1.2.3.4"

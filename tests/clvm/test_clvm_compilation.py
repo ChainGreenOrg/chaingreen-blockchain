@@ -7,39 +7,39 @@ from chaingreen.types.blockchain_format.program import Program, SerializedProgra
 
 wallet_program_files = set(
     [
-        "chia/wallet/puzzles/calculate_synthetic_public_key.clvm",
-        "chia/wallet/puzzles/cc.clvm",
-        "chia/wallet/puzzles/chialisp_deserialisation.clvm",
-        "chia/wallet/puzzles/rom_bootstrap_generator.clvm",
-        "chia/wallet/puzzles/generator_for_single_coin.clvm",
-        "chia/wallet/puzzles/genesis-by-coin-id-with-0.clvm",
-        "chia/wallet/puzzles/genesis-by-puzzle-hash-with-0.clvm",
-        "chia/wallet/puzzles/lock.inner.puzzle.clvm",
-        "chia/wallet/puzzles/p2_conditions.clvm",
-        "chia/wallet/puzzles/p2_delegated_conditions.clvm",
-        "chia/wallet/puzzles/p2_delegated_puzzle.clvm",
-        "chia/wallet/puzzles/p2_delegated_puzzle_or_hidden_puzzle.clvm",
-        "chia/wallet/puzzles/p2_m_of_n_delegate_direct.clvm",
-        "chia/wallet/puzzles/p2_puzzle_hash.clvm",
-        "chia/wallet/puzzles/rl_aggregation.clvm",
-        "chia/wallet/puzzles/rl.clvm",
-        "chia/wallet/puzzles/sha256tree_module.clvm",
-        "chia/wallet/puzzles/singleton_top_layer.clvm",
-        "chia/wallet/puzzles/did_innerpuz.clvm",
-        "chia/wallet/puzzles/decompress_puzzle.clvm",
-        "chia/wallet/puzzles/decompress_coin_solution_entry_with_prefix.clvm",
-        "chia/wallet/puzzles/decompress_coin_solution_entry.clvm",
-        "chia/wallet/puzzles/block_program_zero.clvm",
-        "chia/wallet/puzzles/test_generator_deserialize.clvm",
-        "chia/wallet/puzzles/test_multiple_generator_input_arguments.clvm",
+        "chaingreen/wallet/puzzles/calculate_synthetic_public_key.clvm",
+        "chaingreen/wallet/puzzles/cc.clvm",
+        "chaingreen/wallet/puzzles/chialisp_deserialisation.clvm",
+        "chaingreen/wallet/puzzles/rom_bootstrap_generator.clvm",
+        "chaingreen/wallet/puzzles/generator_for_single_coin.clvm",
+        "chaingreen/wallet/puzzles/genesis-by-coin-id-with-0.clvm",
+        "chaingreen/wallet/puzzles/genesis-by-puzzle-hash-with-0.clvm",
+        "chaingreen/wallet/puzzles/lock.inner.puzzle.clvm",
+        "chaingreen/wallet/puzzles/p2_conditions.clvm",
+        "chaingreen/wallet/puzzles/p2_delegated_conditions.clvm",
+        "chaingreen/wallet/puzzles/p2_delegated_puzzle.clvm",
+        "chaingreen/wallet/puzzles/p2_delegated_puzzle_or_hidden_puzzle.clvm",
+        "chaingreen/wallet/puzzles/p2_m_of_n_delegate_direct.clvm",
+        "chaingreen/wallet/puzzles/p2_puzzle_hash.clvm",
+        "chaingreen/wallet/puzzles/rl_aggregation.clvm",
+        "chaingreen/wallet/puzzles/rl.clvm",
+        "chaingreen/wallet/puzzles/sha256tree_module.clvm",
+        "chaingreen/wallet/puzzles/singleton_top_layer.clvm",
+        "chaingreen/wallet/puzzles/did_innerpuz.clvm",
+        "chaingreen/wallet/puzzles/decompress_puzzle.clvm",
+        "chaingreen/wallet/puzzles/decompress_coin_solution_entry_with_prefix.clvm",
+        "chaingreen/wallet/puzzles/decompress_coin_solution_entry.clvm",
+        "chaingreen/wallet/puzzles/block_program_zero.clvm",
+        "chaingreen/wallet/puzzles/test_generator_deserialize.clvm",
+        "chaingreen/wallet/puzzles/test_multiple_generator_input_arguments.clvm",
     ]
 )
 
 clvm_include_files = set(
-    ["chia/wallet/puzzles/create-lock-puzzlehash.clvm", "chia/wallet/puzzles/condition_codes.clvm"]
+    ["chaingreen/wallet/puzzles/create-lock-puzzlehash.clvm", "chaingreen/wallet/puzzles/condition_codes.clvm"]
 )
 
-CLVM_PROGRAM_ROOT = "chia/wallet/puzzles"
+CLVM_PROGRAM_ROOT = "chaingreen/wallet/puzzles"
 
 
 def list_files(dir, glob):
@@ -66,7 +66,7 @@ class TestClvmCompilation(TestCase):
 
     def test_all_programs_listed(self):
         """
-        Checks to see if a new .clvm file was added to chia/wallet/puzzles, but not added to `wallet_program_files`
+        Checks to see if a new .clvm file was added to chaingreen/wallet/puzzles, but not added to `wallet_program_files`
         """
         existing_files = list_files(CLVM_PROGRAM_ROOT, "*.clvm")
         existing_file_paths = set([Path(x).relative_to(CLVM_PROGRAM_ROOT) for x in existing_files])

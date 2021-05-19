@@ -14,7 +14,7 @@ from chaingreen.consensus.pot_iterations import calculate_sp_iters, is_overflow_
 from chaingreen.protocols import timelord_protocol
 from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
 from chaingreen.server.outbound_message import NodeType, make_msg
-from chaingreen.server.server import ChiaServer
+from chaingreen.server.server import ChaingreenServer
 from chaingreen.timelord.iters_from_block import iters_from_block
 from chaingreen.timelord.timelord_state import LastState
 from chaingreen.timelord.types import Chain, IterationType, StateType
@@ -44,7 +44,7 @@ class Timelord:
         self.free_clients: List[Tuple[str, asyncio.StreamReader, asyncio.StreamWriter]] = []
         self.potential_free_clients: List = []
         self.ip_whitelist = self.config["vdf_clients"]["ip"]
-        self.server: Optional[ChiaServer] = None
+        self.server: Optional[ChaingreenServer] = None
         self.chain_type_to_stream: Dict[Chain, Tuple[str, asyncio.StreamReader, asyncio.StreamWriter]] = {}
         self.chain_start_time: Dict = {}
         # Chains that currently don't have a vdf_client.
@@ -116,7 +116,7 @@ class Timelord:
     async def _await_closed(self):
         pass
 
-    def set_server(self, server: ChiaServer):
+    def set_server(self, server: ChaingreenServer):
         self.server = server
 
     async def _handle_client(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):

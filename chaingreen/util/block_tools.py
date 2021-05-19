@@ -13,7 +13,7 @@ from typing import Callable, Dict, List, Optional, Tuple
 
 from blspy import AugSchemeMPL, G1Element, G2Element, PrivateKey
 
-from chaingreen.cmds.init_funcs import create_all_ssl, create_default_chia_config
+from chaingreen.cmds.init_funcs import create_all_ssl, create_default_chaingreen_config
 from chaingreen.full_node.bundle_tools import (
     best_solution_generator_from_template,
     detect_potential_template_generator,
@@ -118,7 +118,7 @@ class BlockTools:
             root_path = Path(self._tempdir.name)
 
         self.root_path = root_path
-        create_default_chia_config(root_path)
+        create_default_chaingreen_config(root_path)
         self.keychain = Keychain("testing-1.8.0", True)
         self.keychain.delete_all_keys()
         self.farmer_master_sk_entropy = std_hash(b"block_tools farmer key")
@@ -142,7 +142,7 @@ class BlockTools:
 
         farmer_pubkeys: List[G1Element] = [master_sk_to_farmer_sk(sk).get_g1() for sk in self.all_sks]
         if len(self.pool_pubkeys) == 0 or len(farmer_pubkeys) == 0:
-            raise RuntimeError("Keys not generated. Run `chia generate keys`")
+            raise RuntimeError("Keys not generated. Run `chaingreen generate keys`")
 
         _, loaded_plots, _, _ = load_plots({}, {}, farmer_pubkeys, self.pool_pubkeys, None, False, root_path)
         self.plots: Dict[Path, PlotInfo] = loaded_plots

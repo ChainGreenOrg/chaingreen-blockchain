@@ -12,7 +12,7 @@ from chaingreen.consensus.constants import ConsensusConstants
 from chaingreen.protocols import farmer_protocol, harvester_protocol
 from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
 from chaingreen.server.outbound_message import NodeType, make_msg
-from chaingreen.server.ws_connection import WSChiaConnection
+from chaingreen.server.ws_connection import WSChaingreenConnection
 from chaingreen.types.blockchain_format.proof_of_space import ProofOfSpace
 from chaingreen.types.blockchain_format.sized_bytes import bytes32
 from chaingreen.util.bech32m import decode_puzzle_hash
@@ -69,7 +69,7 @@ class Farmer:
         ]
 
         if len(self.get_public_keys()) == 0:
-            error_str = "No keys exist. Please run 'chia keys generate' or open the UI."
+            error_str = "No keys exist. Please run 'chaingreen keys generate' or open the UI."
             raise RuntimeError(error_str)
 
         # This is the farmer configuration
@@ -88,7 +88,7 @@ class Farmer:
         assert len(self.farmer_target) == 32
         assert len(self.pool_target) == 32
         if len(self.pool_sks_map) == 0:
-            error_str = "No keys exist. Please run 'chia keys generate' or open the UI."
+            error_str = "No keys exist. Please run 'chaingreen keys generate' or open the UI."
             raise RuntimeError(error_str)
 
     async def _start(self):
@@ -103,7 +103,7 @@ class Farmer:
     def _set_state_changed_callback(self, callback: Callable):
         self.state_changed_callback = callback
 
-    async def on_connect(self, peer: WSChiaConnection):
+    async def on_connect(self, peer: WSChaingreenConnection):
         # Sends a handshake to the harvester
         handshake = harvester_protocol.HarvesterHandshake(
             self.get_public_keys(),
@@ -120,7 +120,7 @@ class Farmer:
         if self.state_changed_callback is not None:
             self.state_changed_callback(change, data)
 
-    def on_disconnect(self, connection: ws.WSChiaConnection):
+    def on_disconnect(self, connection: ws.WSChaingreenConnection):
         self.log.info(f"peer disconnected {connection.get_peer_info()}")
         self.state_changed("close_connection", {})
 

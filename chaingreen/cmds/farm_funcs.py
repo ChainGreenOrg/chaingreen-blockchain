@@ -200,12 +200,12 @@ async def summary(rpc_port: int, wallet_rpc_port: int, harvester_rpc_port: int, 
         print("Farming")
 
     if amounts is not None:
-        print(f"Total chia farmed: {amounts['farmed_amount'] / units['chaingreen']}")
+        print(f"Total chaingreen farmed: {amounts['farmed_amount'] / units['chaingreen']}")
         print(f"User transaction fees: {amounts['fee_amount'] / units['chaingreen']}")
         print(f"Block rewards: {(amounts['farmer_reward_amount'] + amounts['pool_reward_amount']) / units['chaingreen']}")
         print(f"Last height farmed: {amounts['last_height_farmed']}")
     else:
-        print("Total chia farmed: Unknown")
+        print("Total chaingreen farmed: Unknown")
         print("User transaction fees: Unknown")
         print("Block rewards: Unknown")
         print("Last height farmed: Unknown")
@@ -246,4 +246,4 @@ async def summary(rpc_port: int, wallet_rpc_port: int, harvester_rpc_port: int, 
         proportion = total_plot_size / blockchain_state["space"] if blockchain_state["space"] else -1
         minutes = int((await get_average_block_time(rpc_port) / 60) / proportion) if proportion else -1
     print("Expected time to win: " + format_minutes(minutes))
-    print("Note: log into your key using 'chia wallet show' to see rewards for each key")
+    print("Note: log into your key using 'chaingreen wallet show' to see rewards for each key")

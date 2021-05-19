@@ -41,14 +41,14 @@ dev_dependencies = [
 ]
 
 kwargs = dict(
-    name="chia-blockchain",
+    name="chaingreen-blockchain",
     author="Mariano Sorgente & Mio Sukakura",
     author_email="miosukakura@gmail.com",
-    description="Chia blockchain full node, farmer, timelord, and wallet.",
+    description="Chaingreen blockchain full node, farmer, timelord, and wallet.",
     url="https://chaingreen.org/",
     license="Apache License",
     python_requires=">=3.7, <4",
-    keywords="chia blockchain node",
+    keywords="chaingreen blockchain node",
     install_requires=dependencies,
     setup_requires=["setuptools_scm"],
     extras_require=dict(

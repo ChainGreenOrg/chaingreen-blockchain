@@ -60,7 +60,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
 
-# Omitted checking out blocks and plots repo Chia-Network/test-cache
+# Omitted checking out blocks and plots repo Chaingreen-Network/test-cache
 
     - name: Link home directory
       run: |

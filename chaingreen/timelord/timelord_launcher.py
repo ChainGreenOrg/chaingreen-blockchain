@@ -8,7 +8,7 @@ from typing import Dict, List
 
 import pkg_resources
 
-from chaingreen.util.chia_logging import initialize_logging
+from chaingreen.util.chaingreen_logging import initialize_logging
 from chaingreen.util.config import load_config
 from chaingreen.util.default_root import DEFAULT_ROOT_PATH
 from chaingreen.util.setproctitle import setproctitle

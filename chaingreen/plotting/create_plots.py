@@ -27,7 +27,7 @@ def get_farmer_public_key(alt_fingerprint: Optional[int] = None) -> G1Element:
     else:
         sk_ent = keychain.get_first_private_key()
     if sk_ent is None:
-        raise RuntimeError("No keys, please run 'chia keys add', 'chia keys generate' or provide a public key with -f")
+        raise RuntimeError("No keys, please run 'chaingreen keys add', 'chaingreen keys generate' or provide a public key with -f")
     return master_sk_to_farmer_sk(sk_ent[0]).get_g1()
 
 
@@ -39,7 +39,7 @@ def get_pool_public_key(alt_fingerprint: Optional[int] = None) -> G1Element:
     else:
         sk_ent = keychain.get_first_private_key()
     if sk_ent is None:
-        raise RuntimeError("No keys, please run 'chia keys add', 'chia keys generate' or provide a public key with -p")
+        raise RuntimeError("No keys, please run 'chaingreen keys add', 'chaingreen keys generate' or provide a public key with -p")
     return master_sk_to_pool_sk(sk_ent[0]).get_g1()
 
 

@@ -280,7 +280,7 @@ class TradeManager:
                         to_exclude = []
                     else:
                         to_exclude = spend_bundle.removals()
-                    new_spend_bundle = await wallet.create_spend_bundle_relative_chia(amount, to_exclude)
+                    new_spend_bundle = await wallet.create_spend_bundle_relative_chaingreen(amount, to_exclude)
                 else:
                     return False, None, "unsupported wallet type"
                 if new_spend_bundle is None or new_spend_bundle.removals() == []:
@@ -366,7 +366,7 @@ class TradeManager:
         cc_coinsol_outamounts: Dict[bytes32, List[Tuple[CoinSolution, int]]] = dict()
         aggsig = offer_spend_bundle.aggregated_signature
         cc_discrepancies: Dict[bytes32, int] = dict()
-        chia_discrepancy = None
+        chaingreen_discrepancy = None
         wallets: Dict[bytes32, Any] = dict()  # colour to wallet dict
 
         for coinsol in offer_spend_bundle.coin_solutions:
@@ -399,24 +399,24 @@ class TradeManager:
                     cc_coinsol_outamounts[colour] = [(coinsol, total)]
 
             else:
-                # standard chia coin
+                # standard chaingreen coin
                 unspent = await self.wallet_state_manager.get_spendable_coins_for_wallet(1)
                 if coinsol.coin in [record.coin for record in unspent]:
                     return False, None, "can't respond to own offer"
-                if chia_discrepancy is None:
-                    chia_discrepancy = get_output_discrepancy_for_puzzle_and_solution(coinsol.coin, puzzle, solution)
+                if chaingreen_discrepancy is None:
+                    chaingreen_discrepancy = get_output_discrepancy_for_puzzle_and_solution(coinsol.coin, puzzle, solution)
                 else:
-                    chia_discrepancy += get_output_discrepancy_for_puzzle_and_solution(coinsol.coin, puzzle, solution)
+                    chaingreen_discrepancy += get_output_discrepancy_for_puzzle_and_solution(coinsol.coin, puzzle, solution)
                 coinsols.append(coinsol)
 
-        chia_spend_bundle: Optional[SpendBundle] = None
-        if chia_discrepancy is not None:
-            chia_spend_bundle = await self.wallet_state_manager.main_wallet.create_spend_bundle_relative_chia(
-                chia_discrepancy, []
+        chaingreen_spend_bundle: Optional[SpendBundle] = None
+        if chaingreen_discrepancy is not None:
+            chaingreen_spend_bundle = await self.wallet_state_manager.main_wallet.create_spend_bundle_relative_chaingreen(
+                chaingreen_discrepancy, []
             )
-            if chia_spend_bundle is not None:
+            if chaingreen_spend_bundle is not None:
                 for coinsol in coinsols:
-                    chia_spend_bundle.coin_solutions.append(coinsol)
+                    chaingreen_spend_bundle.coin_solutions.append(coinsol)
 
         zero_spend_list: List[SpendBundle] = []
         spend_bundle = None
@@ -426,10 +426,10 @@ class TradeManager:
             if cc_discrepancies[colour] < 0:
                 my_cc_spends = await wallets[colour].select_coins(abs(cc_discrepancies[colour]))
             else:
-                if chia_spend_bundle is None:
+                if chaingreen_spend_bundle is None:
                     to_exclude: List = []
                 else:
-                    to_exclude = chia_spend_bundle.removals()
+                    to_exclude = chaingreen_spend_bundle.removals()
                 my_cc_spends = await wallets[colour].select_coins(0)
                 if my_cc_spends is None or my_cc_spends == set():
                     zero_spend_bundle: SpendBundle = await wallets[colour].generate_zero_val_coin(False, to_exclude)
@@ -437,7 +437,7 @@ class TradeManager:
                         return (
                             False,
                             None,
-                            "Unable to generate zero value coin. Confirm that you have chia available",
+                            "Unable to generate zero value coin. Confirm that you have chaingreen available",
                         )
                     zero_spend_list.append(zero_spend_bundle)
 
@@ -531,50 +531,50 @@ class TradeManager:
 
         # Add transaction history for this trade
         now = uint64(int(time.time()))
-        if chia_spend_bundle is not None:
-            spend_bundle = SpendBundle.aggregate([spend_bundle, chia_spend_bundle])
+        if chaingreen_spend_bundle is not None:
+            spend_bundle = SpendBundle.aggregate([spend_bundle, chaingreen_spend_bundle])
             # debug_spend_bundle(spend_bundle)
-            if chia_discrepancy < 0:
+            if chaingreen_discrepancy < 0:
                 tx_record = TransactionRecord(
                     confirmed_at_height=uint32(0),
                     created_at_time=now,
                     to_puzzle_hash=token_bytes(),
-                    amount=uint64(abs(chia_discrepancy)),
+                    amount=uint64(abs(chaingreen_discrepancy)),
                     fee_amount=uint64(0),
                     confirmed=False,
                     sent=uint32(10),
-                    spend_bundle=chia_spend_bundle,
-                    additions=chia_spend_bundle.additions(),
-                    removals=chia_spend_bundle.removals(),
+                    spend_bundle=chaingreen_spend_bundle,
+                    additions=chaingreen_spend_bundle.additions(),
+                    removals=chaingreen_spend_bundle.removals(),
                     wallet_id=uint32(1),
                     sent_to=[],
                     trade_id=std_hash(spend_bundle.name() + bytes(now)),
                     type=uint32(TransactionType.OUTGOING_TRADE.value),
-                    name=chia_spend_bundle.name(),
+                    name=chaingreen_spend_bundle.name(),
                 )
             else:
                 tx_record = TransactionRecord(
                     confirmed_at_height=uint32(0),
                     created_at_time=uint64(int(time.time())),
                     to_puzzle_hash=token_bytes(),
-                    amount=uint64(abs(chia_discrepancy)),
+                    amount=uint64(abs(chaingreen_discrepancy)),
                     fee_amount=uint64(0),
                     confirmed=False,
                     sent=uint32(10),
-                    spend_bundle=chia_spend_bundle,
-                    additions=chia_spend_bundle.additions(),
-                    removals=chia_spend_bundle.removals(),
+                    spend_bundle=chaingreen_spend_bundle,
+                    additions=chaingreen_spend_bundle.additions(),
+                    removals=chaingreen_spend_bundle.removals(),
                     wallet_id=uint32(1),
                     sent_to=[],
                     trade_id=std_hash(spend_bundle.name() + bytes(now)),
                     type=uint32(TransactionType.INCOMING_TRADE.value),
-                    name=chia_spend_bundle.name(),
+                    name=chaingreen_spend_bundle.name(),
                 )
             my_tx_records.append(tx_record)
 
         for colour, amount in cc_discrepancies.items():
             wallet = wallets[colour]
-            if chia_discrepancy > 0:
+            if chaingreen_discrepancy > 0:
                 tx_record = TransactionRecord(
                     confirmed_at_height=uint32(0),
                     created_at_time=uint64(int(time.time())),

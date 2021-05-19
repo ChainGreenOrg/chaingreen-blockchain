@@ -375,20 +375,20 @@ class TestCCTrades:
         if file_path.exists():
             file_path.unlink()
 
-        spendable_chia = await wallet_a.get_spendable_balance()
+        spendable_chaingreen = await wallet_a.get_spendable_balance()
 
         offer_dict = {1: 10, 2: -30, 3: 30}
 
         success, trade_offer, error = await trade_manager_a.create_offer_for_ids(offer_dict, file)
 
-        spendable_chia_after = await wallet_a.get_spendable_balance()
+        spendable_chaingreen_after = await wallet_a.get_spendable_balance()
 
         locked_coin = await trade_manager_a.get_locked_coins(wallet_a.id())
         locked_sum = 0
         for name, record in locked_coin.items():
             locked_sum += record.coin.amount
 
-        assert spendable_chia == spendable_chia_after + locked_sum
+        assert spendable_chaingreen == spendable_chaingreen_after + locked_sum
         assert success is True
         assert trade_offer is not None
 
@@ -397,7 +397,7 @@ class TestCCTrades:
         spendable_after_cancel_1 = await wallet_a.get_spendable_balance()
 
         # Spendable should be the same as it was before making offer 1
-        assert spendable_chia == spendable_after_cancel_1
+        assert spendable_chaingreen == spendable_after_cancel_1
 
         trade_a = await trade_manager_a.get_trade_by_id(trade_offer.trade_id)
         assert trade_a is not None
@@ -421,20 +421,20 @@ class TestCCTrades:
         if file_path.exists():
             file_path.unlink()
 
-        spendable_chia = await wallet_a.get_spendable_balance()
+        spendable_chaingreen = await wallet_a.get_spendable_balance()
 
         offer_dict = {1: 10, 2: -30, 3: 30}
 
         success, trade_offer, error = await trade_manager_a.create_offer_for_ids(offer_dict, file)
 
-        spendable_chia_after = await wallet_a.get_spendable_balance()
+        spendable_chaingreen_after = await wallet_a.get_spendable_balance()
 
         locked_coin = await trade_manager_a.get_locked_coins(wallet_a.id())
         locked_sum = 0
         for name, record in locked_coin.items():
             locked_sum += record.coin.amount
 
-        assert spendable_chia == spendable_chia_after + locked_sum
+        assert spendable_chaingreen == spendable_chaingreen_after + locked_sum
         assert success is True
         assert trade_offer is not None
 
@@ -444,7 +444,7 @@ class TestCCTrades:
         for i in range(0, buffer_blocks):
             await full_node.farm_new_transaction_block(FarmNewBlockProtocol(token_bytes()))
 
-        await time_out_assert(15, wallet_a.get_spendable_balance, spendable_chia)
+        await time_out_assert(15, wallet_a.get_spendable_balance, spendable_chaingreen)
 
         # Spendable should be the same as it was before making offer 1
 

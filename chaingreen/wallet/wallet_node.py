@@ -27,8 +27,8 @@ from chaingreen.protocols.wallet_protocol import (
 )
 from chaingreen.server.node_discovery import WalletPeers
 from chaingreen.server.outbound_message import Message, NodeType, make_msg
-from chaingreen.server.server import ChiaServer
-from chaingreen.server.ws_connection import WSChiaConnection
+from chaingreen.server.server import ChaingreenServer
+from chaingreen.server.ws_connection import WSChaingreenConnection
 from chaingreen.types.blockchain_format.coin import Coin, hash_coin_list
 from chaingreen.types.blockchain_format.sized_bytes import bytes32
 from chaingreen.types.header_block import HeaderBlock
@@ -54,7 +54,7 @@ class WalletNode:
     key_config: Dict
     config: Dict
     constants: ConsensusConstants
-    server: Optional[ChiaServer]
+    server: Optional[ChaingreenServer]
     log: logging.Logger
     wallet_peers: WalletPeers
     # Maintains the state of the wallet (blockchain and transactions), handles DB connections
@@ -113,7 +113,7 @@ class WalletNode:
     def get_key_for_fingerprint(self, fingerprint: Optional[int]):
         private_keys = self.keychain.get_all_private_keys()
         if len(private_keys) == 0:
-            self.log.warning("No keys present. Create keys with the UI, or with the 'chia keys' program.")
+            self.log.warning("No keys present. Create keys with the UI, or with the 'chaingreen keys' program.")
             return None
 
         private_key: Optional[PrivateKey] = None
@@ -301,7 +301,7 @@ class WalletNode:
 
         return messages
 
-    def set_server(self, server: ChiaServer):
+    def set_server(self, server: ChaingreenServer):
         self.server = server
         # TODO: perhaps use a different set of DNS seeders for wallets, to split the traffic.
         self.wallet_peers = WalletPeers(
@@ -316,7 +316,7 @@ class WalletNode:
         )
         asyncio.create_task(self.wallet_peers.start())
 
-    async def on_connect(self, peer: WSChiaConnection):
+    async def on_connect(self, peer: WSChaingreenConnection):
         if self.wallet_state_manager is None or self.backup_initialized is False:
             return None
         messages_peer_ids = await self._messages_to_resend()
@@ -358,7 +358,7 @@ class WalletNode:
                 return True
         return False
 
-    async def complete_blocks(self, header_blocks: List[HeaderBlock], peer: WSChiaConnection):
+    async def complete_blocks(self, header_blocks: List[HeaderBlock], peer: WSChaingreenConnection):
         if self.wallet_state_manager is None:
             return None
         header_block_records: List[HeaderBlockRecord] = []
@@ -400,7 +400,7 @@ class WalletNode:
                 else:
                     self.log.debug(f"Result: {result}")
 
-    async def new_peak_wallet(self, peak: wallet_protocol.NewPeakWallet, peer: WSChiaConnection):
+    async def new_peak_wallet(self, peak: wallet_protocol.NewPeakWallet, peer: WSChaingreenConnection):
         if self.wallet_state_manager is None:
             return None
 
@@ -547,7 +547,7 @@ class WalletNode:
             self.log.info("Not performing sync, already caught up.")
             return None
 
-        peers: List[WSChiaConnection] = self.server.get_full_node_connections()
+        peers: List[WSChaingreenConnection] = self.server.get_full_node_connections()
         if len(peers) == 0:
             self.log.info("No peers to sync to")
             return None
@@ -618,7 +618,7 @@ class WalletNode:
 
     async def fetch_blocks_and_validate(
         self,
-        peer: WSChiaConnection,
+        peer: WSChaingreenConnection,
         height_start: uint32,
         height_end: uint32,
         fork_point_with_peak: Optional[uint32],
@@ -809,7 +809,7 @@ class WalletNode:
                         return False
         return True
 
-    async def get_additions(self, peer: WSChiaConnection, block_i, additions) -> Optional[List[Coin]]:
+    async def get_additions(self, peer: WSChaingreenConnection, block_i, additions) -> Optional[List[Coin]]:
         if len(additions) > 0:
             additions_request = RequestAdditions(block_i.height, block_i.header_hash, additions)
             additions_res: Optional[Union[RespondAdditions, RejectAdditionsRequest]] = await peer.request_additions(
@@ -840,7 +840,7 @@ class WalletNode:
             added_coins = []
             return added_coins
 
-    async def get_removals(self, peer: WSChiaConnection, block_i, additions, removals) -> Optional[List[Coin]]:
+    async def get_removals(self, peer: WSChaingreenConnection, block_i, additions, removals) -> Optional[List[Coin]]:
         assert self.wallet_state_manager is not None
         request_all_removals = False
         # Check if we need all removals
