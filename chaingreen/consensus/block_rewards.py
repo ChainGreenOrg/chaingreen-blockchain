@@ -13,8 +13,9 @@ def calculate_pool_reward(height: uint32) -> uint64:
     (3 years, etc), due to fluctuations in difficulty. They will likely come early, if the network space and VDF
     rates increase continuously.
     """
-
-    if height < 4 * _blocks_per_year:
+    if height == 0:
+        return uint64(0)  # genesis block has no reward
+    elif height < 4 * _blocks_per_year:
         return uint64(int((7 / 8) * 500 * _mio_per_chaingreen))
     elif height < 8 * _blocks_per_year:
         return uint64(int((7 / 8) * 250 * _mio_per_chaingreen))
