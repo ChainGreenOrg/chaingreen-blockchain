@@ -112,8 +112,8 @@ class WalletCoinStore:
     # Update coin_record to be spent in DB
     async def set_spent(self, coin_name: bytes32, height: uint32):
         current: Optional[WalletCoinRecord] = await self.get_coin_record(coin_name)
-        if current is None:
-            return None
+        assert current is not None
+        # assert current.spent is False
 
         spent: WalletCoinRecord = WalletCoinRecord(
             current.coin,
