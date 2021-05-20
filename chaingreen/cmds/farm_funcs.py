@@ -202,7 +202,9 @@ async def summary(rpc_port: int, wallet_rpc_port: int, harvester_rpc_port: int, 
     if amounts is not None:
         print(f"Total chaingreen farmed: {amounts['farmed_amount'] / units['chaingreen']}")
         print(f"User transaction fees: {amounts['fee_amount'] / units['chaingreen']}")
-        print(f"Block rewards: {(amounts['farmer_reward_amount'] + amounts['pool_reward_amount']) / units['chaingreen']}")
+        print(
+            f"Block rewards: {(amounts['farmer_reward_amount'] + amounts['pool_reward_amount']) / units['chaingreen']}"
+        )
         print(f"Last height farmed: {amounts['last_height_farmed']}")
     else:
         print("Total chaingreen farmed: Unknown")

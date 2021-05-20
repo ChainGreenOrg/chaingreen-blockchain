@@ -37,7 +37,9 @@ DECOMPRESS_CSE_WITH_PREFIX = load_clvm(
     "decompress_coin_solution_entry_with_prefix.clvm", package_or_requirement="chaingreen.wallet.puzzles"
 )
 DECOMPRESS_BLOCK = load_clvm("block_program_zero.clvm", package_or_requirement="chaingreen.wallet.puzzles")
-TEST_MULTIPLE = load_clvm("test_multiple_generator_input_arguments.clvm", package_or_requirement="chaingreen.wallet.puzzles")
+TEST_MULTIPLE = load_clvm(
+    "test_multiple_generator_input_arguments.clvm", package_or_requirement="chaingreen.wallet.puzzles"
+)
 
 Nil = Program.from_bytes(b"\x80")
 

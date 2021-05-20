@@ -404,15 +404,21 @@ class TradeManager:
                 if coinsol.coin in [record.coin for record in unspent]:
                     return False, None, "can't respond to own offer"
                 if chaingreen_discrepancy is None:
-                    chaingreen_discrepancy = get_output_discrepancy_for_puzzle_and_solution(coinsol.coin, puzzle, solution)
+                    chaingreen_discrepancy = get_output_discrepancy_for_puzzle_and_solution(
+                        coinsol.coin, puzzle, solution
+                    )
                 else:
-                    chaingreen_discrepancy += get_output_discrepancy_for_puzzle_and_solution(coinsol.coin, puzzle, solution)
+                    chaingreen_discrepancy += get_output_discrepancy_for_puzzle_and_solution(
+                        coinsol.coin, puzzle, solution
+                    )
                 coinsols.append(coinsol)
 
         chaingreen_spend_bundle: Optional[SpendBundle] = None
         if chaingreen_discrepancy is not None:
-            chaingreen_spend_bundle = await self.wallet_state_manager.main_wallet.create_spend_bundle_relative_chaingreen(
-                chaingreen_discrepancy, []
+            chaingreen_spend_bundle = (
+                await self.wallet_state_manager.main_wallet.create_spend_bundle_relative_chaingreen(
+                    chaingreen_discrepancy, []
+                )
             )
             if chaingreen_spend_bundle is not None:
                 for coinsol in coinsols:

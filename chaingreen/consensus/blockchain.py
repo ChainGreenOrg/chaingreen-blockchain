@@ -7,7 +7,10 @@ from enum import Enum
 from typing import Dict, List, Optional, Set, Tuple, Union
 
 from chaingreen.consensus.block_body_validation import validate_block_body
-from chaingreen.consensus.block_header_validation import validate_finished_header_block, validate_unfinished_header_block
+from chaingreen.consensus.block_header_validation import (
+    validate_finished_header_block,
+    validate_unfinished_header_block
+)
 from chaingreen.consensus.block_record import BlockRecord
 from chaingreen.consensus.blockchain_interface import BlockchainInterface
 from chaingreen.consensus.constants import ConsensusConstants
