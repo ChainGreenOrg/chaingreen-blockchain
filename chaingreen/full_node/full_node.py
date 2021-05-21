@@ -448,7 +448,6 @@ class FullNode:
                 await self.server.send_to_specific([msg], peer.peer_node_id)
 
     async def synced(self) -> bool:
-        return True
         curr: Optional[BlockRecord] = self.blockchain.get_peak()
         if curr is None:
             return False
