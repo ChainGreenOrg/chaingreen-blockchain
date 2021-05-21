@@ -13,9 +13,10 @@ COPY ./build_scripts ./build_scripts
 COPY ./chaingreen ./chaingreen
 COPY ./install.sh ./install.sh
 COPY ./install-gui.sh ./install-gui.sh
+COPY ./install-timelord.sh ./install-timelord.sh
 
 RUN sh install.sh
 # tzdata is installed in install-gui.sh script, but it's interactive
 # so we install it before the script is started in non-interactive mode
 RUN DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
-RUN . ./activate && sh install-gui.sh && chaingreen keys generate && chaingreen init && chaingreen start -r all
+RUN . ./activate && sh install-gui.sh && sh install-timelord.sh && chaingreen keys generate && chaingreen init && chaingreen start -r all
