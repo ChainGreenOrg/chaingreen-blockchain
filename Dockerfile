@@ -14,11 +14,8 @@ COPY ./chaingreen ./chaingreen
 COPY ./install.sh ./install.sh
 COPY ./install-gui.sh ./install-gui.sh
 
-EXPOSE 55700
 RUN sh install.sh
 # tzdata is installed in install-gui.sh script, but it's interactive
 # so we install it before the script is started in non-interactive mode
 RUN DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
 RUN . ./activate && sh install-gui.sh && chaingreen init && chaingreen keys generate && chaingreen start -r all
-
-# CMD ["ls", "-al"]
