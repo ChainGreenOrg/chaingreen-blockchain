@@ -245,7 +245,7 @@ full_node:
   # List of trusted DNS seeders to bootstrap from.
   # If you modify this, please change the hardcode as well from FullNode.set_server()
   dns_servers:
-    - "138.68.72.82"
+    - "eu.introducer.chaingreen.org"
   farmer_peer:
       host: *self_hostname
       port: 8777
@@ -253,7 +253,7 @@ full_node:
       host: *self_hostname
       port: 8746
   introducer_peer:
-      host: 138.68.72.82 # Chaingreen AWS introducer IPv4/IPv6
+      host: eu.introducer.chaingreen.org # Chaingreen AWS introducer IPv4/IPv6
       port: 8744
   wallet_peer:
     host: *self_hostname
@@ -335,7 +335,7 @@ wallet:
   recent_peer_threshold: 6000
 
   introducer_peer:
-    host: 138.68.72.82 # Chaingreen AWS introducer IPv4/IPv6
+    host: eu.introducer.chaingreen.org # Chaingreen AWS introducer IPv4/IPv6
     port: 8744
 
   ssl:
