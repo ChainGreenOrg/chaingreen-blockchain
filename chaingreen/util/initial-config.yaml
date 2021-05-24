@@ -254,7 +254,7 @@ full_node:
       port: 8746
   introducer_peer:
       host: eu.introducer.chaingreen.org # Chaingreen AWS introducer IPv4/IPv6
-      port: 8744
+      port: 8745
   wallet_peer:
     host: *self_hostname
     port: 8749
@@ -336,7 +336,7 @@ wallet:
 
   introducer_peer:
     host: eu.introducer.chaingreen.org # Chaingreen AWS introducer IPv4/IPv6
-    port: 8744
+    port: 8745
 
   ssl:
     private_crt:  "config/ssl/wallet/private_wallet.crt"
