@@ -130,7 +130,7 @@ class FullNodeRpcApi:
             is_connected = len(self.service.server.get_full_node_connections()) > 0
         else:
             is_connected = False
-        synced = await self.service.synced()
+        synced = await self.service.synced() and is_connected
 
         assert space is not None
         response: Dict = {
