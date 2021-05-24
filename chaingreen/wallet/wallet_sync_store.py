@@ -45,7 +45,6 @@ class WalletSyncStore:
         self.sync_mode = sync_mode
 
     def get_sync_mode(self) -> bool:
-        return True
         return self.sync_mode
 
     async def clear_sync_info(self):
