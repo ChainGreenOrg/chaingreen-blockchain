@@ -20,7 +20,7 @@ from chaingreen.protocols import (
     full_node_protocol,
     introducer_protocol,
     timelord_protocol,
-    wallet_protocol
+    wallet_protocol,
 )
 from chaingreen.protocols.full_node_protocol import RejectBlock, RejectBlocks
 from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes

@@ -38,7 +38,7 @@ async def add_dummy_connection(server: ChaingreenServer, dummy_port: int) -> Tup
         server.chaingreen_ca_crt_path.read_bytes(),
         server.chaingreen_ca_key_path.read_bytes(),
         dummy_crt_path,
-        dummy_key_path
+        dummy_key_path,
     )
     ssl_context = ssl_context_for_client(
         server.chaingreen_ca_crt_path, server.chaingreen_ca_key_path, dummy_crt_path, dummy_key_path

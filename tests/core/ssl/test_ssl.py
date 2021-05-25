@@ -108,7 +108,7 @@ class TestSSL:
             farmer_server.chaingreen_ca_crt_path.read_bytes(),
             farmer_server.chaingreen_ca_key_path.read_bytes(),
             pub_crt,
-            pub_key
+            pub_key,
         )
         ssl_context = ssl_context_for_client(
             farmer_server.chaingreen_ca_crt_path, farmer_server.chaingreen_ca_crt_path, pub_crt, pub_key
@@ -154,7 +154,7 @@ class TestSSL:
             wallet_server.chaingreen_ca_crt_path.read_bytes(),
             wallet_server.chaingreen_ca_key_path.read_bytes(),
             pub_crt,
-            pub_key
+            pub_key,
         )
         ssl_context = ssl_context_for_client(
             wallet_server.chaingreen_ca_crt_path, wallet_server.chaingreen_ca_crt_path, pub_crt, pub_key
