@@ -1,7 +1,8 @@
 from typing import KeysView, Generator
 
 SERVICES_FOR_GROUP = {
-    "all": "chaingreen_harvester chaingreen_timelord_launcher chaingreen_timelord chaingreen_farmer chaingreen_full_node chaingreen_wallet".split(),
+    "all": "chaingreen_harvester chaingreen_timelord_launcher chaingreen_timelord chaingreen_farmer \
+        chaingreen_full_node chaingreen_wallet".split(),
     "node": "chaingreen_full_node".split(),
     "harvester": "chaingreen_harvester".split(),
     "farmer": "chaingreen_harvester chaingreen_farmer chaingreen_full_node chaingreen_wallet".split(),

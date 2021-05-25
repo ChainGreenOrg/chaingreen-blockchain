@@ -16,11 +16,11 @@ from chaingreen.consensus.cost_calculator import NPCResult, calculate_cost_of_pr
 from chaingreen.full_node.mempool_check_conditions import get_name_puzzle_conditions
 from chaingreen.full_node.signage_point import SignagePoint
 from chaingreen.types.blockchain_format.coin import Coin, hash_coin_list
-from chaingreen.types.blockchain_format.foliage import ( 
+from chaingreen.types.blockchain_format.foliage import (
     Foliage,
     FoliageBlockData,
     FoliageTransactionBlock,
-    TransactionsInfo
+    TransactionsInfo,
 )
 from chaingreen.types.blockchain_format.pool_target import PoolTarget
 from chaingreen.types.blockchain_format.proof_of_space import ProofOfSpace
