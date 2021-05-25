@@ -122,7 +122,8 @@ async def print_balances(args: dict, wallet_client: WalletRpcClient, fingerprint
                 f"({balances['confirmed_wallet_balance']} mio)"
             )
             print(
-                f"   -Pending Total Balance: {balances['unconfirmed_wallet_balance']/units['chaingreen']} {address_prefix} "
+                f"   -Pending Total Balance: {balances['unconfirmed_wallet_balance']/units['chaingreen']} \
+                {address_prefix} "
                 f"({balances['unconfirmed_wallet_balance']} mio)"
             )
             print(
