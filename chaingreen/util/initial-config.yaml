@@ -246,6 +246,8 @@ full_node:
   # If you modify this, please change the hardcode as well from FullNode.set_server()
   dns_servers:
     - "eu.introducer.chaingreen.org"
+    - "eu1.node.chaingreen.org"
+    - "eu2.node.chaingreen.org"
   farmer_peer:
       host: *self_hostname
       port: 8777
@@ -254,7 +256,7 @@ full_node:
       port: 8746
   introducer_peer:
       host: eu.introducer.chaingreen.org # Chaingreen AWS introducer IPv4/IPv6
-      port: 8745
+      port: 8744
   wallet_peer:
     host: *self_hostname
     port: 8749
