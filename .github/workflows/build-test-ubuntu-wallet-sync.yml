@@ -20,7 +20,7 @@ jobs:
       max-parallel: 4
       matrix:
         python-version: [3.7, 3.8, 3.9]
-        os: [ubuntu-latest]
+        os: [ubuntu-20.04]
 
     steps:
     - name: Cancel previous runs on the same branch

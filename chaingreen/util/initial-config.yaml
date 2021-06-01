@@ -246,8 +246,6 @@ full_node:
   # If you modify this, please change the hardcode as well from FullNode.set_server()
   dns_servers:
     - "eu.introducer.chaingreen.org"
-    - "eu1.node.chaingreen.org"
-    - "eu2.node.chaingreen.org"
   farmer_peer:
       host: *self_hostname
       port: 8777

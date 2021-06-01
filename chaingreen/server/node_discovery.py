@@ -178,7 +178,7 @@ class FullNodeDiscovery:
                 peers.append(
                     TimestampedPeerInfo(
                         ip.to_text(),
-                        8444,
+                        8744,
                         0,
                     )
                 )

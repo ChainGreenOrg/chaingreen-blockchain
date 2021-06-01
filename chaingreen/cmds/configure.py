@@ -73,8 +73,8 @@ def configure(
             print("uPnP disabled")
         change_made = True
     if testnet is not None:
-        testnet_port = "58444"
-        testnet_introducer = "beta1_introducer.chaingreen.org"
+        testnet_port = "58744"
+        testnet_introducer = "testnet0.introducer.chaingreen.org"
         testnet = "testnet0"
         config["full_node"]["port"] = int(testnet_port)
         config["full_node"]["introducer_peer"]["port"] = int(testnet_port)
