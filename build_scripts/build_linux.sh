@@ -58,7 +58,7 @@ if [ "$LAST_EXIT_CODE" -ne 0 ]; then
 fi
 
 electron-packager . chaingreen-blockchain --asar.unpack="**/daemon/**" --platform=linux \
---icon=src/assets/img/Chaingreen.icns --overwrite --app-bundle-id=net.chaingreen.blockchain \
+--icon=src/assets/img/chia.icns --overwrite --app-bundle-id=net.chaingreen.blockchain \
 --appVersion=$CHAINGREEN_INSTALLER_VERSION
 LAST_EXIT_CODE=$?
 if [ "$LAST_EXIT_CODE" -ne 0 ]; then
