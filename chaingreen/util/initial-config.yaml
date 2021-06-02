@@ -291,7 +291,7 @@ ui:
 
 introducer:
   host: *self_hostname
-  port: 8745
+  port: 8744
   max_peers_to_send: 20
   # The introducer will only return peers who it has seen in the last
   # recent_peer_threshold seconds
@@ -336,7 +336,7 @@ wallet:
 
   introducer_peer:
     host: eu.introducer.chaingreen.org # Chaingreen AWS introducer IPv4/IPv6
-    port: 8745
+    port: 8744
 
   ssl:
     private_crt:  "config/ssl/wallet/private_wallet.crt"
