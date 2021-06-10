@@ -70,7 +70,11 @@ class FullNodeDiscovery:
         self.serialize_task: Optional[asyncio.Task] = None
         self.cleanup_task: Optional[asyncio.Task] = None
         self.initial_wait: int = 0
-        self.resolver = dns.asyncresolver.Resolver()
+        try:
+            self.resolver = dns.asyncresolver.Resolver()
+        except Exception:
+            self.resolver = None
+            self.log.exception("Error initializing asyncresolver")
         self.pending_outbound_connections: Set[str] = set()
         self.pending_tasks: Set[asyncio.Task] = set()
 
@@ -185,6 +189,14 @@ class FullNodeDiscovery:
 
     async def _query_dns(self, dns_address):
         try:
+            if self.default_port is None:
+                self.log.error(
+                    "Network id not supported in NETWORK_ID_DEFAULT_PORTS neither in config. Skipping DNS query."
+                )
+                return
+            if self.resolver is None:
+                self.log.warn("Skipping DNS query: asyncresolver not initialized.")
+                return
             peers: List[TimestampedPeerInfo] = []
             result = await self.resolver.resolve(qname=dns_address, lifetime=30)
             for ip in result:
