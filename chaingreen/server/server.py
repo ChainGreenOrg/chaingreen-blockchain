@@ -16,7 +16,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 
 from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
-from chaingreen.protocols.shared_protocol import protocol_version
+from chaingreen.protocols.shared_protocol import protocol_version, fork_id
 from chaingreen.server.introducer_peers import IntroducerPeers
 from chaingreen.server.outbound_message import Message, NodeType
 from chaingreen.server.ssl_context import private_ssl_paths, public_ssl_paths
@@ -250,6 +250,7 @@ class ChaingreenServer:
             handshake = await connection.perform_handshake(
                 self._network_id,
                 protocol_version,
+                fork_id,
                 self._port,
                 self._local_type,
             )
@@ -407,6 +408,7 @@ class ChaingreenServer:
                 handshake = await connection.perform_handshake(
                     self._network_id,
                     protocol_version,
+                    fork_id,
                     self._port,
                     self._local_type,
                 )
