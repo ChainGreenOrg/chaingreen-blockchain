@@ -40,6 +40,10 @@ class IntroducerAPI:
 
             if r_peer.host == peer.peer_host and r_peer.port == peer.peer_server_port:
                 continue
+
+            if r_peer.port == 8444:
+                continue
+            
             peer_without_timestamp = TimestampedPeerInfo(
                 r_peer.host,
                 r_peer.port,
