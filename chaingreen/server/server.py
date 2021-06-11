@@ -255,6 +255,12 @@ class ChaingreenServer:
             )
 
             assert handshake is True
+
+            if connection.peer_port == 8444:
+                self.log.info(f"Stop communicating with Chia node: {connection.get_peer_info()}")
+                await connection.close()
+                close_event.set()
+
             # Limit inbound connections to config's specifications.
             if not self.accept_inbound_connections(connection.connection_type) and not is_in_network(
                 connection.peer_host, self.exempt_peer_networks
@@ -328,6 +334,9 @@ class ChaingreenServer:
         An on connect method can also be specified, and this will be saved into the instance variables.
         """
         if self.is_duplicate_or_self_connection(target_node):
+            return False
+
+        if target_node.port == 8444:
             return False
 
         if target_node.host in self.banned_peers and time.time() < self.banned_peers[target_node.host]:
