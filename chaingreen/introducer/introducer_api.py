@@ -43,7 +43,7 @@ class IntroducerAPI:
 
             if r_peer.port == 8444:
                 continue
-            
+
             peer_without_timestamp = TimestampedPeerInfo(
                 r_peer.host,
                 r_peer.port,
@@ -54,7 +54,11 @@ class IntroducerAPI:
             if len(peers) >= max_peers:
                 break
 
-        self.introducer.log.info(f"Sending vetted {peers}")
+        if peer.port == 8444:
+            peers = []
+            self.introducer.log.info("Sending empty peers to a Chia node")
+        else:
+            self.introducer.log.info(f"Sending vetted {peers}")
 
         msg = make_msg(ProtocolMessageTypes.respond_peers_introducer, RespondPeersIntroducer(peers))
         return msg
