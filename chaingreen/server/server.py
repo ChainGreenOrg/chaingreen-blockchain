@@ -256,7 +256,10 @@ class ChaingreenServer:
 
             assert handshake is True
 
-            if connection.peer_port == 8444:
+            self.log.warning(f"Connecting peer {connection.get_peer_info()}")
+
+            if connection.peer_port == 8444 or connection.peer_server_port == 8444:
+                
                 self.log.info(f"Stop communicating with Chia node: {connection.get_peer_info()}")
                 await connection.close()
                 close_event.set()
