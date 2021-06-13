@@ -477,6 +477,10 @@ class FullNode:
         if self.full_node_peers is not None:
             asyncio.create_task(self.full_node_peers.on_connect(connection))
 
+        if connection.peer_port == 8444 or connection.peer_server_port == 8444:
+            self.log.warning(f"Removing Chia peer {connection.peer_host} {connection.peer_port}")
+            return None
+            
         if self.initialized is False:
             return None
 
