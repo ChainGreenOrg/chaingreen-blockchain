@@ -494,8 +494,11 @@ def validate_unfinished_header_block(
         return None, ValidationError(Err.INVALID_SP_INDEX)
 
     # Note that required iters might be from the previous slot (if we are in an overflow block)
+    difficulty = constants.DIFFICULTY_CONSTANT_FACTOR,
+    if header_block.height >= 2000:
+        difficulty = constants.DIFFICULTY_CONSTANT_FACTOR_BLOCK_200K
     required_iters: uint64 = calculate_iterations_quality(
-        constants.DIFFICULTY_CONSTANT_FACTOR,
+        difficulty,
         q_str,
         header_block.reward_chain_block.proof_of_space.size,
         expected_difficulty,

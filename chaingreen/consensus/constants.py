@@ -16,6 +16,7 @@ class ConsensusConstants:
 
     SUB_SLOT_ITERS_STARTING: uint64  # The sub_slot_iters for the first epoch
     DIFFICULTY_CONSTANT_FACTOR: uint128  # Multiplied by the difficulty to get iterations
+    DIFFICULTY_CONSTANT_FACTOR_BLOCK_200K: uint128  # Multiplied by the difficulty to get iterations
     DIFFICULTY_STARTING: uint64  # The difficulty for the first epoch
     # The maximum factor by which difficulty and sub_slot_iters can change per epoch
     DIFFICULTY_CHANGE_MAX_FACTOR: uint32
