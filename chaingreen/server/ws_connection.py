@@ -5,6 +5,7 @@ import traceback
 from typing import Any, Callable, Dict, List, Optional
 
 from aiohttp import WSCloseCode, WSMessage, WSMsgType
+from packaging import parse
 
 from chaingreen.cmds.init_funcs import chaingreen_full_version_str
 from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
@@ -103,16 +104,14 @@ class WSChaingreenConnection:
         self.outbound_rate_limiter = RateLimiter(incoming=False, percentage_of_limit=outbound_rate_limit_percent)
         self.inbound_rate_limiter = RateLimiter(incoming=True, percentage_of_limit=inbound_rate_limit_percent)
 
-    async def perform_handshake(self, network_id: str, protocol_version: str, fork_id: str, 
-    server_port: int, local_type: NodeType):
-
+    async def perform_handshake(self, network_id: str, protocol_version: str, coin_protocol_id: str, server_port: int, local_type: NodeType):
         if self.is_outbound:
             outbound_handshake = make_msg(
                 ProtocolMessageTypes.handshake,
                 Handshake(
                     network_id,
                     protocol_version,
-                    fork_id,
+                    coin_protocol_id,
                     chaingreen_full_version_str(),
                     uint16(server_port),
                     uint8(local_type.value),
@@ -131,8 +130,9 @@ class WSChaingreenConnection:
                 raise ProtocolError(Err.INVALID_HANDSHAKE)
             if inbound_handshake.network_id != network_id:
                 raise ProtocolError(Err.INCOMPATIBLE_NETWORK_ID)
-            if inbound_handshake.fork_id != fork_id:
-                raise ProtocolError(Err.INCOMPATIBLE_FORK_ID)
+            if inbound_handshake.coin_protocol_id != coin_protocol_id and parse(
+                    inbound_handshake.protocol) > parse("0.0.32"):
+                raise ProtocolError(Err.INCOMPATIBLE_COIN_PROTOCOL_ID)
 
             self.peer_server_port = inbound_handshake.server_port
             self.connection_type = NodeType(inbound_handshake.node_type)
@@ -151,15 +151,16 @@ class WSChaingreenConnection:
                 raise ProtocolError(Err.INVALID_HANDSHAKE)
             if inbound_handshake.network_id != network_id:
                 raise ProtocolError(Err.INCOMPATIBLE_NETWORK_ID)
-            if inbound_handshake.fork_id != fork_id:
-                raise ProtocolError(Err.INCOMPATIBLE_FORK_ID)
-                
+            if inbound_handshake.coin_protocol_id != coin_protocol_id and parse(
+                    inbound_handshake.protocol) > parse("0.0.32"):
+                raise ProtocolError(Err.INCOMPATIBLE_COIN_PROTOCOL_ID)
+               
             outbound_handshake = make_msg(
                 ProtocolMessageTypes.handshake,
                 Handshake(
                     network_id,
                     protocol_version,
-                    fork_id,
+                    coin_protocol_id,
                     chaingreen_full_version_str(),
                     uint16(server_port),
                     uint8(local_type.value),

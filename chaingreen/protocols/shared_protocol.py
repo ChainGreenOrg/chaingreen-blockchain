@@ -8,9 +8,9 @@ from chaingreen.util.config import load_config
 from chaingreen.util.default_root import DEFAULT_ROOT_PATH
 
 
-protocol_version = "0.0.32"
+protocol_version = "0.0.33"
 config = load_config(DEFAULT_ROOT_PATH, "config.yaml")
-fork_id = config["FORK_ID"]
+coin_protocol_id = config["COIN_PROTOCOL_ID"]
 
 """
 Handshake when establishing a connection between two servers.
@@ -29,7 +29,7 @@ class Capability(IntEnum):
 class Handshake(Streamable):
     network_id: str
     protocol_version: str
-    fork_id: str
+    coin_protocol_id: str
     software_version: str
     server_port: uint16
     node_type: uint8
