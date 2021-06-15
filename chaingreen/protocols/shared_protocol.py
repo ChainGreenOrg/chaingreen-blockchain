@@ -8,9 +8,10 @@ from chaingreen.util.config import load_config
 from chaingreen.util.default_root import DEFAULT_ROOT_PATH
 
 
-protocol_version = "0.0.33"
+protocol_version = "0.0.32"
 config = load_config(DEFAULT_ROOT_PATH, "config.yaml")
 coin_protocol_id = config["COIN_PROTOCOL_ID"]
+coin_protocol_activation: int = config["COIN_PROTOCOL_ACTIVATION_TIMESTAMP"]
 
 """
 Handshake when establishing a connection between two servers.
