@@ -9,7 +9,7 @@ from chaingreen.types.blockchain_format.program import Program, INFINITE_COST
 from chaingreen.types.condition_opcodes import ConditionOpcode
 from chaingreen.types.condition_with_args import ConditionWithArgs
 from chaingreen.util.ints import uint32
-from chaingreen.util.wallet_tools import WalletTool
+from tests.wallet_tools import WalletTool
 from chaingreen.wallet.derive_keys import master_sk_to_wallet_sk
 from chaingreen.wallet.puzzles.p2_delegated_puzzle import puzzle_for_pk
 

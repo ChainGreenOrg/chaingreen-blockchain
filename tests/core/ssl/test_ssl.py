@@ -9,7 +9,7 @@ from chaingreen.server.server import ChaingreenServer, ssl_context_for_client
 from chaingreen.server.ws_connection import WSChaingreenConnection
 from chaingreen.ssl.create_ssl import generate_ca_signed_cert
 from chaingreen.types.peer_info import PeerInfo
-from chaingreen.util.block_tools import test_constants
+from tests.block_tools import test_constants
 from chaingreen.util.ints import uint16
 from tests.setup_nodes import (
     bt,

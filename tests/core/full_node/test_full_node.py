@@ -30,14 +30,14 @@ from chaingreen.types.mempool_inclusion_status import MempoolInclusionStatus
 from chaingreen.types.peer_info import PeerInfo, TimestampedPeerInfo
 from chaingreen.types.spend_bundle import SpendBundle
 from chaingreen.types.unfinished_block import UnfinishedBlock
-from chaingreen.util.block_tools import get_signage_point
+from tests.block_tools import get_signage_point
 from chaingreen.util.clvm import int_to_bytes
 from chaingreen.util.errors import Err
 from chaingreen.util.hash import std_hash
 from chaingreen.util.ints import uint8, uint16, uint32, uint64
 from chaingreen.util.recursive_replace import recursive_replace
 from chaingreen.util.vdf_prover import get_vdf_info_and_proof
-from chaingreen.util.wallet_tools import WalletTool
+from tests.wallet_tools import WalletTool
 from tests.core.fixtures import empty_blockchain  # noqa: F401
 from chaingreen.wallet.cc_wallet.cc_wallet import CCWallet
 from chaingreen.wallet.transaction_record import TransactionRecord

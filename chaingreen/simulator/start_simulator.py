@@ -6,7 +6,7 @@ from chaingreen.full_node.full_node import FullNode
 from chaingreen.rpc.full_node_rpc_api import FullNodeRpcApi
 from chaingreen.server.outbound_message import NodeType
 from chaingreen.server.start_service import run_service
-from chaingreen.util.block_tools import BlockTools, test_constants
+from tests.block_tools import BlockTools, test_constants
 from chaingreen.util.config import load_config_cli
 from chaingreen.util.default_root import DEFAULT_ROOT_PATH
 from chaingreen.util.path import mkdir, path_from_root
