@@ -28,13 +28,13 @@ from chaingreen.types.end_of_slot_bundle import EndOfSubSlotBundle
 from chaingreen.types.full_block import FullBlock
 from chaingreen.types.spend_bundle import SpendBundle
 from chaingreen.types.unfinished_block import UnfinishedBlock
-from chaingreen.util.block_tools import BlockTools, get_vdf_info_and_proof
+from tests.block_tools import BlockTools, get_vdf_info_and_proof
 from chaingreen.util.errors import Err
 from chaingreen.util.hash import std_hash
 from chaingreen.util.ints import uint8, uint64, uint32
 from chaingreen.util.merkle_set import MerkleSet
 from chaingreen.util.recursive_replace import recursive_replace
-from chaingreen.util.wallet_tools import WalletTool
+from tests.wallet_tools import WalletTool
 from tests.core.fixtures import default_400_blocks  # noqa: F401; noqa: F401
 from tests.core.fixtures import default_1000_blocks  # noqa: F401
 from tests.core.fixtures import default_10000_blocks  # noqa: F401

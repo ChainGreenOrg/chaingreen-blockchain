@@ -14,7 +14,7 @@ from chaingreen.rpc.harvester_rpc_client import HarvesterRpcClient
 from chaingreen.rpc.rpc_server import start_rpc_server
 from chaingreen.types.blockchain_format.sized_bytes import bytes32
 from chaingreen.util.bech32m import decode_puzzle_hash, encode_puzzle_hash
-from chaingreen.util.block_tools import get_plot_dir
+from tests.block_tools import get_plot_dir
 from chaingreen.util.config import load_config
 from chaingreen.util.hash import std_hash
 from chaingreen.util.ints import uint8, uint16, uint32, uint64

@@ -18,7 +18,7 @@ from chaingreen.types.full_block import FullBlock
 from chaingreen.types.generator_types import BlockGenerator
 from chaingreen.util.generator_tools import tx_removals_and_additions
 from chaingreen.util.ints import uint64, uint32
-from chaingreen.util.wallet_tools import WalletTool
+from tests.wallet_tools import WalletTool
 from chaingreen.util.db_wrapper import DBWrapper
 from tests.setup_nodes import bt, test_constants
 
