@@ -22,7 +22,7 @@ from chaingreen.types.coin_solution import CoinSolution
 from chaingreen.types.condition_opcodes import ConditionOpcode
 from chaingreen.types.full_block import FullBlock
 from chaingreen.types.spend_bundle import SpendBundle
-from chaingreen.util.block_tools import BlockTools, test_constants
+from tests.block_tools import BlockTools, test_constants
 from chaingreen.util.errors import Err
 
 from .ram_db import create_ram_blockchain

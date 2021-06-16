@@ -18,7 +18,7 @@ from chaingreen.simulator.start_simulator import service_kwargs_for_full_node_si
 from chaingreen.timelord.timelord_launcher import kill_processes, spawn_process
 from chaingreen.types.peer_info import PeerInfo
 from chaingreen.util.bech32m import encode_puzzle_hash
-from chaingreen.util.block_tools import BlockTools, test_constants
+from tests.block_tools import BlockTools, test_constants
 from chaingreen.util.hash import std_hash
 from chaingreen.util.ints import uint16, uint32
 from chaingreen.util.keychain import Keychain, bytes_to_mnemonic

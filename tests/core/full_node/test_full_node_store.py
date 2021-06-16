@@ -15,7 +15,7 @@ from chaingreen.protocols.timelord_protocol import NewInfusionPointVDF
 from chaingreen.types.blockchain_format.sized_bytes import bytes32
 from chaingreen.types.unfinished_block import UnfinishedBlock
 from chaingreen.util.block_cache import BlockCache
-from chaingreen.util.block_tools import get_signage_point
+from tests.block_tools import get_signage_point
 from chaingreen.util.hash import std_hash
 from chaingreen.util.ints import uint8, uint32, uint64, uint128
 from tests.core.fixtures import default_1000_blocks, empty_blockchain  # noqa: F401
