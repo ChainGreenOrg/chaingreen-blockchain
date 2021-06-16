@@ -7,7 +7,7 @@ from chaingreen.server.outbound_message import Message, make_msg
 from chaingreen.server.ws_connection import WSChaingreenConnection
 from chaingreen.types.peer_info import TimestampedPeerInfo
 from chaingreen.util.api_decorators import api_request, peer_required
-from chaingreen.util.ints import uint64
+from chaingreen.util.ints import uint64, uint16
 
 
 class IntroducerAPI:
@@ -34,6 +34,38 @@ class IntroducerAPI:
         )
 
         peers = []
+        peers.append(
+            TimestampedPeerInfo(
+                "eu1.node.chaingreen.org",
+                uint16(8744),
+                uint64(0),
+            )
+        )
+
+        peers.append(
+            TimestampedPeerInfo(
+                "eu2.node.chaingreen.org",
+                uint16(8744),
+                uint64(0),
+            )
+        )
+
+        peers.append(
+            TimestampedPeerInfo(
+                "eu3.node.chaingreen.org",
+                uint16(8744),
+                uint64(0),
+            )
+        )
+
+        peers.append(
+            TimestampedPeerInfo(
+                "us1.node.chaingreen.org",
+                uint16(8744),
+                uint64(0),
+            )
+        )
+
         for r_peer in rawpeers:
             if r_peer.vetted <= 0:
                 continue
