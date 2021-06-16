@@ -13,6 +13,8 @@ testnet_kwargs = {
     "DIFFICULTY_CONSTANT_FACTOR": 2 ** 20,
     "DIFFICULTY_STARTING": 1,
     "DIFFICULTY_CHANGE_MAX_FACTOR": 3,  # The next difficulty is truncated to range [prev / FACTOR, prev * FACTOR]
+    "DIFFICULTY_CHANGE_MAX_FACTOR_v1_2_0": 81,  # This difficulty change to be applied with v1.2.0
+    "v1_2_0_ACTIVATION_BLOCK": 161280,  # activation of v1.2.0 rules height
     # These 3 constants must be changed at the same time
     "SUB_EPOCH_BLOCKS": 384,  # The number of blocks per sub-epoch, mainnet 384
     "EPOCH_BLOCKS": 4608,  # The number of blocks per epoch, mainnet 4608. Must be multiple of SUB_EPOCH_BLOCKS

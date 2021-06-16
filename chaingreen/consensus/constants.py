@@ -19,6 +19,8 @@ class ConsensusConstants:
     DIFFICULTY_STARTING: uint64  # The difficulty for the first epoch
     # The maximum factor by which difficulty and sub_slot_iters can change per epoch
     DIFFICULTY_CHANGE_MAX_FACTOR: uint32
+    DIFFICULTY_CHANGE_MAX_FACTOR_v1_2_0: uint32
+    v1_2_0_ACTIVATION_BLOCK: uint64
     SUB_EPOCH_BLOCKS: uint32  # The number of blocks per sub-epoch
     EPOCH_BLOCKS: uint32  # The number of blocks per sub-epoch, must be a multiple of SUB_EPOCH_BLOCKS
 

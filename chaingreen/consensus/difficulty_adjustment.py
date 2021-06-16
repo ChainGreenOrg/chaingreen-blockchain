@@ -254,9 +254,13 @@ def _get_next_sub_slot_iters(
         // (last_block_curr.timestamp - last_block_prev.timestamp)
     )
 
+    difficulty_max_change_factor = constants.DIFFICULTY_CHANGE_MAX_FACTOR
+    if height >= constants.v1_2_0_ACTIVATION_BLOCK:
+        difficulty_max_change_factor = constants.DIFFICULTY_CHANGE_MAX_FACTOR_v1_2_0
+
     # Only change by a max factor as a sanity check
-    max_ssi = uint64(constants.DIFFICULTY_CHANGE_MAX_FACTOR * last_block_curr.sub_slot_iters)
-    min_ssi = uint64(last_block_curr.sub_slot_iters // constants.DIFFICULTY_CHANGE_MAX_FACTOR)
+    max_ssi = uint64(difficulty_max_change_factor * last_block_curr.sub_slot_iters)
+    min_ssi = uint64(last_block_curr.sub_slot_iters // difficulty_max_change_factor)
     if new_ssi_precise >= last_block_curr.sub_slot_iters:
         new_ssi_precise = uint64(min(new_ssi_precise, max_ssi))
     else:
@@ -339,9 +343,13 @@ def _get_next_difficulty(
         // (constants.SLOT_BLOCKS_TARGET * actual_epoch_time)
     )
 
+    difficulty_max_change_factor = constants.DIFFICULTY_CHANGE_MAX_FACTOR
+    if height >= constants.v1_2_0_ACTIVATION_BLOCK:
+        difficulty_max_change_factor = constants.DIFFICULTY_CHANGE_MAX_FACTOR_v1_2_0
+
     # Only change by a max factor, to prevent attacks, as in greenpaper, and must be at least 1
-    max_diff = uint64(constants.DIFFICULTY_CHANGE_MAX_FACTOR * old_difficulty)
-    min_diff = uint64(old_difficulty // constants.DIFFICULTY_CHANGE_MAX_FACTOR)
+    max_diff = uint64(difficulty_max_change_factor * old_difficulty)
+    min_diff = uint64(old_difficulty // difficulty_max_change_factor)
 
     if new_difficulty_precise >= old_difficulty:
         new_difficulty_precise = uint64(min(new_difficulty_precise, max_diff))
