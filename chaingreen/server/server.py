@@ -379,7 +379,7 @@ class ChaingreenServer:
                 self.log.debug(f"Timeout error connecting to {url}")
                 return False
             if ws is None:
-
+                return False
 
             assert ws._response.connection is not None and ws._response.connection.transport is not None
             transport = ws._response.connection.transport  # type: ignore
