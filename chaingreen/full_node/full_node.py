@@ -458,8 +458,6 @@ class FullNode:
         now = time.time()
         if (
             curr is None
-            or curr.timestamp is None
-            or curr.timestamp < uint64(int(now - 60 * 7))
             or self.sync_store.get_sync_mode()
         ):
             return False
