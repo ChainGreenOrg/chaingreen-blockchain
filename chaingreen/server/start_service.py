@@ -15,6 +15,7 @@ except ImportError:
 from chaingreen.rpc.rpc_server import start_rpc_server
 from chaingreen.server.outbound_message import NodeType
 from chaingreen.server.server import ChaingreenServer
+from chaingreen.types.peer_info import PeerInfo
 from chaingreen.server.upnp import upnp
 from chaingreen.util.chaingreen_logging import initialize_logging
 from chaingreen.util.config import load_config, load_config_cli
