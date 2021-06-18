@@ -318,8 +318,8 @@ class Timelord:
         while not self._shut_down:
             picked_chain = None
             async with self.lock:
-                if len(self.free_clients) == 0:
-                    break
+                # if len(self.free_clients) == 0:
+                #     break
                 ip, reader, writer = self.free_clients[0]
                 for chain_type in self.unspawned_chains:
                     challenge = self.last_state.get_challenge(chain_type)
