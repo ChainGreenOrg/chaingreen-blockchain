@@ -249,7 +249,9 @@ class Timelord:
                         self.iters_to_submit[Chain.INFUSED_CHALLENGE_CHAIN].append(new_block_iters)
                     self.iteration_to_proof_type[new_block_iters] = IterationType.INFUSION_POINT
         # Remove all unfinished blocks that have already passed.
-        self.unfinished_blocks = new_unfinished_blocks[10:]
+        if self.total_unfinished_blocks > 10:
+            self.unfinished_blocks = new_unfinished_blocks[5:] + new_unfinished_blocks[:5]
+            self.total_unfinished_blocks = 10
         # Signage points.
         if not only_eos and len(self.signage_point_iters) > 0:
             count_signage = 0
@@ -795,11 +797,11 @@ class Timelord:
         while not self._shut_down:
             try:
                 await asyncio.sleep(0.1)
-                async with self.lock:
-                    await self._handle_failures()
-                    # We've got a new peak, process it.
-                    if self.new_peak is not None:
-                        await self._handle_new_peak()
+                # async with self.lock:
+                #     await self._handle_failures()
+                #     # We've got a new peak, process it.
+                #     if self.new_peak is not None:
+                #         await self._handle_new_peak()
                 # Map free vdf_clients to unspawned chains.
                 await self._map_chains_with_vdf_clients()
                 async with self.lock:
