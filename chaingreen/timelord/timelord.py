@@ -240,16 +240,16 @@ class Timelord:
                 new_block_iters: Optional[uint64] = self._can_infuse_unfinished_block(block)
                 # Does not add duplicates, or blocks that we cannot infuse
                 if new_block_iters and new_block_iters not in self.iters_to_submit[Chain.CHALLENGE_CHAIN]:
-                    # if block not in self.unfinished_blocks:
-                    #     self.total_unfinished += 1
-                    # new_unfinished_blocks.append(block)
+                    if block not in self.unfinished_blocks:
+                        self.total_unfinished += 1
+                    new_unfinished_blocks.append(block)
                     for chain in [Chain.REWARD_CHAIN, Chain.CHALLENGE_CHAIN]:
                         self.iters_to_submit[chain].append(new_block_iters)
                     if self.last_state.get_deficit() < self.constants.MIN_BLOCKS_PER_CHALLENGE_BLOCK:
                         self.iters_to_submit[Chain.INFUSED_CHALLENGE_CHAIN].append(new_block_iters)
                     self.iteration_to_proof_type[new_block_iters] = IterationType.INFUSION_POINT
         # Remove all unfinished blocks that have already passed.
-        self.unfinished_blocks = new_unfinished_blocks
+        self.unfinished_blocks = new_unfinished_blocks[10:]
         # Signage points.
         if not only_eos and len(self.signage_point_iters) > 0:
             count_signage = 0
