@@ -69,6 +69,3 @@ class UPnP:
     # e.g. via an exception before the main thread can call shutdown()
     def __del__(self):
         self.shutdown()
-
-
-upnp: UPnP = UPnP()

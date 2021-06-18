@@ -17,7 +17,7 @@ from chaingreen.rpc.rpc_server import start_rpc_server
 from chaingreen.server.outbound_message import NodeType
 from chaingreen.server.server import ChaingreenServer
 from chaingreen.types.peer_info import PeerInfo
-from chaingreen.server.upnp import upnp
+from chaingreen.server.upnp import UPnP
 from chaingreen.util.chaingreen_logging import initialize_logging
 from chaingreen.util.config import load_config, load_config_cli
 from chaingreen.util.setproctitle import setproctitle
@@ -114,6 +114,7 @@ class Service:
         self._on_connect_callback = on_connect_callback
         self._advertised_port = advertised_port
         self._reconnect_tasks: List[asyncio.Task] = []
+        self.upnp: Optional[UPnP] = None
 
     async def start(self, **kwargs) -> None:
         # we include `kwargs` as a hack for the wallet, which for some
@@ -133,7 +134,10 @@ class Service:
         await self._node._start(**kwargs)
 
         for port in self._upnp_ports:
-            upnp.remap(port)
+            if self.upnp is None:
+                self.upnp = UPnP()
+
+            self.upnp.remap(port)
 
         await self._server.start_server(self._on_connect_callback)
 
