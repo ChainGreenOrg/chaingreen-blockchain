@@ -28,6 +28,8 @@ MAX_CONCURRENT_OUTBOUND_CONNECTIONS = 70
 
 
 class FullNodeDiscovery:
+    resolver: Optional[dns.asyncresolver.Resolver]
+
     def __init__(
         self,
         server: ChaingreenServer,
