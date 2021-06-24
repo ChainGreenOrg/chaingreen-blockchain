@@ -6,7 +6,8 @@ import signal
 from sys import platform
 from typing import Any, Callable, List, Optional, Tuple
 
-from chaingreen.server.ssl_context import chaingreen_ssl_ca_paths, private_ssl_ca_paths
+from chaingreen.daemon.server import singleton, service_launch_lock_path
+from chaingreen.server.ssl_context import chia_ssl_ca_paths, private_ssl_ca_paths
 
 try:
     import uvloop
@@ -159,6 +160,10 @@ class Service:
             )
 
     async def run(self) -> None:
+        lockfile = singleton(service_launch_lock_path(self.root_path, self._service_name))
+        if lockfile is None:
+            self._log.error(f"{self._service_name}: already running")
+            raise ValueError(f"{self._service_name}: already running")
         await self.start()
         await self.wait_closed()
 
