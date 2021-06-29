@@ -34,8 +34,6 @@ from chaingreen.wallet.util.wallet_types import WalletType
 from chaingreen.wallet.wallet import Wallet
 from chaingreen.wallet.wallet_coin_record import WalletCoinRecord
 
-# from chaingreen.wallet.cc_wallet.debug_spend_bundle import debug_spend_bundle
-
 
 class TradeManager:
     wallet_state_manager: Any
@@ -538,9 +536,8 @@ class TradeManager:
         # Add transaction history for this trade
         now = uint64(int(time.time()))
         if chaingreen_spend_bundle is not None:
-            spend_bundle = SpendBundle.aggregate([spend_bundle, chaingreen_spend_bundle])
-            # debug_spend_bundle(spend_bundle)
-            if chaingreen_discrepancy < 0:
+            spend_bundle = SpendBundle.aggregate([spend_bundle, chia_spend_bundle])
+            if chia_discrepancy < 0:
                 tx_record = TransactionRecord(
                     confirmed_at_height=uint32(0),
                     created_at_time=now,

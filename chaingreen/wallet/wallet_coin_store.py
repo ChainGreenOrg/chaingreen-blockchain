@@ -180,27 +180,11 @@ class WalletCoinStore:
 
     async def get_unspent_coins_for_wallet(self, wallet_id: int) -> Set[WalletCoinRecord]:
         """Returns set of CoinRecords that have not been spent yet for a wallet."""
-        async with self.wallet_cache_lock:
-            if wallet_id in self.coin_wallet_record_cache:
-                wallet_coins: Dict[bytes32, WalletCoinRecord] = self.coin_wallet_record_cache[wallet_id]
-                return set(wallet_coins.values())
-
-            coin_set = set()
-
-            cursor = await self.db_connection.execute(
-                "SELECT * from coin_record WHERE spent=0 and wallet_id=?",
-                (wallet_id,),
-            )
-            rows = await cursor.fetchall()
-            await cursor.close()
-            cache_dict = {}
-            for row in rows:
-                coin_record = self.coin_record_from_row(row)
-                coin_set.add(coin_record)
-                cache_dict[coin_record.name()] = coin_record
-
-            self.coin_wallet_record_cache[wallet_id] = cache_dict
-            return coin_set
+        if wallet_id in self.unspent_coin_wallet_cache:
+            wallet_coins: Dict[bytes32, WalletCoinRecord] = self.unspent_coin_wallet_cache[wallet_id]
+            return set(wallet_coins.values())
+        else:
+            return set()
 
     async def get_all_coins(self) -> Set[WalletCoinRecord]:
         """Returns set of all CoinRecords."""
