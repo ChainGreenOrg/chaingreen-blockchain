@@ -32,6 +32,11 @@ wallet_program_files = set(
         "chaingreen/wallet/puzzles/block_program_zero.clvm",
         "chaingreen/wallet/puzzles/test_generator_deserialize.clvm",
         "chaingreen/wallet/puzzles/test_multiple_generator_input_arguments.clvm",
+        "chaingreen/wallet/puzzles/p2_singleton.clvm",
+        "chaingreen/wallet/puzzles/pool_waitingroom_innerpuz.clvm",
+        "chaingreen/wallet/puzzles/pool_member_innerpuz.clvm",
+        "chaingreen/wallet/puzzles/singleton_launcher.clvm",
+        "chaingreen/wallet/puzzles/p2_singleton_or_delayed_puzhash.clvm",
     ]
 )
 
