@@ -122,10 +122,16 @@ class WSChaingreenConnection:
             if inbound_handshake_msg is None:
                 raise ProtocolError(Err.INVALID_HANDSHAKE)
             inbound_handshake = Handshake.from_bytes(inbound_handshake_msg.data)
-            if ProtocolMessageTypes(inbound_handshake_msg.type) != ProtocolMessageTypes.handshake:
+
+            # Handle case of invalid ProtocolMessageType
+            try:
+                message_type: ProtocolMessageTypes = ProtocolMessageTypes(inbound_handshake_msg.type)
+            except Exception:
                 raise ProtocolError(Err.INVALID_HANDSHAKE)
-            if inbound_handshake.server_port == 8444:
+
+            if message_type != ProtocolMessageTypes.handshake:
                 raise ProtocolError(Err.INVALID_HANDSHAKE)
+
             if inbound_handshake.network_id != network_id:
                 raise ProtocolError(Err.INCOMPATIBLE_NETWORK_ID)
 
@@ -139,11 +145,17 @@ class WSChaingreenConnection:
                 raise ProtocolError(Err.INVALID_HANDSHAKE)
             if message is None:
                 raise ProtocolError(Err.INVALID_HANDSHAKE)
+
+            # Handle case of invalid ProtocolMessageType
+            try:
+                message_type = ProtocolMessageTypes(message.type)
+            except Exception:
+                raise ProtocolError(Err.INVALID_HANDSHAKE)
+
+            if message_type != ProtocolMessageTypes.handshake:
+                raise ProtocolError(Err.INVALID_HANDSHAKE)
+
             inbound_handshake = Handshake.from_bytes(message.data)
-            if ProtocolMessageTypes(message.type) != ProtocolMessageTypes.handshake:
-                raise ProtocolError(Err.INVALID_HANDSHAKE)
-            if inbound_handshake.server_port == 8444:
-                raise ProtocolError(Err.INVALID_HANDSHAKE)
             if inbound_handshake.network_id != network_id:
                 raise ProtocolError(Err.INCOMPATIBLE_NETWORK_ID)
             outbound_handshake = make_msg(
