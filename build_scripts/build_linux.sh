@@ -5,8 +5,7 @@ if [ ! "$1" ]; then
 	exit 1
 elif [ "$1" = "amd64" ]; then
 	PLATFORM="$1"
-	REDHAT_PLATFORM="x86_64"
-	DIR_NAME="chaingreen-blockchain-linux-x64"
+	DIR_NAME="chia-blockchain-linux-x64"
 else
 	PLATFORM="$1"
 	DIR_NAME="chaingreen-blockchain-linux-arm64"
@@ -27,7 +26,6 @@ echo "Chaingreen Installer Version is: $CHAINGREEN_INSTALLER_VERSION"
 echo "Installing npm and electron packagers"
 npm install electron-packager -g
 npm install electron-installer-debian -g
-npm install electron-installer-redhat -g
 
 echo "Create dist/"
 rm -rf dist
@@ -78,18 +76,6 @@ LAST_EXIT_CODE=$?
 if [ "$LAST_EXIT_CODE" -ne 0 ]; then
 	echo >&2 "electron-installer-debian failed!"
 	exit $LAST_EXIT_CODE
-fi
-
-if [ "$REDHAT_PLATFORM" = "x86_64" ]; then
-	echo "Create chaingreen-blockchain-$CHAINGREEN_INSTALLER_VERSION.rpm"
-  electron-installer-redhat --src dist/$DIR_NAME/ --dest final_installer/ \
-  --arch "$REDHAT_PLATFORM" --options.version $CHAINGREEN_INSTALLER_VERSION \
-  --license ../LICENSE
-  LAST_EXIT_CODE=$?
-  if [ "$LAST_EXIT_CODE" -ne 0 ]; then
-	  echo >&2 "electron-installer-redhat failed!"
-	  exit $LAST_EXIT_CODE
-  fi
 fi
 
 ls final_installer/
