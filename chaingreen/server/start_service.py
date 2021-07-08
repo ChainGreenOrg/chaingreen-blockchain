@@ -190,8 +190,8 @@ class Service:
             # start with UPnP, since this can take a while, we want it to happen
             # in the background while shutting down everything else
             for port in self._upnp_ports:
-                if self.upnp is not None:
-                    self.upnp.release(port)
+                if upnp is not None:
+                    upnp.release(port)
 
             self._log.info("Cancelling reconnect task")
             for _ in self._reconnect_tasks:
@@ -228,9 +228,9 @@ class Service:
         self._log.info("Waiting for service _await_closed callback")
         await self._node._await_closed()
 
-        if self.upnp is not None:
+        if upnp is not None:
             # this is a blocking call, waiting for the UPnP thread to exit
-            self.upnp.shutdown()
+            upnp.shutdown()
 
         self._log.info(f"Service {self._service_name} at port {self._advertised_port} fully closed")
 
