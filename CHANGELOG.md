@@ -141,6 +141,7 @@ for setuptools_scm/PEP 440 reasons.
 - Help -> About was blank.
 - Our estimate for k=32 was about 0.4GiB too low in some cases.
 - Building the GUI in especially ARM64 Linux was painful enough to be considered broken.
+
 ## 1.0.4 Chia Blockchain 2021-04-12
 
 ### Added
@@ -255,14 +256,15 @@ for setuptools_scm/PEP 440 reasons.
 - Thank you @L3Sota for bringing this log back into 2021.
 - The errant warning on Electron startup has been removed. Thanks @dkackman.
 
-
 ## 1.0rc9 aka Release Candidate 9 - 2021-03-16
 
 ### Changed
+
 - This is a hard fork/breaking change from RC6/7/8. The current plan is to drop the flag at noon pacific time, today 3/16.
 - Using the real prefarm keys for this test
 
 ### Fixed
+
 - Found and fixed another green flag related issue
 - Fixed an issue with weight proofs where all sub-epochs were sampled, and the size of the weight proof kept growing
 - Fixed an issue with install-gui.sh, where npm audit fix was failing. (Thanks @Depado!)
@@ -506,7 +508,6 @@ all fields that referred to sub blocks are changed to blocks.
 - We updated chiapos to hopefully address some harvester crashes when moving plot files.
 - Many of the cards on the Farming page have had bugs addressed including last block farmed, block rewards, and user fees.
 - Improved validation of overflow blocks.
-
 
 ## [1.0beta27] aka Beta 1.27 - 2021-02-11
 
