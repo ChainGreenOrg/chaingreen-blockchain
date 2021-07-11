@@ -8,7 +8,7 @@ from chaingreen.types.blockchain_format.sized_bytes import bytes32
 from chaingreen.util.streamable import Streamable, streamable
 from chaingreen.wallet.util.debug_spend_bundle import debug_spend_bundle
 
-from .coin_solution import CoinSolution
+from chaingreen.types.coin_solution import CoinSolution
 
 
 @dataclass(frozen=True)

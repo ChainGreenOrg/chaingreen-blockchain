@@ -27,7 +27,7 @@ from chaingreen.protocols.pool_protocol import (
 )
 from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
 from chaingreen.server.outbound_message import NodeType, make_msg
-from chaingreen.server.ws_connection import WSChiaConnection
+from chaingreen.server.ws_connection import WSChaingreenConnection
 from chaingreen.types.blockchain_format.proof_of_space import ProofOfSpace
 from chaingreen.types.blockchain_format.sized_bytes import bytes32
 from chaingreen.util.bech32m import decode_puzzle_hash

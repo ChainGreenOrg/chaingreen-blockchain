@@ -13,7 +13,7 @@ from chaingreen.protocols.farmer_protocol import FarmingInfo
 from chaingreen.protocols.harvester_protocol import Plot
 from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
 from chaingreen.server.outbound_message import make_msg
-from chaingreen.server.ws_connection import WSChiaConnection
+from chaingreen.server.ws_connection import WSChaingreenConnection
 from chaingreen.types.blockchain_format.proof_of_space import ProofOfSpace
 from chaingreen.types.blockchain_format.sized_bytes import bytes32
 from chaingreen.util.api_decorators import api_request, peer_required
