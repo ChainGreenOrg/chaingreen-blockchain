@@ -4,9 +4,9 @@ from typing import Any, Optional, Set, Tuple, List, Dict
 
 from blspy import PrivateKey, G2Element, G1Element
 
-from chia.consensus.block_record import BlockRecord
-from chia.pools.pool_config import PoolWalletConfig, load_pool_config, update_pool_config
-from chia.pools.pool_wallet_info import (
+from chaingreen.consensus.block_record import BlockRecord
+from chaingreen.pools.pool_config import PoolWalletConfig, load_pool_config, update_pool_config
+from chaingreen.pools.pool_wallet_info import (
     PoolWalletInfo,
     PoolSingletonState,
     PoolState,
@@ -15,17 +15,17 @@ from chia.pools.pool_wallet_info import (
     LEAVING_POOL,
     create_pool_state,
 )
-from chia.protocols.pool_protocol import POOL_PROTOCOL_VERSION
+from chaingreen.protocols.pool_protocol import POOL_PROTOCOL_VERSION
 
-from chia.types.announcement import Announcement
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.blockchain_format.program import Program, SerializedProgram
-from chia.types.coin_record import CoinRecord
-from chia.types.coin_solution import CoinSolution
-from chia.types.spend_bundle import SpendBundle
+from chaingreen.types.announcement import Announcement
+from chaingreen.types.blockchain_format.coin import Coin
+from chaingreen.types.blockchain_format.sized_bytes import bytes32
+from chaingreen.types.blockchain_format.program import Program, SerializedProgram
+from chaingreen.types.coin_record import CoinRecord
+from chaingreen.types.coin_solution import CoinSolution
+from chaingreen.types.spend_bundle import SpendBundle
 
-from chia.pools.pool_puzzles import (
+from chaingreen.pools.pool_puzzles import (
     create_waiting_room_inner_puzzle,
     create_full_puzzle,
     SINGLETON_LAUNCHER,
@@ -43,18 +43,18 @@ from chia.pools.pool_puzzles import (
     get_delayed_puz_info_from_launcher_spend,
 )
 
-from chia.util.ints import uint8, uint32, uint64
-from chia.wallet.derive_keys import (
+from chaingreen.util.ints import uint8, uint32, uint64
+from chaingreen.wallet.derive_keys import (
     master_sk_to_pooling_authentication_sk,
     find_owner_sk,
 )
-from chia.wallet.sign_coin_solutions import sign_coin_solutions
-from chia.wallet.transaction_record import TransactionRecord
-from chia.wallet.util.wallet_types import WalletType
-from chia.wallet.wallet import Wallet
+from chaingreen.wallet.sign_coin_solutions import sign_coin_solutions
+from chaingreen.wallet.transaction_record import TransactionRecord
+from chaingreen.wallet.util.wallet_types import WalletType
+from chaingreen.wallet.wallet import Wallet
 
-from chia.wallet.wallet_info import WalletInfo
-from chia.wallet.util.transaction_type import TransactionType
+from chaingreen.wallet.wallet_info import WalletInfo
+from chaingreen.wallet.util.transaction_type import TransactionType
 
 
 class PoolWallet:
