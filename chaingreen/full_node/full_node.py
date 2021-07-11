@@ -333,7 +333,7 @@ class FullNode:
             await asyncio.sleep(sleep_before)
         self._state_changed("peer_changed_peak")
 
-    async def new_peak(self, request: full_node_protocol.NewPeak, peer: ws.WSChiaConnection):
+    async def new_peak(self, request: full_node_protocol.NewPeak, peer: ws.WSChaingreenConnection):
         """
         We have received a notification of a new peak from a peer. This happens either when we have just connected,
         or when the peer has updated their peak.
