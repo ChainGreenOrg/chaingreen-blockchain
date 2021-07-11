@@ -7,7 +7,7 @@ import pytest
 from clvm import SExp
 from clvm.EvalError import EvalError
 
-import chia.server.ws_connection as ws
+import chaingreen.server.ws_connection as ws
 
 from chaingreen.full_node.mempool import Mempool
 from chaingreen.full_node.full_node_api import FullNodeAPI
@@ -32,8 +32,8 @@ from tests.connection_utils import connect_and_get_peer
 from tests.core.node_height import node_height_at_least
 from tests.setup_nodes import bt, setup_simulators_and_wallets
 from tests.time_out_assert import time_out_assert
-from chia.types.blockchain_format.program import Program, INFINITE_COST
-from chia.consensus.condition_costs import ConditionCost
+from chaingreen.types.blockchain_format.program import Program, INFINITE_COST
+from chaingreen.consensus.condition_costs import ConditionCost
 
 BURN_PUZZLE_HASH = b"0" * 32
 BURN_PUZZLE_HASH_2 = b"1" * 32
