@@ -6,7 +6,7 @@ import aiosqlite
 from chaingreen.consensus.block_record import BlockRecord
 from chaingreen.types.blockchain_format.sized_bytes import bytes32
 from chaingreen.types.blockchain_format.sub_epoch_summary import SubEpochSummary
-from chaingreen.types.coin_solution import CoinSolution
+from chaingreen.types.coin_spend import CoinSpend
 from chaingreen.types.header_block import HeaderBlock
 from chaingreen.util.db_wrapper import DBWrapper
 from chaingreen.util.ints import uint32, uint64
@@ -18,7 +18,7 @@ from chaingreen.wallet.block_record import HeaderBlockRecord
 @dataclass(frozen=True)
 @streamable
 class AdditionalCoinSpends(Streamable):
-    coin_spends_list: List[CoinSolution]
+    coin_spends_list: List[CoinSpend]
 
 
 class WalletBlockStore:
@@ -79,7 +79,7 @@ class WalletBlockStore:
         self,
         header_block_record: HeaderBlockRecord,
         block_record: BlockRecord,
-        additional_coin_spends: List[CoinSolution],
+        additional_coin_spends: List[CoinSpend],
     ):
         """
         Adds a block record to the database. This block record is assumed to be connected
@@ -157,7 +157,7 @@ class WalletBlockStore:
         else:
             return None
 
-    async def get_additional_coin_spends(self, header_hash: bytes32) -> Optional[List[CoinSolution]]:
+    async def get_additional_coin_spends(self, header_hash: bytes32) -> Optional[List[CoinSpend]]:
         cursor = await self.db.execute(
             "SELECT spends_list_blob from additional_coin_spends WHERE header_hash=?", (header_hash.hex(),)
         )

@@ -5,7 +5,7 @@ import blspy
 from chaingreen.full_node.bundle_tools import simple_solution_generator
 from chaingreen.types.blockchain_format.coin import Coin
 from chaingreen.types.blockchain_format.program import Program
-from chaingreen.types.coin_solution import CoinSolution
+from chaingreen.types.coin_spend import CoinSpend
 from chaingreen.types.condition_opcodes import ConditionOpcode
 from chaingreen.types.generator_types import BlockGenerator
 from chaingreen.types.spend_bundle import SpendBundle
@@ -50,15 +50,15 @@ def make_spend_bundle(count: int) -> SpendBundle:
     puzzle_hash_db: Dict = dict()
     coins = [make_fake_coin(_, puzzle_hash_db) for _ in range(count)]
 
-    coin_solutions = []
+    coin_spends = []
     for coin in coins:
         puzzle_reveal = puzzle_hash_db[coin.puzzle_hash]
         conditions = conditions_for_payment(coin)
         solution = solution_for_conditions(conditions)
-        coin_solution = CoinSolution(coin, puzzle_reveal, solution)
-        coin_solutions.append(coin_solution)
+        coin_spend = CoinSpend(coin, puzzle_reveal, solution)
+        coin_spends.append(coin_spend)
 
-    spend_bundle = SpendBundle(coin_solutions, blspy.G2Element())
+    spend_bundle = SpendBundle(coin_spends, blspy.G2Element())
     return spend_bundle
 
 
