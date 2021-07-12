@@ -4,9 +4,15 @@ from typing import List, Any
 import blspy
 from blspy import AugSchemeMPL
 
-from chaingreen.types.coin_spend import CoinSpend
+<<<<<<< HEAD:chaingreen/wallet/sign_coin_solutions.py
+from chaingreen.types.coin_solution import CoinSolution
 from chaingreen.types.spend_bundle import SpendBundle
 from chaingreen.util.condition_tools import conditions_dict_for_solution, pkm_pairs_for_conditions_dict
+=======
+from chia.types.coin_spend import CoinSpend
+from chia.types.spend_bundle import SpendBundle
+from chia.util.condition_tools import conditions_dict_for_solution, pkm_pairs_for_conditions_dict
+>>>>>>> 6cf29102... Rename coin solution to coin spend (#6841):chaingreen/wallet/sign_coin_spends.py
 
 
 async def sign_coin_spends(

@@ -5,7 +5,7 @@ from chaingreen.full_node.signage_point import SignagePoint
 from chaingreen.rpc.rpc_client import RpcClient
 from chaingreen.types.blockchain_format.sized_bytes import bytes32
 from chaingreen.types.coin_record import CoinRecord
-from chaingreen.types.coin_solution import CoinSolution
+from chaingreen.types.coin_spend import CoinSpend
 from chaingreen.types.end_of_slot_bundle import EndOfSubSlotBundle
 from chaingreen.types.full_block import FullBlock
 from chaingreen.types.spend_bundle import SpendBundle
@@ -146,7 +146,7 @@ class FullNodeRpcClient(RpcClient):
     async def get_puzzle_and_solution(self, coin_id: bytes32, height: uint32) -> Optional[CoinRecord]:
         try:
             response = await self.fetch("get_puzzle_and_solution", {"coin_id": coin_id.hex(), "height": height})
-            return CoinSolution.from_json_dict(response["coin_solution"])
+            return CoinSpend.from_json_dict(response["coin_solution"])
         except Exception:
             return None
 

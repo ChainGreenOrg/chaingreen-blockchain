@@ -19,7 +19,7 @@ from chaingreen.consensus.constants import ConsensusConstants
 from chaingreen.types.announcement import Announcement
 from chaingreen.types.blockchain_format.program import Program
 from chaingreen.types.coin_record import CoinRecord
-from chaingreen.types.coin_solution import CoinSolution
+from chaingreen.types.coin_spend import CoinSpend
 from chaingreen.types.condition_opcodes import ConditionOpcode
 from chaingreen.types.full_block import FullBlock
 from chaingreen.types.spend_bundle import SpendBundle
@@ -112,8 +112,8 @@ async def check_conditions(
     blocks = initial_blocks()
     coin = list(blocks[spend_reward_index].get_included_reward_coins())[0]
 
-    coin_solution = CoinSolution(coin, EASY_PUZZLE, condition_solution)
-    spend_bundle = SpendBundle([coin_solution], G2Element())
+    coin_spend = CoinSpend(coin, EASY_PUZZLE, condition_solution)
+    spend_bundle = SpendBundle([coin_spend], G2Element())
 
     # now let's try to create a block with the spend bundle and ensure that it doesn't validate
 
