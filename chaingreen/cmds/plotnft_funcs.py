@@ -13,6 +13,8 @@ from chaingreen.protocols.pool_protocol import POOL_PROTOCOL_VERSION
 from chaingreen.rpc.farmer_rpc_client import FarmerRpcClient
 from chaingreen.rpc.wallet_rpc_client import WalletRpcClient
 from chaingreen.types.blockchain_format.sized_bytes import bytes32
+from chaingreen.server.server import ssl_context_for_root
+from chaingreen.ssl.create_ssl import get_mozilla_ca_crt
 from chaingreen.util.bech32m import encode_puzzle_hash
 from chaingreen.util.byte_types import hexstr_to_bytes
 from chaingreen.util.config import load_config
@@ -25,7 +27,7 @@ from chaingreen.wallet.util.wallet_types import WalletType
 async def create_pool_args(pool_url: str) -> Dict:
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"{pool_url}/pool_info") as response:
+            async with session.get(f"{pool_url}/pool_info", ssl=ssl_context_for_root(get_mozilla_ca_crt())) as response:
                 if response.ok:
                     json_dict = json.loads(await response.text())
                 else:
@@ -275,7 +277,7 @@ async def join_pool(args: dict, wallet_client: WalletRpcClient, fingerprint: int
     prompt = not args.get("yes", False)
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"{pool_url}/pool_info") as response:
+            async with session.get(f"{pool_url}/pool_info", ssl=ssl_context_for_root(get_mozilla_ca_crt())) as response:
                 if response.ok:
                     json_dict = json.loads(await response.text())
                 else:
