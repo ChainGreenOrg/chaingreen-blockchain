@@ -18,6 +18,8 @@ from chaingreen.protocols.pool_protocol import (
 )
 from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
 from chaingreen.server.outbound_message import NodeType, make_msg
+from chaingreen.server.server import ssl_context_for_root
+from chaingreen.ssl.create_ssl import get_mozilla_ca_crt
 from chaingreen.types.blockchain_format.pool_target import PoolTarget
 from chaingreen.types.blockchain_format.proof_of_space import ProofOfSpace
 from chaingreen.util.api_decorators import api_request, peer_required
@@ -218,7 +220,12 @@ class FarmerAPI:
                 }
                 try:
                     async with aiohttp.ClientSession() as session:
-                        async with session.post(f"{pool_url}/partial", data=post_partial_body, headers=headers) as resp:
+                        async with session.post(
+                            f"{pool_url}/partial",
+                            data=post_partial_body,
+                            headers=headers,
+                            ssl=ssl_context_for_root(get_mozilla_ca_crt()),
+                        ) as resp:
                             if resp.ok:
                                 pool_response: Dict = json.loads(await resp.text())
                                 self.farmer.log.info(f"Pool response: {pool_response}")
