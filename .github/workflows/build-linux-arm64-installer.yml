@@ -35,6 +35,29 @@ jobs:
         fetch-depth: 0
         submodules: recursive
 
+    - name: Cleanup any leftovers that exist from previous runs
+      run: bash build_scripts/clean-runner.sh || true
+
+    # Create our own venv outside of the git directory JUST for getting the ACTUAL version so that install can't break it
+    - name: Create installer version number
+      id: version_number
+      run: |
+        python3 -m venv ../venv
+        . ../venv/bin/activate
+        pip3 install setuptools_scm
+        echo "::set-output name=CHIA_INSTALLER_VERSION::$(python3 ./build_scripts/installer-version.py)"
+        deactivate
+
+    - name: Test for secrets access
+      id: check_secrets
+      shell: bash
+      run: |
+        unset HAS_SECRET
+        if [ -n "$SECRET" ]; then HAS_SECRET='true' ; fi
+        echo ::set-output name=HAS_SECRET::${HAS_SECRET}
+      env:
+        SECRET: "${{ secrets.INSTALLER_UPLOAD_SECRET }}"
+
     - name: Build ARM64 Installer
       run: |
         podman run --rm=true \
