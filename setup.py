@@ -102,10 +102,10 @@ kwargs = dict(
         ]
     },
     package_data={
-        "chaingreen": ["pyinstaller.spec"],
-        "chaingreen.wallet.puzzles": ["*.clvm", "*.clvm.hex"],
-        "chaingreen.util": ["initial-*.yaml", "english.txt"],
-        "chaingreen.ssl": ["chaingreen_ca.crt", "chaingreen_ca.key", "dst_root_ca.pem"],
+        "chia": ["pyinstaller.spec"],
+        "": ["*.clvm", "*.clvm.hex", "*.clib", "*.clinc", "*.clsp"],
+        "chia.util": ["initial-*.yaml", "english.txt"],
+        "chia.ssl": ["chia_ca.crt", "chia_ca.key", "dst_root_ca.pem"],
         "mozilla-ca": ["cacert.pem"],
     },
     use_scm_version={"fallback_version": "unknown-no-.git-directory"},
