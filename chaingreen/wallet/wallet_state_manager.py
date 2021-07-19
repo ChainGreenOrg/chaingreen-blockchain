@@ -59,7 +59,7 @@ from chaingreen.wallet.wallet_puzzle_store import WalletPuzzleStore
 from chaingreen.wallet.wallet_sync_store import WalletSyncStore
 from chaingreen.wallet.wallet_transaction_store import WalletTransactionStore
 from chaingreen.wallet.wallet_user_store import WalletUserStore
-from chaingreen.server.server import ChiaServer
+from chaingreen.server.server import ChaingreenServer
 from chaingreen.wallet.did_wallet.did_wallet import DIDWallet
 
 
