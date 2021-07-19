@@ -7,7 +7,7 @@ from sys import platform
 from typing import Any, Callable, List, Optional, Tuple
 
 from chaingreen.daemon.server import singleton, service_launch_lock_path
-from chaingreen.server.ssl_context import chia_ssl_ca_paths, private_ssl_ca_paths
+from chaingreen.server.ssl_context import chaingreen_ssl_ca_paths, private_ssl_ca_paths
 
 try:
     import uvloop
