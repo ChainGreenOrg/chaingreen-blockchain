@@ -28,7 +28,7 @@ from chaingreen.protocols.wallet_protocol import (
 )
 from chaingreen.server.node_discovery import WalletPeers
 from chaingreen.server.outbound_message import Message, NodeType, make_msg
-from chaingreen.server.server import ChiaServer
+from chaingreen.server.server import ChaingreenServer
 from chaingreen.server.ws_connection import WSChaingreenConnection
 from chaingreen.types.blockchain_format.coin import Coin, hash_coin_list
 from chaingreen.types.blockchain_format.sized_bytes import bytes32
