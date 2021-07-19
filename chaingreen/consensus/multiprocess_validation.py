@@ -25,6 +25,7 @@ from chaingreen.util.errors import Err
 from chaingreen.util.generator_tools import get_block_header, tx_removals_and_additions
 from chaingreen.util.ints import uint16, uint64, uint32
 from chaingreen.util.streamable import Streamable, dataclass_from_dict, streamable
+from chaingreen.types.blockchain_format.sub_epoch_summary import SubEpochSummary
 
 log = logging.getLogger(__name__)
 
