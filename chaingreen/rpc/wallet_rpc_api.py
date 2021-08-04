@@ -18,7 +18,7 @@ from chaingreen.types.blockchain_format.sized_bytes import bytes32
 from chaingreen.util.bech32m import decode_puzzle_hash, encode_puzzle_hash
 from chaingreen.util.byte_types import hexstr_to_bytes
 from chaingreen.util.ints import uint32, uint64
-from chaingreen.util.keychain import bytes_to_mnemonic, generate_mnemonic
+from chaingreen.util.keychain import KeyringIsLocked, bytes_to_mnemonic, generate_mnemonic
 from chaingreen.util.path import path_from_root
 from chaingreen.util.ws_message import WsRpcMessage, create_payload_dict
 from chaingreen.wallet.cc_wallet.cc_wallet import CCWallet
@@ -178,7 +178,7 @@ class WalletRpcApi:
             backup_info = None
             backup_path = None
             try:
-                private_key = self.service.get_key_for_fingerprint(fingerprint)
+                private_key = await self.service.get_key_for_fingerprint(fingerprint)
                 last_recovery = await download_backup(recovery_host, private_key)
                 backup_path = path_from_root(self.service.root_path, "last_recovery")
                 if backup_path.exists():
@@ -198,13 +198,27 @@ class WalletRpcApi:
         return {"success": False, "error": "Unknown Error"}
 
     async def get_public_keys(self, request: Dict):
-        fingerprints = [sk.get_g1().get_fingerprint() for (sk, seed) in self.service.keychain.get_all_private_keys()]
-        return {"public_key_fingerprints": fingerprints}
+        try:
+            assert self.service.keychain_proxy is not None  # An offering to the mypy gods
+            fingerprints = [
+                sk.get_g1().get_fingerprint() for (sk, seed) in await self.service.keychain_proxy.get_all_private_keys()
+            ]
+        except KeyringIsLocked:
+            return {"keyring_is_locked": True}
+        except Exception:
+            return {"public_key_fingerprints": []}
+        else:
+            return {"public_key_fingerprints": fingerprints}
 
     async def _get_private_key(self, fingerprint) -> Tuple[Optional[PrivateKey], Optional[bytes]]:
-        for sk, seed in self.service.keychain.get_all_private_keys():
-            if sk.get_g1().get_fingerprint() == fingerprint:
-                return sk, seed
+        try:
+            assert self.service.keychain_proxy is not None  # An offering to the mypy gods
+            all_keys = await self.service.keychain_proxy.get_all_private_keys()
+            for sk, seed in all_keys:
+                if sk.get_g1().get_fingerprint() == fingerprint:
+                    return sk, seed
+        except Exception as e:
+            log.error(f"Failed to get private key by fingerprint: {e}")
         return None, None
 
     async def get_private_key(self, request):
@@ -235,20 +249,25 @@ class WalletRpcApi:
         mnemonic = request["mnemonic"]
         passphrase = ""
         try:
-            sk = self.service.keychain.add_private_key(" ".join(mnemonic), passphrase)
+            sk = await self.service.keychain_proxy.add_private_key(" ".join(mnemonic), passphrase)
         except KeyError as e:
             return {
                 "success": False,
                 "error": f"The word '{e.args[0]}' is incorrect.'",
                 "word": e.args[0],
             }
+        except Exception as e:
+            return {"success": False, "error": str(e)}
 
         fingerprint = sk.get_g1().get_fingerprint()
         await self._stop_wallet()
 
         # Makes sure the new key is added to config properly
         started = False
-        check_keys(self.service.root_path)
+        try:
+            await self.service.keychain_proxy.check_keys(self.service.root_path)
+        except Exception as e:
+            log.error(f"Failed to check_keys after adding a new key: {e}")
         request_type = request["type"]
         if request_type == "new_wallet":
             started = await self.service._start(fingerprint=fingerprint, new_wallet=True)
@@ -265,7 +284,11 @@ class WalletRpcApi:
     async def delete_key(self, request):
         await self._stop_wallet()
         fingerprint = request["fingerprint"]
-        self.service.keychain.delete_key_by_fingerprint(fingerprint)
+        try:
+            await self.service.keychain_proxy.delete_key_by_fingerprint(fingerprint)
+        except Exception as e:
+            log.error(f"Failed to delete key by fingerprint: {e}")
+            return {"success": False, "error": str(e)}
         path = path_from_root(
             self.service.root_path,
             f"{self.service.config['database_path']}-{fingerprint}",
@@ -345,7 +368,12 @@ class WalletRpcApi:
 
     async def delete_all_keys(self, request: Dict):
         await self._stop_wallet()
-        self.service.keychain.delete_all_keys()
+        try:
+            assert self.service.keychain_proxy is not None  # An offering to the mypy gods
+            await self.service.keychain_proxy.delete_all_keys()
+        except Exception as e:
+            log.error(f"Failed to delete all keys: {e}")
+            return {"success": False, "error": str(e)}
         path = path_from_root(self.service.root_path, self.service.config["database_path"])
         if path.exists():
             path.unlink()
@@ -902,13 +930,16 @@ class WalletRpcApi:
             mnemonic = request["words"]
             passphrase = ""
             try:
-                sk = self.service.keychain.add_private_key(" ".join(mnemonic), passphrase)
+                assert self.service.keychain_proxy is not None  # An offering to the mypy gods
+                sk = await self.service.keychain_proxy.add_private_key(" ".join(mnemonic), passphrase)
             except KeyError as e:
                 return {
                     "success": False,
                     "error": f"The word '{e.args[0]}' is incorrect.'",
                     "word": e.args[0],
                 }
+            except Exception as e:
+                return {"success": False, "error": str(e)}
         elif "fingerprint" in request:
             sk, seed = await self._get_private_key(request["fingerprint"])
 
