@@ -96,7 +96,7 @@ class TestSSL:
             priv_key,
         )
         ssl_context = ssl_context_for_client(
-            farmer_server.ca_private_crt_path, farmer_server.ca_private_crt_path, priv_crt, priv_key
+            farmer_server.ca_private_crt_path, farmer_server.ca_private_key_path, priv_crt, priv_key
         )
         connected = await establish_connection(farmer_server, 12312, ssl_context)
         assert connected is True
@@ -111,12 +111,12 @@ class TestSSL:
             pub_key,
         )
         ssl_context = ssl_context_for_client(
-            farmer_server.chaingreen_ca_crt_path, farmer_server.chaingreen_ca_crt_path, pub_crt, pub_key
+            farmer_server.chaingreen_ca_crt_path, farmer_server.chaingreen_ca_key_path, pub_crt, pub_key
         )
         connected = await establish_connection(farmer_server, 12312, ssl_context)
         assert connected is False
         ssl_context = ssl_context_for_client(
-            farmer_server.ca_private_crt_path, farmer_server.ca_private_crt_path, pub_crt, pub_key
+            farmer_server.ca_private_crt_path, farmer_server.ca_private_key_path, pub_crt, pub_key
         )
         connected = await establish_connection(farmer_server, 12312, ssl_context)
         assert connected is False
@@ -137,7 +137,7 @@ class TestSSL:
             pub_key,
         )
         ssl_context = ssl_context_for_client(
-            full_node_server.chaingreen_ca_crt_path, full_node_server.chaingreen_ca_crt_path, pub_crt, pub_key
+            full_node_server.chaingreen_ca_crt_path, full_node_server.chaingreen_ca_key_path, pub_crt, pub_key
         )
         connected = await establish_connection(full_node_server, 12312, ssl_context)
         assert connected is True
@@ -157,7 +157,7 @@ class TestSSL:
             pub_key,
         )
         ssl_context = ssl_context_for_client(
-            wallet_server.chaingreen_ca_crt_path, wallet_server.chaingreen_ca_crt_path, pub_crt, pub_key
+            wallet_server.chaingreen_ca_crt_path, wallet_server.chaingreen_ca_key_path, pub_crt, pub_key
         )
         connected = await establish_connection(wallet_server, 12312, ssl_context)
         assert connected is False
@@ -172,7 +172,7 @@ class TestSSL:
             priv_key,
         )
         ssl_context = ssl_context_for_client(
-            wallet_server.ca_private_crt_path, wallet_server.ca_private_crt_path, priv_crt, priv_key
+            wallet_server.ca_private_crt_path, wallet_server.ca_private_key_path, priv_crt, priv_key
         )
         connected = await establish_connection(wallet_server, 12312, ssl_context)
         assert connected is False
@@ -192,7 +192,7 @@ class TestSSL:
             pub_key,
         )
         ssl_context = ssl_context_for_client(
-            harvester_server.chaingreen_ca_crt_path, harvester_server.chaingreen_ca_crt_path, pub_crt, pub_key
+            harvester_server.chaingreen_ca_crt_path, harvester_server.chaingreen_ca_key_path, pub_crt, pub_key
         )
         connected = await establish_connection(harvester_server, 12312, ssl_context)
         assert connected is False
@@ -207,7 +207,7 @@ class TestSSL:
             priv_key,
         )
         ssl_context = ssl_context_for_client(
-            harvester_server.ca_private_crt_path, harvester_server.ca_private_crt_path, priv_crt, priv_key
+            harvester_server.ca_private_crt_path, harvester_server.ca_private_key_path, priv_crt, priv_key
         )
         connected = await establish_connection(harvester_server, 12312, ssl_context)
         assert connected is False
@@ -226,7 +226,7 @@ class TestSSL:
             pub_key,
         )
         ssl_context = ssl_context_for_client(
-            introducer_server.chaingreen_ca_crt_path, introducer_server.chaingreen_ca_crt_path, pub_crt, pub_key
+            introducer_server.chaingreen_ca_crt_path, introducer_server.chaingreen_ca_key_path, pub_crt, pub_key
         )
         connected = await establish_connection(introducer_server, 12312, ssl_context)
         assert connected is True
@@ -245,7 +245,7 @@ class TestSSL:
             pub_key,
         )
         ssl_context = ssl_context_for_client(
-            timelord_server.chaingreen_ca_crt_path, timelord_server.chaingreen_ca_crt_path, pub_crt, pub_key
+            timelord_server.chaingreen_ca_crt_path, timelord_server.chaingreen_ca_key_path, pub_crt, pub_key
         )
         connected = await establish_connection(timelord_server, 12312, ssl_context)
         assert connected is False
@@ -260,7 +260,7 @@ class TestSSL:
             priv_key,
         )
         ssl_context = ssl_context_for_client(
-            timelord_server.ca_private_crt_path, timelord_server.ca_private_crt_path, priv_crt, priv_key
+            timelord_server.ca_private_crt_path, timelord_server.ca_private_key_path, priv_crt, priv_key
         )
         connected = await establish_connection(timelord_server, 12312, ssl_context)
         assert connected is False
