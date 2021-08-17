@@ -86,6 +86,7 @@ from chaingreen.wallet.derive_keys import (
 
 test_constants = DEFAULT_CONSTANTS.replace(
     **{
+        "RUST_CONDITION_CHECKER": 0,
         "MIN_PLOT_SIZE": 18,
         "MIN_BLOCKS_PER_CHALLENGE_BLOCK": 12,
         "DIFFICULTY_STARTING": 2 ** 12,
