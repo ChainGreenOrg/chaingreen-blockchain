@@ -288,7 +288,9 @@ class ChaingreenServer:
             if not self.accept_inbound_connections(connection.connection_type) and not is_in_network(
                 connection.peer_host, self.exempt_peer_networks
             ):
-                self.log.info(f"Not accepting inbound connection: {connection.get_peer_info()}.Inbound limit reached.")
+                self.log.info(
+                    f"Not accepting inbound connection: {connection.get_peer_logging()}.Inbound limit reached."
+                )
                 await connection.close()
                 close_event.set()
             else:
@@ -566,7 +568,7 @@ class ChaingreenServer:
                             pass
                         except Exception as e:
                             tb = traceback.format_exc()
-                            connection.log.error(f"Exception: {e}, {connection.get_peer_info()}. {tb}")
+                            connection.log.error(f"Exception: {e}, {connection.get_peer_logging()}. {tb}")
                             raise e
                         return None
 
@@ -583,7 +585,7 @@ class ChaingreenServer:
                     if self.connection_close_task is None:
                         tb = traceback.format_exc()
                         connection.log.error(
-                            f"Exception: {e} {type(e)}, closing connection {connection.get_peer_info()}. {tb}"
+                            f"Exception: {e} {type(e)}, closing connection {connection.get_peer_logging()}. {tb}"
                         )
                     else:
                         connection.log.debug(f"Exception: {e} while closing connection")

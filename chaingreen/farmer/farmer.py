@@ -218,8 +218,8 @@ class Farmer:
             ErrorResponse(uint16(PoolErrorCode.REQUEST_FAILED.value), error_message).to_json_dict()
         )
 
-    def on_disconnect(self, connection: ws.WSChaingreenConnection):
-        self.log.info(f"peer disconnected {connection.get_peer_info()}")
+    def on_disconnect(self, connection: ws.WSChiaConnection):
+        self.log.info(f"peer disconnected {connection.get_peer_logging()}")
         self.state_changed("close_connection", {})
 
     async def _pool_get_pool_info(self, pool_config: PoolWalletConfig) -> Optional[Dict]:
