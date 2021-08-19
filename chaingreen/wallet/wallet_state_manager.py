@@ -649,6 +649,7 @@ class WalletStateManager:
 
         pool_rewards = set()
         farmer_rewards = set()
+        added = []
 
         prev = await self.blockchain.get_block_record_from_db(block.prev_hash)
         # [block 1] [block 2] [tx block 3] [block 4] [block 5] [tx block 6]
@@ -733,9 +734,11 @@ class WalletStateManager:
             if derivation_index is not None:
                 await self.puzzle_store.set_used_up_to(derivation_index, True)
 
-        return trade_adds
+        return trade_adds, added
 
-    async def coins_of_interest_removed(self, coins: List[Coin], height: uint32) -> List[Coin]:
+    async def coins_of_interest_removed(
+        self, coins: List[Coin], height: uint32
+    ) -> Tuple[List[Coin], List[WalletCoinRecord]]:
         # This gets called when coins of our interest are spent on chain
         if len(coins) > 0:
             self.log.info(f"Coins removed {coins} at height: {height}")
@@ -746,7 +749,7 @@ class WalletStateManager:
 
         # Keep track of trade coins that are removed
         trade_coin_removed: List[Coin] = []
-
+        removed = []
         all_unconfirmed: List[TransactionRecord] = await self.tx_store.get_all_unconfirmed()
         for coin in coins:
             record = await self.coin_store.get_coin_record_by_coin_id(coin.name())
@@ -763,7 +766,7 @@ class WalletStateManager:
             if record is not None:
                 removed.append(record)
 
-        return trade_coin_removed
+        return trade_coin_removed, removed
 
     async def coin_added(
         self,
@@ -908,7 +911,7 @@ class WalletStateManager:
             # this may return -1, in case there is no shared ancestor block
             fork_h = find_fork_point_in_chain(
                 self.blockchain,
-                self.blockchain.block_record(self.peak.header_hash),
+                block_record,
                 new_block,
             )
         else:

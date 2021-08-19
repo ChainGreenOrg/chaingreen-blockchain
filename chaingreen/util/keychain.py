@@ -1,12 +1,12 @@
 import colorama
-import pkg_resources
+import setuptools as pkg_resources
 import sys
 import unicodedata
 
 from bitstring import BitArray  # pyright: reportMissingImports=false
 from blspy import AugSchemeMPL, G1Element, PrivateKey  # pyright: reportMissingImports=false
-from chia.util.hash import std_hash
-from chia.util.keyring_wrapper import KeyringWrapper
+from chaingreen.util.hash import std_hash
+from chaingreen.util.keyring_wrapper import KeyringWrapper
 from getpass import getpass
 from hashlib import pbkdf2_hmac
 from pathlib import Path
@@ -207,7 +207,7 @@ class Keychain:
     keyring_wrapper: KeyringWrapper
     user: str
 
-    def __init__(self, user: str = "user-chia-1.8", testing: bool = False):
+    def __init__(self, user: str = "user-chaingreen-1.8", testing: bool = False):
         self.user = user
         self.testing = testing
         self.keyring_wrapper = KeyringWrapper.get_shared_instance()

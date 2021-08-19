@@ -218,7 +218,7 @@ class Farmer:
             ErrorResponse(uint16(PoolErrorCode.REQUEST_FAILED.value), error_message).to_json_dict()
         )
 
-    def on_disconnect(self, connection: ws.WSChiaConnection):
+    def on_disconnect(self, connection: ws.WSChaingreenConnection):
         self.log.info(f"peer disconnected {connection.get_peer_logging()}")
         self.state_changed("close_connection", {})
 
@@ -630,7 +630,7 @@ class Farmer:
                     )
         return updated
 
-    async def get_cached_harvesters(self, connection: WSChiaConnection) -> HarvesterCacheEntry:
+    async def get_cached_harvesters(self, connection: WSChaingreenConnection) -> HarvesterCacheEntry:
         host_cache = self.harvester_cache.get(connection.peer_host)
         if host_cache is None:
             host_cache = {}

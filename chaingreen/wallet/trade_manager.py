@@ -420,7 +420,7 @@ class TradeManager:
             )
             if chaingreen_spend_bundle is not None:
                 for coinsol in coinsols:
-                    chia_spend_bundle.coin_spends.append(coinsol)
+                    chaingreen_spend_bundle.coin_spends.append(coinsol)
 
         zero_spend_list: List[SpendBundle] = []
         spend_bundle = None
@@ -536,8 +536,8 @@ class TradeManager:
         # Add transaction history for this trade
         now = uint64(int(time.time()))
         if chaingreen_spend_bundle is not None:
-            spend_bundle = SpendBundle.aggregate([spend_bundle, chia_spend_bundle])
-            if chia_discrepancy < 0:
+            spend_bundle = SpendBundle.aggregate([spend_bundle, chaingreen_spend_bundle])
+            if chaingreen_discrepancy < 0:
                 tx_record = TransactionRecord(
                     confirmed_at_height=uint32(0),
                     created_at_time=now,

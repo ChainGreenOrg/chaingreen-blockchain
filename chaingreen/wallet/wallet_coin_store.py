@@ -76,6 +76,19 @@ class WalletCoinStore:
         await cursor.close()
         await self.db_connection.commit()
 
+    async def rebuild_wallet_cache(self):
+        # First update all coins that were reorged, then re-add coin_records
+        all_coins = await self.get_all_coins()
+        self.unspent_coin_wallet_cache = {}
+        self.coin_record_cache = {}
+        for coin_record in all_coins:
+            name = coin_record.name()
+            self.coin_record_cache[name] = coin_record
+            if coin_record.spent is False:
+                if coin_record.wallet_id not in self.unspent_coin_wallet_cache:
+                    self.unspent_coin_wallet_cache[coin_record.wallet_id] = {}
+                self.unspent_coin_wallet_cache[coin_record.wallet_id][name] = coin_record
+
     # Store CoinRecord in DB and ram cache
     async def add_coin_record(self, record: WalletCoinRecord) -> None:
         # update wallet cache
