@@ -4,7 +4,7 @@ from typing import Any, Dict
 from chaingreen.util.json_util import dict_to_json_str
 
 try:
-    from typings import TypedDict
+    from typing import TypedDict
 except ImportError:
     from typing_extensions import TypedDict
 

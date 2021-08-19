@@ -38,7 +38,7 @@ from chaingreen.protocols.full_node_protocol import (
 from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
 from chaingreen.server.node_discovery import FullNodePeers
 from chaingreen.server.outbound_message import Message, NodeType, make_msg
-from chaingreen.server.server import chaingreenServer
+from chaingreen.server.server import ChaingreenServer
 from chaingreen.types.blockchain_format.classgroup import ClassgroupElement
 from chaingreen.types.blockchain_format.pool_target import PoolTarget
 from chaingreen.types.blockchain_format.sized_bytes import bytes32
@@ -496,9 +496,9 @@ class FullNode:
             asyncio.create_task(self.full_node_peers.on_connect(connection))
 
         if connection.peer_port == 8444 or connection.peer_server_port == 8444:
-            self.log.warning(f"Removing Chia peer {connection.peer_host} {connection.peer_port}")
+            self.log.warning(f"Removing Chaingreen peer {connection.peer_host} {connection.peer_port}")
             return None
-            
+
         if self.initialized is False:
             return None
 
@@ -539,7 +539,7 @@ class FullNode:
             elif connection.connection_type is NodeType.TIMELORD:
                 await self.send_peak_to_timelords()
 
-    def on_disconnect(self, connection: ws.WSChiaConnection):
+    def on_disconnect(self, connection: ws.WSChaingreenConnection):
         self.log.info(f"peer disconnected {connection.get_peer_logging()}")
         self._state_changed("close_connection")
         self._state_changed("sync_mode")
@@ -721,7 +721,7 @@ class FullNode:
         )
         batch_size = self.constants.MAX_BLOCK_COUNT_PER_REQUESTS
 
-        async def fetch_block_batches(batch_queue, peers_with_peak: List[ws.WSChiaConnection]):
+        async def fetch_block_batches(batch_queue, peers_with_peak: List[ws.WSChaingreenConnection]):
             try:
                 for start_height in range(fork_point_height, target_peak_sb_height, batch_size):
                     end_height = min(target_peak_sb_height, start_height + batch_size)
@@ -775,7 +775,7 @@ class FullNode:
                 self.blockchain.clean_block_record(end_height - self.constants.BLOCKS_CACHE_SIZE)
 
         loop = asyncio.get_event_loop()
-        batch_queue: asyncio.Queue[Tuple[ws.WSChiaConnection, List[FullBlock]]] = asyncio.Queue(
+        batch_queue: asyncio.Queue[Tuple[ws.WSChaingreenConnection, List[FullBlock]]] = asyncio.Queue(
             loop=loop, maxsize=buffer_size
         )
         fetch_task = asyncio.Task(fetch_block_batches(batch_queue, peers_with_peak))
@@ -2020,7 +2020,7 @@ class FullNode:
 
 
 async def node_next_block_check(
-    peer: ws.WSChiaConnection, potential_peek: uint32, blockchain: BlockchainInterface
+    peer: ws.WSChaingreenConnection, potential_peek: uint32, blockchain: BlockchainInterface
 ) -> bool:
 
     block_response: Optional[Any] = await peer.request_block(full_node_protocol.RequestBlock(potential_peek, True))

@@ -72,7 +72,7 @@ def read_passphrase_from_file(passphrase_file: TextIOWrapper) -> str:
 def initialize_passphrase() -> None:
     if Keychain.has_master_passphrase():
         print("Keyring is already protected by a passphrase")
-        print("\nUse 'chia passphrase set' or 'chia passphrase remove' to update or remove your passphrase")
+        print("\nUse 'chaingreen passphrase set' or 'chaingreen passphrase remove' to update or remove your passphrase")
         sys.exit(1)
 
     # We'll rely on Keyring initialization to leverage the cached passphrase for
@@ -187,7 +187,7 @@ def using_default_passphrase() -> bool:
 
 
 async def async_update_daemon_passphrase_cache_if_running(root_path: Path) -> None:
-    from chia.daemon.client import connect_to_daemon_and_validate
+    from chaingreen.daemon.client import connect_to_daemon_and_validate
 
     new_passphrase = Keychain.get_cached_master_passphrase()
     assert new_passphrase is not None

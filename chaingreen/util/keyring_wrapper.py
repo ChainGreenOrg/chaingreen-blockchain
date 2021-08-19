@@ -1,8 +1,8 @@
 import keyring as keyring_main
 
-from chia.util.default_root import DEFAULT_KEYS_ROOT_PATH
-from chia.util.file_keyring import FileKeyring
-from chia.util.misc import prompt_yes_no
+from chaingreen.util.default_root import DEFAULT_KEYS_ROOT_PATH
+from chaingreen.util.file_keyring import FileKeyring
+from chaingreen.util.misc import prompt_yes_no
 from keyrings.cryptfile.cryptfile import CryptFileKeyring  # pyright: reportMissingImports=false
 from pathlib import Path
 from sys import exit, platform
@@ -10,7 +10,7 @@ from typing import Any, Optional, Tuple, Union
 
 
 # We want to protect the keyring, even if a user-specified master passphrase isn't provided
-DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE = "$ chia passphrase set # all the cool kids are doing it!"
+DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE = "$ chaingreen passphrase set # all the cool kids are doing it!"
 
 
 class KeyringWrapper:
@@ -48,7 +48,7 @@ class KeyringWrapper:
         self.legacy_keyring = self._configure_legacy_backend()
 
     def _configure_backend(self) -> Union[Any, FileKeyring]:
-        from chia.util.keychain import supports_keyring_passphrase
+        from chaingreen.util.keychain import supports_keyring_passphrase
 
         if self.keyring:
             raise Exception("KeyringWrapper has already been instantiated")
@@ -164,7 +164,7 @@ class KeyringWrapper:
         Sets a new master passphrase for the keyring
         """
 
-        from chia.util.keychain import KeyringCurrentPassphaseIsInvalid, KeyringRequiresMigration
+        from chaingreen.util.keychain import KeyringCurrentPassphaseIsInvalid, KeyringRequiresMigration
 
         # Require a valid current_passphrase
         if (
@@ -214,12 +214,13 @@ class KeyringWrapper:
                 "passphrase."
             )
             print(
-                "Would you like to set a master passphrase now? Use 'chia passphrase set' to change the passphrase.\n"
+                "Would you like to set a master passphrase now? "
+                "Use 'chaingreen passphrase set' to change the passphrase.\n"
             )
 
             response = prompt_yes_no("Set keyring master passphrase? (y/n) ")
             if response:
-                from chia.cmds.passphrase_funcs import prompt_for_new_passphrase
+                from chaingreen.cmds.passphrase_funcs import prompt_for_new_passphrase
 
                 # Prompt for a master passphrase and cache it
                 new_passphrase = prompt_for_new_passphrase()
@@ -228,7 +229,8 @@ class KeyringWrapper:
                 )
             else:
                 print(
-                    "Will skip setting a master passphrase. Use 'chia passphrase set' to set the master passphrase.\n"
+                    "Will skip setting a master passphrase. "
+                    "Use 'chaingreen passphrase set' to set the master passphrase.\n"
                 )
         else:
             import colorama
@@ -254,7 +256,7 @@ class KeyringWrapper:
         to cleanup the legacy keyring.
         """
 
-        from chia.util.keychain import Keychain, MAX_KEYS
+        from chaingreen.util.keychain import Keychain, MAX_KEYS
 
         # Make sure the user is ready to begin migration. We want to ensure that
         response = self.confirm_migration()
@@ -325,7 +327,7 @@ class KeyringWrapper:
             print("Keys in old keyring left intact")
 
         # TODO: CryptFileKeyring doesn't cleanup section headers
-        # [chia_2Duser_2Dchia_2D1_2E8] is left behind
+        # [chaingreen_2Duser_2Dchaingreen_2D1_2E8] is left behind
 
     # Keyring interface
 
