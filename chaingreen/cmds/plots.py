@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 
 
 def show_plots(root_path: Path):
-    from chia.plotting.util import get_plot_directories
+    from chaingreen.plotting.util import get_plot_directories
 
     print("Directories where plots are being searched for:")
     print("Note that subdirectories must be added manually")
@@ -112,7 +112,7 @@ def create_cmd(
     exclude_final_dir: bool,
     connect_to_daemon: bool,
 ):
-    from chia.plotting.create_plots import create_plots, resolve_plot_keys
+    from chaingreen.plotting.create_plots import create_plots, resolve_plot_keys
 
     class Params(object):
         def __init__(self):
@@ -185,7 +185,7 @@ def check_cmd(
 )
 @click.pass_context
 def add_cmd(ctx: click.Context, final_dir: str):
-    from chia.plotting.util import add_plot_directory
+    from chaingreen.plotting.util import add_plot_directory
 
     add_plot_directory(ctx.obj["root_path"], final_dir)
 
@@ -201,7 +201,7 @@ def add_cmd(ctx: click.Context, final_dir: str):
 )
 @click.pass_context
 def remove_cmd(ctx: click.Context, final_dir: str):
-    from chia.plotting.util import remove_plot_directory
+    from chaingreen.plotting.util import remove_plot_directory
 
     remove_plot_directory(ctx.obj["root_path"], final_dir)
 

@@ -6,7 +6,7 @@ from clvm_tools.clvmc import compile_clvm
 from chaingreen.types.blockchain_format.program import Program, SerializedProgram
 
 wallet_program_files = set(
-    [chaingreen
+    chaingreen[
         "chia/wallet/puzzles/calculate_synthetic_public_key.clvm",
         "chia/wallet/puzzles/cc.clvm",
         "chia/wallet/puzzles/chialisp_deserialisation.clvm",

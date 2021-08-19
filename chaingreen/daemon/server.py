@@ -16,7 +16,7 @@ from typing import Any, Dict, List, Optional, TextIO, Tuple, cast
 
 from websockets import ConnectionClosedOK, WebSocketException, WebSocketServerProtocol, serve
 
-from chaingreen.cmds.init_funcs import check_keys, chaingreen_init
+from chaingreen.cmds.init_funcs import check_keys, chia_init
 from chaingreen.cmds.passphrase_funcs import default_passphrase, using_default_passphrase
 from chaingreen.daemon.keychain_server import KeychainServer, keychain_commands
 from chaingreen.daemon.windows_signal import kill
@@ -943,7 +943,7 @@ def launch_service(root_path: Path, service_command) -> Tuple[subprocess.Popen, 
     service_executable = executable_for_service(service_array[0])
     service_array[0] = service_executable
 
-    if service_command == "chia_full_node_simulator":
+    if service_command == "chaingreen_full_node_simulator":
         # Set the -D/--connect_to_daemon flag to signify that the child should connect
         # to the daemon to access the keychain
         service_array.append("-D")

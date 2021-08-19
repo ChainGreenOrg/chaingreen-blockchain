@@ -36,8 +36,8 @@ from chaingreen.protocols.wallet_protocol import (
 )
 from chaingreen.server.node_discovery import WalletPeers
 from chaingreen.server.outbound_message import Message, NodeType, make_msg
-from chaingreen.server.server import chaingreenServer
-from chaingreen.server.ws_connection import WSchaingreenConnection
+from chaingreen.server.server import ChaingreenServer
+from chaingreen.server.ws_connection import WSChaingreenConnection
 from chaingreen.types.blockchain_format.coin import Coin, hash_coin_list
 from chaingreen.types.blockchain_format.sized_bytes import bytes32
 from chaingreen.types.coin_spend import CoinSpend
@@ -70,7 +70,7 @@ class WalletNode:
     constants: ConsensusConstants
     keychain_proxy: Optional[KeychainProxy]
     local_keychain: Optional[Keychain]  # For testing only. KeychainProxy is used in normal cases
-    server: Optional[ChiaServer]
+    server: Optional[ChaingreenServer]
     log: logging.Logger
     wallet_peers: WalletPeers
     # Maintains the state of the wallet (blockchain and transactions), handles DB connections
@@ -142,7 +142,7 @@ class WalletNode:
             keychain_proxy = await self.ensure_keychain_proxy()
             key = await keychain_proxy.get_key_for_fingerprint(fingerprint)
         except KeyringIsEmpty:
-            self.log.warning("No keys present. Create keys with the UI, or with the 'chia keys' program.")
+            self.log.warning("No keys present. Create keys with the UI, or with the 'chaingreen keys' program.")
             return None
         except KeyringIsLocked:
             self.log.warning("Keyring is locked")
@@ -169,6 +169,9 @@ class WalletNode:
         if private_key is None:
             self.logged_in = False
             return False
+
+        if self.config.get("enable_profiler", False):
+            asyncio.create_task(profile_task(self.root_path, "wallet", self.log))
 
         db_path_key_suffix = str(private_key.get_g1().get_fingerprint())
         db_path_replaced: str = (
@@ -1000,7 +1003,7 @@ class WalletNode:
 
 
 async def wallet_next_block_check(
-    peer: WSChiaConnection, potential_peek: uint32, blockchain: BlockchainInterface
+    peer: WSChaingreenConnection, potential_peek: uint32, blockchain: BlockchainInterface
 ) -> bool:
     block_response = await peer.request_header_blocks(
         wallet_protocol.RequestHeaderBlocks(potential_peek, potential_peek)

@@ -6,10 +6,10 @@ import sys
 from pathlib import Path
 from typing import Optional
 
+from chaingreen.cmds.passphrase_funcs import get_current_passphrase
 from chaingreen.daemon.client import DaemonProxy, connect_to_daemon_and_validate
 from chaingreen.util.service_groups import services_for_groups
 from chaingreen.util.keychain import KeyringMaxUnlockAttempts
-from chaingreen.util.service_groups import services_for_groups
 
 
 def launch_start_daemon(root_path: Path) -> subprocess.Popen:

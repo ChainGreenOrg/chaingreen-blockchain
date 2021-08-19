@@ -6,7 +6,6 @@ from typing import Callable, Dict, List, Optional, Tuple
 
 from blspy import PrivateKey, G1Element
 
-from chaingreen.cmds.init_funcs import check_keys
 from chaingreen.consensus.block_rewards import calculate_base_farmer_reward
 from chaingreen.pools.pool_wallet import PoolWallet
 from chaingreen.pools.pool_wallet_info import create_pool_state, FARMING_TO_POOL, PoolWalletInfo, PoolState

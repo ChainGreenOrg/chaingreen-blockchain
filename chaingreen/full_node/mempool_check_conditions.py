@@ -159,7 +159,7 @@ def parse_aggsig(args: SExp) -> List[bytes]:
     # agg sig conditions only take 2 parameters
     args = args.rest()
     # the list is terminated by having a right-element that's not another pair,
-    # just like as_atom_list() (see chia/types/blockchain_format/program.py)
+    # just like as_atom_list() (see chaingreen/types/blockchain_format/program.py)
     if args.pair is not None:
         raise ValidationError(Err.INVALID_CONDITION)
     return [pubkey, message]

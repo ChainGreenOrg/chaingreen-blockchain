@@ -7,13 +7,13 @@ from chaingreen.cmds.farm import farm_cmd
 from chaingreen.cmds.init import init_cmd
 from chaingreen.cmds.keys import keys_cmd
 from chaingreen.cmds.netspace import netspace_cmd
+from chaingreen.cmds.passphrase import passphrase_cmd
 from chaingreen.cmds.plots import plots_cmd
 from chaingreen.cmds.show import show_cmd
 from chaingreen.cmds.start import start_cmd
 from chaingreen.cmds.stop import stop_cmd
 from chaingreen.cmds.wallet import wallet_cmd
 from chaingreen.cmds.plotnft import plotnft_cmd
-from chaingreen.util.default_root import DEFAULT_ROOT_PATH
 from chaingreen.util.default_root import DEFAULT_KEYS_ROOT_PATH, DEFAULT_ROOT_PATH
 from chaingreen.util.keychain import set_keys_root_path, supports_keyring_passphrase
 from typing import Optional
