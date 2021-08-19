@@ -5,11 +5,11 @@ import socket
 import time
 import traceback
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Set, Tuple, Union, Any
+from typing import Callable, Dict, List, Optional, Set, Tuple, Union
 
 from blspy import PrivateKey
-
 from chaingreen.consensus.block_record import BlockRecord
+from chaingreen.consensus.blockchain_interface import BlockchainInterface
 from chaingreen.consensus.constants import ConsensusConstants
 from chaingreen.consensus.multiprocess_validation import PreValidationResult
 from chaingreen.daemon.keychain_proxy import (
@@ -36,8 +36,8 @@ from chaingreen.protocols.wallet_protocol import (
 )
 from chaingreen.server.node_discovery import WalletPeers
 from chaingreen.server.outbound_message import Message, NodeType, make_msg
-from chaingreen.server.server import ChaingreenServer
-from chaingreen.server.ws_connection import WSChaingreenConnection
+from chaingreen.server.server import chaingreenServer
+from chaingreen.server.ws_connection import WSchaingreenConnection
 from chaingreen.types.blockchain_format.coin import Coin, hash_coin_list
 from chaingreen.types.blockchain_format.sized_bytes import bytes32
 from chaingreen.types.coin_spend import CoinSpend
@@ -45,6 +45,7 @@ from chaingreen.types.header_block import HeaderBlock
 from chaingreen.types.mempool_inclusion_status import MempoolInclusionStatus
 from chaingreen.types.peer_info import PeerInfo
 from chaingreen.util.byte_types import hexstr_to_bytes
+from chaingreen.util.check_fork_next_block import check_fork_next_block
 from chaingreen.util.errors import Err, ValidationError
 from chaingreen.util.ints import uint32, uint128
 from chaingreen.util.keychain import Keychain
@@ -647,33 +648,13 @@ class WalletNode:
             fork_height = None
             if peak is not None:
                 fork_height = self.wallet_state_manager.sync_store.get_potential_fork_point(peak.header_hash)
-                our_peak_height = self.wallet_state_manager.blockchain.get_peak_height()
-                ses_heigths = self.wallet_state_manager.blockchain.get_ses_heights()
-                if len(ses_heigths) > 2 and our_peak_height is not None:
-                    ses_heigths.sort()
-                    max_fork_ses_height = ses_heigths[-3]
-                    # This is the fork point in SES in the case where no fork was detected
-                    if (
-                        self.wallet_state_manager.blockchain.get_peak_height() is not None
-                        and fork_height == max_fork_ses_height
-                    ):
-                        peers = self.server.get_full_node_connections()
-                        for peer in peers:
-                            # Grab a block at peak + 1 and check if fork point is actually our current height
-                            potential_height = uint32(our_peak_height + 1)
-                            block_response: Optional[Any] = await peer.request_header_blocks(
-                                wallet_protocol.RequestHeaderBlocks(potential_height, potential_height)
-                            )
-                            if block_response is not None and isinstance(
-                                block_response, wallet_protocol.RespondHeaderBlocks
-                            ):
-                                our_peak = self.wallet_state_manager.blockchain.get_peak()
-                                if (
-                                    our_peak is not None
-                                    and block_response.header_blocks[0].prev_header_hash == our_peak.header_hash
-                                ):
-                                    fork_height = our_peak_height
-                                break
+                assert fork_height is not None
+                # This is the fork point in SES in the case where no fork was detected
+                peers = self.server.get_full_node_connections()
+                fork_height = await check_fork_next_block(
+                    self.wallet_state_manager.blockchain, fork_height, peers, wallet_next_block_check
+                )
+
             if fork_height is None:
                 fork_height = uint32(0)
             await self.wallet_state_manager.blockchain.warmup(fork_height)
@@ -1016,3 +997,16 @@ class WalletNode:
 
         else:
             return []
+
+
+async def wallet_next_block_check(
+    peer: WSChiaConnection, potential_peek: uint32, blockchain: BlockchainInterface
+) -> bool:
+    block_response = await peer.request_header_blocks(
+        wallet_protocol.RequestHeaderBlocks(potential_peek, potential_peek)
+    )
+    if block_response is not None and isinstance(block_response, wallet_protocol.RespondHeaderBlocks):
+        our_peak = blockchain.get_peak()
+        if our_peak is not None and block_response.header_blocks[0].prev_header_hash == our_peak.header_hash:
+            return True
+    return False
