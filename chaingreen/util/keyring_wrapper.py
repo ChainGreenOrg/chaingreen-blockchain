@@ -25,7 +25,7 @@ class KeyringWrapper:
     """
 
     # Static members
-    __shared_instance = None
+    __shared_instance: Any = None
     __keys_root_path: Path = DEFAULT_KEYS_ROOT_PATH
 
     # Instance members
@@ -33,7 +33,7 @@ class KeyringWrapper:
     keyring: Union[Any, FileKeyring] = None
     cached_passphase: Optional[str] = DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE
     cached_passphase_is_validated: bool = False
-    legacy_keyring = None
+    legacy_keyring: Any = None
 
     def __init__(self, keys_root_path: Path = DEFAULT_KEYS_ROOT_PATH):
         """

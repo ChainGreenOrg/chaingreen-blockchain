@@ -125,7 +125,7 @@ def recurse_jsonify(d):
     return d
 
 
-PARSE_FUNCTIONS_FOR_STREAMABLE_CLASS = {}
+PARSE_FUNCTIONS_FOR_STREAMABLE_CLASS: dict = {}
 
 
 def streamable(cls: Any):
