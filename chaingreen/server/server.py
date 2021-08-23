@@ -39,7 +39,7 @@ def ssl_context_for_server(
     log: Optional[logging.Logger] = None,
 ) -> Optional[ssl.SSLContext]:
     if check_permissions:
-        verify_ssl_certs_and_keys([(ca_cert, ca_key), (private_cert_path, private_key_path)], log)
+        verify_ssl_certs_and_keys([ca_cert, private_cert_path], [ca_key, private_key_path], log)
 
     ssl_context = ssl._create_unverified_context(purpose=ssl.Purpose.SERVER_AUTH, cafile=str(ca_cert))
     ssl_context.check_hostname = False
@@ -52,7 +52,7 @@ def ssl_context_for_root(
     ca_cert_file: str, *, check_permissions: bool = True, log: Optional[logging.Logger] = None
 ) -> Optional[ssl.SSLContext]:
     if check_permissions:
-        verify_ssl_certs_and_keys([(Path(ca_cert_file), None)], log)
+        verify_ssl_certs_and_keys([Path(ca_cert_file)], [], log)
 
     ssl_context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH, cafile=ca_cert_file)
     return ssl_context
@@ -68,7 +68,7 @@ def ssl_context_for_client(
     log: Optional[logging.Logger] = None,
 ) -> Optional[ssl.SSLContext]:
     if check_permissions:
-        verify_ssl_certs_and_keys([(ca_cert, ca_key), (private_cert_path, private_key_path)], log)
+        verify_ssl_certs_and_keys([ca_cert, private_cert_path], [ca_key, private_key_path], log)
 
     ssl_context = ssl._create_unverified_context(purpose=ssl.Purpose.SERVER_AUTH, cafile=str(ca_cert))
     ssl_context.check_hostname = False
@@ -558,8 +558,10 @@ class ChaingreenServer:
 
                     if hasattr(f, "peer_required"):
                         coroutine = f(full_message.data, connection)
+                        self.log.debug(f"coroutine: {coroutine}")
                     else:
                         coroutine = f(full_message.data)
+                        self.log.debug(f"coroutine: {coroutine}")
 
                     async def wrapped_coroutine() -> Optional[Message]:
                         try:
@@ -649,6 +651,7 @@ class ChaingreenServer:
     def get_full_node_outgoing_connections(self) -> List[WSChaingreenConnection]:
         result = []
         connections = self.get_full_node_connections()
+        #self.log.debug(f"get_full_node_outgoing_connections {connections}")
         for connection in connections:
             if connection.is_outbound:
                 result.append(connection)
@@ -700,6 +703,17 @@ class ChaingreenServer:
     async def get_peer_info(self) -> Optional[PeerInfo]:
         ip = None
         port = self._port
+
+        # Use chia's service first.
+        try:
+            timeout = ClientTimeout(total=15)
+            async with ClientSession(timeout=timeout) as session:
+                async with session.get("https://ip.chia.net/") as resp:
+                    if resp.status == 200:
+                        ip = str(await resp.text())
+                        ip = ip.rstrip()
+        except Exception:
+            ip = None
 
         # Fallback to `checkip` from amazon.
         if ip is None:

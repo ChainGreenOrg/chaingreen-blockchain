@@ -43,7 +43,8 @@ class Introducer:
                 if self.server.introducer_peers is None:
                     continue
                 raw_peers = self.server.introducer_peers.get_peers(100, True, 3 * self.recent_peer_threshold)
-
+                print('raw_peers', raw_peers)
+                self.log.info(f"raw_peers {raw_peers}")
                 if len(raw_peers) == 0:
                     continue
 
