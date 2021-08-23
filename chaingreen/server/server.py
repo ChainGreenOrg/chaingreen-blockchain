@@ -20,7 +20,7 @@ from chaingreen.protocols.shared_protocol import protocol_version
 from chaingreen.server.introducer_peers import IntroducerPeers
 from chaingreen.server.outbound_message import Message, NodeType
 from chaingreen.server.ssl_context import private_ssl_paths, public_ssl_paths
-from chaingreen.server.ws_connection import WSchaingreenConnection
+from chaingreen.server.ws_connection import WSChaingreenConnection
 from chaingreen.types.blockchain_format.sized_bytes import bytes32
 from chaingreen.types.peer_info import PeerInfo
 from chaingreen.util.errors import Err, ProtocolError
@@ -226,7 +226,7 @@ class ChaingreenServer:
         else:
             self.p2p_crt_path, self.p2p_key_path = public_ssl_paths(self.root_path, self.config)
             ssl_context = ssl_context_for_server(
-                self.chia_ca_crt_path, self.chia_ca_key_path, self.p2p_crt_path, self.p2p_key_path, log=self.log
+                self.chaingreen_ca_crt_path, self.chaingreen_ca_key_path, self.p2p_crt_path, self.p2p_key_path, log=self.log
             )
 
         self.site = web.TCPSite(
@@ -656,7 +656,7 @@ class ChaingreenServer:
     def get_full_node_connections(self) -> List[WSChaingreenConnection]:
         return list(self.connection_by_type[NodeType.FULL_NODE].values())
 
-    def get_connections(self, node_type: Optional[NodeType] = None) -> List[WSChiaConnection]:
+    def get_connections(self, node_type: Optional[NodeType] = None) -> List[WSChaingreenConnection]:
         result = []
         for _, connection in self.all_connections.items():
             if node_type is None or connection.connection_type == node_type:
