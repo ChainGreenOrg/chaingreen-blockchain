@@ -18,9 +18,10 @@ class WalletCoinStore:
     """
 
     db_connection: aiosqlite.Connection
+    # coin_record_cache keeps ALL coin records in memory. [record_name: record]
     coin_record_cache: Dict[bytes32, WalletCoinRecord]
-    coin_wallet_record_cache: Dict[int, Dict[bytes32, WalletCoinRecord]]
-    wallet_cache_lock: asyncio.Lock
+    # unspent_coin_wallet_cache keeps ALL unspent coin records for wallet in memory [wallet_id: [record_name: record]]
+    unspent_coin_wallet_cache: Dict[int, Dict[bytes32, WalletCoinRecord]]
     db_wrapper: DBWrapper
 
     @classmethod
@@ -62,13 +63,9 @@ class WalletCoinStore:
         await self.db_connection.execute("CREATE INDEX IF NOT EXISTS wallet_id on coin_record(wallet_id)")
 
         await self.db_connection.commit()
-        self.coin_record_cache = dict()
-        self.coin_wallet_record_cache = {}
-        all_coins = await self.get_all_coins()
-        for coin_record in all_coins:
-            self.coin_record_cache[coin_record.coin.name()] = coin_record
-
-        self.wallet_cache_lock = asyncio.Lock()
+        self.coin_record_cache = {}
+        self.unspent_coin_wallet_cache = {}
+        await self.rebuild_wallet_cache()
         return self
 
     async def _clear_database(self):
@@ -92,38 +89,37 @@ class WalletCoinStore:
     # Store CoinRecord in DB and ram cache
     async def add_coin_record(self, record: WalletCoinRecord) -> None:
         # update wallet cache
+        name = record.name()
+        self.coin_record_cache[name] = record
+        if record.wallet_id in self.unspent_coin_wallet_cache:
+            if record.spent and name in self.unspent_coin_wallet_cache[record.wallet_id]:
+                self.unspent_coin_wallet_cache[record.wallet_id].pop(name)
+            if not record.spent:
+                self.unspent_coin_wallet_cache[record.wallet_id][name] = record
+        else:
+            if not record.spent:
+                self.unspent_coin_wallet_cache[record.wallet_id] = {}
+                self.unspent_coin_wallet_cache[record.wallet_id][name] = record
 
-        await self.wallet_cache_lock.acquire()
-        try:
-            if record.wallet_id in self.coin_wallet_record_cache:
-                cache_dict = self.coin_wallet_record_cache[record.wallet_id]
-                if record.coin.name() in cache_dict and record.spent:
-                    cache_dict.pop(record.coin.name())
-                else:
-                    cache_dict[record.coin.name()] = record
-
-            cursor = await self.db_connection.execute(
-                "INSERT OR REPLACE INTO coin_record VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (
-                    record.coin.name().hex(),
-                    record.confirmed_block_height,
-                    record.spent_block_height,
-                    int(record.spent),
-                    int(record.coinbase),
-                    str(record.coin.puzzle_hash.hex()),
-                    str(record.coin.parent_coin_info.hex()),
-                    bytes(record.coin.amount),
-                    record.wallet_type,
-                    record.wallet_id,
-                ),
-            )
-            await cursor.close()
-            self.coin_record_cache[record.coin.name()] = record
-        finally:
-            self.wallet_cache_lock.release()
+        cursor = await self.db_connection.execute(
+            "INSERT OR REPLACE INTO coin_record VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                name.hex(),
+                record.confirmed_block_height,
+                record.spent_block_height,
+                int(record.spent),
+                int(record.coinbase),
+                str(record.coin.puzzle_hash.hex()),
+                str(record.coin.parent_coin_info.hex()),
+                bytes(record.coin.amount),
+                record.wallet_type,
+                record.wallet_id,
+            ),
+        )
+        await cursor.close()
 
     # Update coin_record to be spent in DB
-    async def set_spent(self, coin_name: bytes32, height: uint32):
+    async def set_spent(self, coin_name: bytes32, height: uint32) -> WalletCoinRecord:
         current: Optional[WalletCoinRecord] = await self.get_coin_record(coin_name)
         assert current is not None
         # assert current.spent is False
@@ -139,6 +135,7 @@ class WalletCoinStore:
         )
 
         await self.add_coin_record(spent)
+        return spent
 
     def coin_record_from_row(self, row: sqlite3.Row) -> WalletCoinRecord:
         coin = Coin(bytes32(bytes.fromhex(row[6])), bytes32(bytes.fromhex(row[5])), uint64.from_bytes(row[7]))
@@ -216,43 +213,37 @@ class WalletCoinStore:
 
         return [self.coin_record_from_row(row) for row in rows]
 
-    async def get_coin_record_by_coin_id(self, coin_id: bytes32) -> Optional[WalletCoinRecord]:
-        """Returns a coin records with the given name, if it exists"""
-        # TODO: This is a duplicate of get_coin_record()
-        return await self.get_coin_record(coin_id)
-
     async def rollback_to_block(self, height: int):
         """
         Rolls back the blockchain to block_index. All blocks confirmed after this point
         are removed from the LCA. All coins confirmed after this point are removed.
         All coins spent after this point are set to unspent. Can be -1 (rollback all)
         """
-        # Update memory cache
-
+        # Delete from storage
         delete_queue: List[WalletCoinRecord] = []
         for coin_name, coin_record in self.coin_record_cache.items():
             if coin_record.spent_block_height > height:
                 new_record = WalletCoinRecord(
                     coin_record.coin,
                     coin_record.confirmed_block_height,
-                    coin_record.spent_block_height,
+                    uint32(0),
                     False,
                     coin_record.coinbase,
                     coin_record.wallet_type,
                     coin_record.wallet_id,
                 )
                 self.coin_record_cache[coin_record.coin.name()] = new_record
+                self.unspent_coin_wallet_cache[coin_record.wallet_id][coin_record.coin.name()] = new_record
             if coin_record.confirmed_block_height > height:
                 delete_queue.append(coin_record)
 
         for coin_record in delete_queue:
             self.coin_record_cache.pop(coin_record.coin.name())
-            if coin_record.wallet_id in self.coin_wallet_record_cache:
-                coin_cache = self.coin_wallet_record_cache[coin_record.wallet_id]
+            if coin_record.wallet_id in self.unspent_coin_wallet_cache:
+                coin_cache = self.unspent_coin_wallet_cache[coin_record.wallet_id]
                 if coin_record.coin.name() in coin_cache:
                     coin_cache.pop(coin_record.coin.name())
 
-        # Delete from storage
         c1 = await self.db_connection.execute("DELETE FROM coin_record WHERE confirmed_height>?", (height,))
         await c1.close()
         c2 = await self.db_connection.execute(

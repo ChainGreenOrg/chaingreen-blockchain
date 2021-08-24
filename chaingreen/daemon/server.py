@@ -16,7 +16,7 @@ from typing import Any, Dict, List, Optional, TextIO, Tuple, cast
 
 from websockets import ConnectionClosedOK, WebSocketException, WebSocketServerProtocol, serve
 
-from chaingreen.cmds.init_funcs import check_keys, chia_init
+from chaingreen.cmds.init_funcs import check_keys, chaingreen_init
 from chaingreen.cmds.passphrase_funcs import default_passphrase, using_default_passphrase
 from chaingreen.daemon.keychain_server import KeychainServer, keychain_commands
 from chaingreen.daemon.windows_signal import kill
@@ -1111,9 +1111,9 @@ def singleton(lockfile: Path, text: str = "semaphore") -> Optional[TextIO]:
 
 
 async def async_run_daemon(root_path: Path, wait_for_unlock: bool = False) -> int:
-    # When wait_for_unlock is true, we want to skip the check_keys() call in chia_init
+    # When wait_for_unlock is true, we want to skip the check_keys() call in init
     # since it might be necessary to wait for the GUI to unlock the keyring first.
-    chia_init(root_path, should_check_keys=(not wait_for_unlock))
+    chaingreen_init(root_path, should_check_keys=(not wait_for_unlock))
     config = load_config(root_path, "config.yaml")
     setproctitle("chaingreen_daemon")
     initialize_logging("daemon", config["logging"], root_path)

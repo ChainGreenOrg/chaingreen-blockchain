@@ -49,7 +49,7 @@ if not supports_keyring_passphrase():
 
 
 if __name__ == "__main__":
-    from .init_funcs import chia_init
+    from .init_funcs import chaingreen_init
     from chaingreen.util.default_root import DEFAULT_ROOT_PATH
 
-    chia_init(DEFAULT_ROOT_PATH)
+    chaingreen_init(DEFAULT_ROOT_PATH)
