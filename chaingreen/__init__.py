@@ -1,4 +1,4 @@
-from setuptools import DistributionNotFound, get_distribution, resource_filename
+from pkg_resources import DistributionNotFound, get_distribution, resource_filename
 
 try:
     __version__ = get_distribution("chaingreen-blockchain").version

@@ -1,6 +1,6 @@
 import pathlib
 
-import setuptools as pkg_resources
+import pkg_resources
 from clvm_tools.clvmc import compile_clvm
 
 from chaingreen.types.blockchain_format.program import Program, SerializedProgram

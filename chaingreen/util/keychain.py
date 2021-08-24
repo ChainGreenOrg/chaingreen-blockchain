@@ -1,5 +1,5 @@
 import colorama
-import setuptools as pkg_resources
+import pkg_resources
 import sys
 import unicodedata
 

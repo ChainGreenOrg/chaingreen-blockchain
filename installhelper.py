@@ -7,7 +7,7 @@
 import json
 import os
 import subprocess
-from setuptools import parse_version
+from pkg_resources import parse_version
 
 
 #
