@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, List, Tuple
 
 import pkg_resources
-from chia.util.ssl import DEFAULT_PERMISSIONS_CERT_FILE, DEFAULT_PERMISSIONS_KEY_FILE
+from chaingreen.util.ssl import DEFAULT_PERMISSIONS_CERT_FILE, DEFAULT_PERMISSIONS_KEY_FILE
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
@@ -19,7 +19,7 @@ def get_chaingreen_ca_crt_key() -> Tuple[Any, Any]:
     return crt, key
 
 
-def get_mozzila_ca_crt() -> str:
+def get_mozilla_ca_crt() -> str:
     mozilla_path = Path(__file__).parent.parent.parent.absolute() / "mozilla-ca/cacert.pem"
     return str(mozilla_path)
 

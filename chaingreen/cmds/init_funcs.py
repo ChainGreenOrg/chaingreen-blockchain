@@ -261,13 +261,13 @@ def init(create_certs: Optional[Path], root_path: Path, fix_ssl_permissions: boo
         else:
             print(f"** {root_path} does not exist. Executing core init **")
             # sanity check here to prevent infinite recursion
-            if chia_init(root_path, fix_ssl_permissions=fix_ssl_permissions) == 0 and root_path.exists():
+            if chaingreen_init(root_path, fix_ssl_permissions=fix_ssl_permissions) == 0 and root_path.exists():
                 return init(create_certs, root_path, fix_ssl_permissions)
 
             print(f"** {root_path} was not created. Exiting **")
             return -1
     else:
-        return chia_init(root_path, fix_ssl_permissions=fix_ssl_permissions)
+        return chaingreen_init(root_path, fix_ssl_permissions=fix_ssl_permissions)
 
 
 def chaingreen_version_number() -> Tuple[str, str, str, str]:
@@ -329,7 +329,7 @@ def chaingreen_full_version_str() -> str:
     return f"{major}.{minor}.{patch}{dev}"
 
 
-def chia_init(
+def chaingreen_init(
     root_path: Path, *, should_check_keys: bool = True, should_check_ssl: bool = True, fix_ssl_permissions: bool = False
 ):
     """

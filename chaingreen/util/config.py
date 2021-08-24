@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 from typing import Any, Callable, Dict, Optional, Union
 
-import setuptools as pkg_resources
+import pkg_resources
 import yaml
 
 from chaingreen.util.path import mkdir
