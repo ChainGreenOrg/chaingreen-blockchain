@@ -1,21 +1,22 @@
 from io import TextIOWrapper
 import click
 
-from chaingreen import __version__
-from chaingreen.cmds.configure import configure_cmd
-from chaingreen.cmds.farm import farm_cmd
-from chaingreen.cmds.init import init_cmd
-from chaingreen.cmds.keys import keys_cmd
-from chaingreen.cmds.netspace import netspace_cmd
-from chaingreen.cmds.passphrase import passphrase_cmd
-from chaingreen.cmds.plots import plots_cmd
-from chaingreen.cmds.show import show_cmd
-from chaingreen.cmds.start import start_cmd
-from chaingreen.cmds.stop import stop_cmd
-from chaingreen.cmds.wallet import wallet_cmd
-from chaingreen.cmds.plotnft import plotnft_cmd
-from chaingreen.util.default_root import DEFAULT_KEYS_ROOT_PATH, DEFAULT_ROOT_PATH
-from chaingreen.util.keychain import set_keys_root_path, supports_keyring_passphrase
+from chia import __version__
+from chia.cmds.configure import configure_cmd
+from chia.cmds.farm import farm_cmd
+from chia.cmds.init import init_cmd
+from chia.cmds.keys import keys_cmd
+from chia.cmds.netspace import netspace_cmd
+from chia.cmds.passphrase import passphrase_cmd
+from chia.cmds.plots import plots_cmd
+from chia.cmds.show import show_cmd
+from chia.cmds.start import start_cmd
+from chia.cmds.stop import stop_cmd
+from chia.cmds.wallet import wallet_cmd
+from chia.cmds.plotnft import plotnft_cmd
+from chia.util.default_root import DEFAULT_KEYS_ROOT_PATH, DEFAULT_ROOT_PATH
+from chia.util.keychain import set_keys_root_path, supports_keyring_passphrase
+from chia.util.ssl import check_ssl
 from typing import Optional
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
@@ -71,6 +72,8 @@ def cli(
             cache_passphrase(read_passphrase_from_file(passphrase_file))
         except Exception as e:
             print(f"Failed to read passphrase: {e}")
+
+    check_ssl(Path(root_path))
 
 
 if not supports_keyring_passphrase():
