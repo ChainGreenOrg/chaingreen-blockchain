@@ -89,29 +89,62 @@ def configure(
         print("Target peer count updated")
         change_made = True
     if testnet is not None:
-        print("Setting Testnet")
-        testnet_port = "58744"
-        testnet_introducer = "testnet0.introducer.chaingreen.org"
-        testnet = "testnet0"
-        config["full_node"]["port"] = int(testnet_port)
-        config["full_node"]["introducer_peer"]["port"] = int(testnet_port)
-        config["farmer"]["full_node_peer"]["port"] = int(testnet_port)
-        config["timelord"]["full_node_peer"]["port"] = int(testnet_port)
-        config["wallet"]["full_node_peer"]["port"] = int(testnet_port)
-        config["wallet"]["introducer_peer"]["port"] = int(testnet_port)
-        config["introducer"]["port"] = int(testnet_port)
-        config["full_node"]["introducer_peer"]["host"] = testnet_introducer
-        config["selected_network"] = testnet
-        config["harvester"]["selected_network"] = testnet
-        config["pool"]["selected_network"] = testnet
-        config["farmer"]["selected_network"] = testnet
-        config["timelord"]["selected_network"] = testnet
-        config["full_node"]["selected_network"] = testnet
-        config["ui"]["selected_network"] = testnet
-        config["introducer"]["selected_network"] = testnet
-        config["wallet"]["selected_network"] = testnet
-        print("Default full node port, introducer and network setting updated")
-        change_made = True
+        if testnet == "true" or testnet == "t":
+            print("Setting Testnet")
+            testnet_port = "58444"
+            testnet_introducer = "beta1_introducer.chia.net"
+            testnet_dns_introducer = "dns-introducer-testnet7.chia.net"
+            testnet = "testnet7"
+            config["full_node"]["port"] = int(testnet_port)
+            config["full_node"]["introducer_peer"]["port"] = int(testnet_port)
+            config["farmer"]["full_node_peer"]["port"] = int(testnet_port)
+            config["timelord"]["full_node_peer"]["port"] = int(testnet_port)
+            config["wallet"]["full_node_peer"]["port"] = int(testnet_port)
+            config["wallet"]["introducer_peer"]["port"] = int(testnet_port)
+            config["introducer"]["port"] = int(testnet_port)
+            config["full_node"]["introducer_peer"]["host"] = testnet_introducer
+            config["full_node"]["dns_servers"] = [testnet_dns_introducer]
+            config["selected_network"] = testnet
+            config["harvester"]["selected_network"] = testnet
+            config["pool"]["selected_network"] = testnet
+            config["farmer"]["selected_network"] = testnet
+            config["timelord"]["selected_network"] = testnet
+            config["full_node"]["selected_network"] = testnet
+            config["ui"]["selected_network"] = testnet
+            config["introducer"]["selected_network"] = testnet
+            config["wallet"]["selected_network"] = testnet
+            print("Default full node port, introducer and network setting updated")
+            change_made = True
+
+        elif testnet == "false" or testnet == "f":
+            print("Setting Mainnet")
+            mainnet_port = "8444"
+            mainnet_introducer = "introducer.chia.net"
+            mainnet_dns_introducer = "dns-introducer.chia.net"
+            net = "mainnet"
+            config["full_node"]["port"] = int(mainnet_port)
+            config["full_node"]["introducer_peer"]["port"] = int(mainnet_port)
+            config["farmer"]["full_node_peer"]["port"] = int(mainnet_port)
+            config["timelord"]["full_node_peer"]["port"] = int(mainnet_port)
+            config["wallet"]["full_node_peer"]["port"] = int(mainnet_port)
+            config["wallet"]["introducer_peer"]["port"] = int(mainnet_port)
+            config["introducer"]["port"] = int(mainnet_port)
+            config["full_node"]["introducer_peer"]["host"] = mainnet_introducer
+            config["full_node"]["dns_servers"] = [mainnet_dns_introducer]
+            config["selected_network"] = net
+            config["harvester"]["selected_network"] = net
+            config["pool"]["selected_network"] = net
+            config["farmer"]["selected_network"] = net
+            config["timelord"]["selected_network"] = net
+            config["full_node"]["selected_network"] = net
+            config["ui"]["selected_network"] = net
+            config["introducer"]["selected_network"] = net
+            config["wallet"]["selected_network"] = net
+            print("Default full node port, introducer and network setting updated")
+            change_made = True
+        else:
+            print("Please choose True or False")
+
     if change_made:
         print("Restart any running chaingreen services for changes to take effect")
         save_config(root_path, "config.yaml", config)
