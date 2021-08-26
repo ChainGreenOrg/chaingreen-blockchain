@@ -89,6 +89,7 @@ def configure(
         print("Target peer count updated")
         change_made = True
     if testnet is not None:
+        print("Setting Testnet")
         testnet_port = "58744"
         testnet_introducer = "testnet0.introducer.chaingreen.org"
         testnet = "testnet0"

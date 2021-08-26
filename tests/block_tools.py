@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple, Any
 
 from blspy import AugSchemeMPL, G1Element, G2Element, PrivateKey
-from chiabip158 import PyBIP158
+from chaingreenbip158 import PyBIP158
 
 from chaingreen.cmds.init_funcs import create_all_ssl, create_default_chaingreen_config
 from chaingreen.daemon.keychain_proxy import connect_to_keychain_and_validate, wrap_local_keychain
@@ -63,17 +63,22 @@ from chaingreen.types.blockchain_format.slots import (
 )
 from chaingreen.types.blockchain_format.sub_epoch_summary import SubEpochSummary
 from chaingreen.types.blockchain_format.vdf import VDFInfo, VDFProof
+from chaingreen.types.condition_with_args import ConditionWithArgs
 from chaingreen.types.end_of_slot_bundle import EndOfSubSlotBundle
 from chaingreen.types.full_block import FullBlock
 from chaingreen.types.generator_types import BlockGenerator, CompressorArg
 from chaingreen.types.spend_bundle import SpendBundle
 from chaingreen.types.unfinished_block import UnfinishedBlock
+from chaingreen.types.name_puzzle_condition import NPC
 from chaingreen.util.bech32m import encode_puzzle_hash
 from chaingreen.util.block_cache import BlockCache
+from chaingreen.util.condition_tools import ConditionOpcode, conditions_by_opcode
 from chaingreen.util.config import load_config, save_config
 from chaingreen.util.hash import std_hash
-from chaingreen.util.ints import uint8, uint32, uint64, uint128
+from chaingreen.util.ints import uint8, uint16, uint32, uint64, uint128
 from chaingreen.util.keychain import Keychain, bytes_to_mnemonic
+from chaingreen.util.merkle_set import MerkleSet
+from chaingreen.util.prev_transaction_block import get_prev_transaction_block
 from chaingreen.util.path import mkdir
 from chaingreen.util.vdf_prover import get_vdf_info_and_proof
 from tests.wallet_tools import WalletTool
@@ -135,7 +140,7 @@ class BlockTools:
         self.root_path = root_path
         self.local_keychain = keychain
 
-        create_default_chia_config(root_path)
+        create_default_chaingreen_config(root_path)
         create_all_ssl(root_path)
 
         self.local_sk_cache: Dict[bytes32, Tuple[PrivateKey, Any]] = {}
@@ -181,7 +186,7 @@ class BlockTools:
 
         self.farmer_pubkeys: List[G1Element] = [master_sk_to_farmer_sk(sk).get_g1() for sk in self.all_sks]
         if len(self.pool_pubkeys) == 0 or len(self.farmer_pubkeys) == 0:
-            raise RuntimeError("Keys not generated. Run `chia generate keys`")
+            raise RuntimeError("Keys not generated. Run `chaingreen generate keys`")
 
     def change_config(self, new_config: Dict):
         self._config = new_config

@@ -904,6 +904,13 @@ def launch_plotter(root_path: Path, service_name: str, service_array: List[str],
         startupinfo = subprocess.STARTUPINFO()  # type: ignore
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW  # type: ignore
 
+    # Windows-specific.
+    # If the current process group is used, CTRL_C_EVENT will kill the parent and everyone in the group!
+    try:
+        creationflags: int = subprocess.CREATE_NEW_PROCESS_GROUP  # type: ignore
+    except AttributeError:  # Not on Windows.
+        creationflags = 0
+        
     plotter_path = plotter_log_path(root_path, id)
 
     if plotter_path.parent.exists():
@@ -913,7 +920,14 @@ def launch_plotter(root_path: Path, service_name: str, service_array: List[str],
         mkdir(plotter_path.parent)
     outfile = open(plotter_path.resolve(), "w")
     log.info(f"Service array: {service_array}")
-    process = subprocess.Popen(service_array, shell=False, stderr=outfile, stdout=outfile, startupinfo=startupinfo)
+    process = subprocess.Popen(
+        service_array,
+        shell=False,
+        stderr=outfile,
+        stdout=outfile,
+        startupinfo=startupinfo,
+        creationflags=creationflags,
+    )
 
     pid_path = pid_path_for_service(root_path, service_name, id)
     try:
@@ -1111,7 +1125,7 @@ def singleton(lockfile: Path, text: str = "semaphore") -> Optional[TextIO]:
 
 
 async def async_run_daemon(root_path: Path, wait_for_unlock: bool = False) -> int:
-    # When wait_for_unlock is true, we want to skip the check_keys() call in init
+    # When wait_for_unlock is true, we want to skip the check_keys() call in chaingreen_init
     # since it might be necessary to wait for the GUI to unlock the keyring first.
     chaingreen_init(root_path, should_check_keys=(not wait_for_unlock))
     config = load_config(root_path, "config.yaml")

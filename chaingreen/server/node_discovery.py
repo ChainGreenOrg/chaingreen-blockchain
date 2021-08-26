@@ -25,6 +25,11 @@ from chaingreen.util.path import mkdir, path_from_root
 MAX_PEERS_RECEIVED_PER_REQUEST = 1000
 MAX_TOTAL_PEERS_RECEIVED = 3000
 MAX_CONCURRENT_OUTBOUND_CONNECTIONS = 70
+NETWORK_ID_DEFAULT_PORTS = {
+    "mainnet": 8744,
+    "testnet0": 58744,
+
+}
 
 
 class FullNodeDiscovery:
@@ -40,6 +45,7 @@ class FullNodeDiscovery:
         dns_servers: List[str],
         peer_connect_interval: int,
         selected_network: str,
+        default_port: Optional[int],
         log,
     ):
         self.server: ChaingreenServer = server
@@ -79,6 +85,9 @@ class FullNodeDiscovery:
             self.log.exception("Error initializing asyncresolver")
         self.pending_outbound_connections: Set[str] = set()
         self.pending_tasks: Set[asyncio.Task] = set()
+        self.default_port: Optional[int] = default_port
+        if default_port is None and selected_network in NETWORK_ID_DEFAULT_PORTS:
+            self.default_port = NETWORK_ID_DEFAULT_PORTS[selected_network]
 
     async def initialize_address_manager(self) -> None:
         mkdir(self.peer_db_path.parent)
@@ -497,6 +506,7 @@ class FullNodePeers(FullNodeDiscovery):
         dns_servers,
         peer_connect_interval,
         selected_network,
+        default_port,
         log,
     ):
         super().__init__(
@@ -508,6 +518,7 @@ class FullNodePeers(FullNodeDiscovery):
             dns_servers,
             peer_connect_interval,
             selected_network,
+            default_port,
             log,
         )
         self.relay_queue = asyncio.Queue()
@@ -668,6 +679,7 @@ class WalletPeers(FullNodeDiscovery):
         dns_servers,
         peer_connect_interval,
         selected_network,
+        default_port,
         log,
     ) -> None:
         super().__init__(
@@ -679,6 +691,7 @@ class WalletPeers(FullNodeDiscovery):
             dns_servers,
             peer_connect_interval,
             selected_network,
+            default_port,
             log,
         )
 
