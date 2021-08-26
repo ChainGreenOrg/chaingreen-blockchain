@@ -133,7 +133,7 @@ class FullNode:
         self._init_weight_proof = asyncio.create_task(self.initialize_weight_proof())
 
         if self.config.get("enable_profiler", False):
-            asyncio.create_task(profile_task(self.root_path, self.log))
+            asyncio.create_task(profile_task(self.root_path, "node", self.log))
 
         self._sync_task = None
         self._segment_task = None
@@ -178,6 +178,12 @@ class FullNode:
     def set_server(self, server: ChaingreenServer):
         self.server = server
         dns_servers = []
+        try:
+            network_name = self.config["selected_network"]
+            default_port = self.config["network_overrides"]["config"][network_name]["default_full_node_port"]
+        except Exception:
+            self.log.info("Default port field not found in config.")
+            default_port = None
         if "dns_servers" in self.config:
             dns_servers = self.config["dns_servers"]
         elif self.config["port"] == 8744:
@@ -194,6 +200,7 @@ class FullNode:
                 dns_servers,
                 self.config["peer_connect_interval"],
                 self.config["selected_network"],
+                default_port,
                 self.log,
             )
         except Exception as e:
@@ -206,9 +213,7 @@ class FullNode:
         if self.state_changed_callback is not None:
             self.state_changed_callback(change)
 
-    async def short_sync_batch(
-        self, peer: ws.WSChaingreenConnection, start_height: uint32, target_height: uint32
-    ) -> bool:
+    async def short_sync_batch(self, peer: ws.WSChaingreenConnection, start_height: uint32, target_height: uint32) -> bool:
         """
         Tries to sync to a chain which is not too far in the future, by downloading batches of blocks. If the first
         block that we download is not connected to our chain, we return False and do an expensive long sync instead.
@@ -556,9 +561,11 @@ class FullNode:
         self._shut_down = True
         if self._init_weight_proof is not None:
             self._init_weight_proof.cancel()
-        if self.blockchain is not None:
+        # blockchain is created in _start and in certain cases it may not exist here during _close
+        if hasattr(self, "blockchain"):
             self.blockchain.shut_down()
-        if self.mempool_manager is not None:
+        # same for mempool_manager
+        if hasattr(self, "mempool_manager"):
             self.mempool_manager.shut_down()
         if self.full_node_peers is not None:
             asyncio.create_task(self.full_node_peers.close())
@@ -1198,7 +1205,12 @@ class FullNode:
                 )
                 assert result_to_validate.required_iters == pre_validation_results[0].required_iters
                 added, error_code, fork_height = await self.blockchain.receive_block(block, result_to_validate, None)
-
+                if (
+                    self.full_node_store.previous_generator is not None
+                    and fork_height is not None
+                    and fork_height < self.full_node_store.previous_generator.block_height
+                ):
+                    self.full_node_store.previous_generator = None
             validation_time = time.time() - validation_start
 
             if added == ReceiveBlockResult.ALREADY_HAVE_BLOCK:

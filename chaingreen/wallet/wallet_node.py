@@ -359,6 +359,7 @@ class WalletNode:
             DNS_SERVERS_EMPTY,
             self.config["peer_connect_interval"],
             self.config["selected_network"],
+            None,
             self.log,
         )
 
@@ -596,6 +597,7 @@ class WalletNode:
                 break
             asyncio.create_task(self.check_new_peak())
             await self.sync_event.wait()
+            self.last_new_peak_messages = LRUCache(5)
             self.sync_event.clear()
 
             if self._shut_down is True:
@@ -610,6 +612,8 @@ class WalletNode:
             finally:
                 if self.wallet_state_manager is not None:
                     self.wallet_state_manager.set_sync_mode(False)
+                for peer, peak in self.last_new_peak_messages.cache.items():
+                    asyncio.create_task(self.new_peak_wallet(peak, peer))
             self.log.info("Loop end in sync job")
 
     async def _sync(self) -> None:
