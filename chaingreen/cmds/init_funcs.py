@@ -340,7 +340,7 @@ def chaingreen_init(
     protected Keychain. When launching the daemon from the GUI, we want the GUI to
     handle unlocking the keychain.
     """
-    if os.environ.get("CHIA_ROOT", None) is not None:
+    if os.environ.get("CHAINGREEN_ROOT", None) is not None:
         print(
             f"warning, your CHAINGREEN_ROOT is set to {os.environ['CHAINGREEN_ROOT']}. "
             f"Please unset the environment variable and run chaingreen init again\n"
