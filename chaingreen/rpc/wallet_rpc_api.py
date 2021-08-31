@@ -688,7 +688,7 @@ class WalletRpcApi:
     # be removed in the future
     async def get_initial_freeze_period(self, _: Dict):
         # Mon May 03 2021 17:00:00 GMT+0000
-        return {"INITIAL_FREEZE_END_TIMESTAMP": 1620061200}
+        return {"INITIAL_FREEZE_END_TIMESTAMP": 1621027178}
 
     async def get_next_address(self, request: Dict) -> Dict:
         """
