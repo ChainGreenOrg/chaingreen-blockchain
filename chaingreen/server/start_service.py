@@ -9,11 +9,6 @@ from typing import Any, Callable, List, Optional, Tuple
 from chaingreen.daemon.server import singleton, service_launch_lock_path
 from chaingreen.server.ssl_context import chaingreen_ssl_ca_paths, private_ssl_ca_paths
 
-try:
-    import uvloop
-except ImportError:
-    uvloop = None
-
 from chaingreen.rpc.rpc_server import start_rpc_server
 from chaingreen.server.outbound_message import NodeType
 from chaingreen.server.server import ChaingreenServer
@@ -246,6 +241,4 @@ async def async_run_service(*args, **kwargs) -> None:
 
 
 def run_service(*args, **kwargs) -> None:
-    if uvloop is not None:
-        uvloop.install()
     return asyncio.run(async_run_service(*args, **kwargs))
