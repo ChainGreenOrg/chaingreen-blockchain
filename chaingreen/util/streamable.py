@@ -11,12 +11,11 @@ from typing import Any, BinaryIO, Dict, List, Tuple, Type, Callable, Optional, I
 
 from blspy import G1Element, G2Element, PrivateKey
 
-from chaingreen.types.blockchain_format.program import Program, SerializedProgram
-from chaingreen.types.blockchain_format.sized_bytes import bytes32
-from chaingreen.util.byte_types import hexstr_to_bytes
-from chaingreen.util.hash import std_hash
-from chaingreen.util.ints import int64, int512, uint32, uint64, uint128
-from chaingreen.util.type_checking import is_type_List, is_type_SpecificOptional, is_type_Tuple, strictdataclass
+from chia.types.blockchain_format.sized_bytes import bytes32
+from chia.util.byte_types import hexstr_to_bytes
+from chia.util.hash import std_hash
+from chia.util.ints import int64, int512, uint32, uint64, uint128
+from chia.util.type_checking import is_type_List, is_type_SpecificOptional, is_type_Tuple, strictdataclass
 
 if sys.version_info < (3, 8):
 
@@ -39,11 +38,11 @@ size_hints = {
     "ConditionOpcode": 1,
 }
 unhashable_types = [
-    PrivateKey,
-    G1Element,
-    G2Element,
-    Program,
-    SerializedProgram,
+    "PrivateKey",
+    "G1Element",
+    "G2Element",
+    "Program",
+    "SerializedProgram",
 ]
 # JSON does not support big ints, so these types must be serialized differently in JSON
 big_ints = [uint64, int64, uint128, int512]
@@ -77,7 +76,7 @@ def dataclass_from_dict(klass, d):
     elif issubclass(klass, bytes):
         # Type is bytes, data is a hex string
         return klass(hexstr_to_bytes(d))
-    elif klass in unhashable_types:
+    elif klass.__name__ in unhashable_types:
         # Type is unhashable (bls type), so cast from hex string
         return klass.from_bytes(hexstr_to_bytes(d))
     else:
@@ -93,7 +92,7 @@ def recurse_jsonify(d):
     if isinstance(d, list) or isinstance(d, tuple):
         new_list = []
         for item in d:
-            if type(item) in unhashable_types or issubclass(type(item), bytes):
+            if type(item).__name__ in unhashable_types or issubclass(type(item), bytes):
                 item = f"0x{bytes(item).hex()}"
             if isinstance(item, dict):
                 item = recurse_jsonify(item)
@@ -110,7 +109,7 @@ def recurse_jsonify(d):
 
     else:
         for key, value in d.items():
-            if type(value) in unhashable_types or issubclass(type(value), bytes):
+            if type(value).__name__ in unhashable_types or issubclass(type(value), bytes):
                 d[key] = f"0x{bytes(value).hex()}"
             if isinstance(value, dict):
                 d[key] = recurse_jsonify(value)
