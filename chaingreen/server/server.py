@@ -449,6 +449,7 @@ class ChaingreenServer:
             if is_feeler:
                 asyncio.create_task(connection.close())
             return True
+        
         except client_exceptions.ClientConnectorError as e:
             self.log.info(f"{e}")
         except ProtocolError as e:

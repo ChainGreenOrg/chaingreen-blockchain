@@ -55,6 +55,7 @@ pip-delete-this-directory.txt
 .python-version
 .eggs
 .venv
+.tvenv
 venv
 activate
 
