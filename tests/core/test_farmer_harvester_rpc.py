@@ -1,5 +1,6 @@
 # flake8: noqa: E501
 import logging
+from os import unlink
 from pathlib import Path
 from secrets import token_bytes
 from shutil import copy, move
@@ -8,17 +9,17 @@ import pytest
 from blspy import AugSchemeMPL
 from chiapos import DiskPlotter
 
-from chaingreen.consensus.coinbase import create_puzzlehash_for_pk
-from chaingreen.plotting.util import stream_plot_info_ph, stream_plot_info_pk, PlotRefreshResult
-from chaingreen.plotting.manager import PlotManager
-from chaingreen.protocols import farmer_protocol
-from chaingreen.rpc.farmer_rpc_api import FarmerRpcApi
-from chaingreen.rpc.farmer_rpc_client import FarmerRpcClient
-from chaingreen.rpc.harvester_rpc_api import HarvesterRpcApi
-from chaingreen.rpc.harvester_rpc_client import HarvesterRpcClient
-from chaingreen.rpc.rpc_server import start_rpc_server
-from chaingreen.types.blockchain_format.sized_bytes import bytes32
-from chaingreen.util.bech32m import decode_puzzle_hash, encode_puzzle_hash
+from chia.consensus.coinbase import create_puzzlehash_for_pk
+from chia.plotting.util import stream_plot_info_ph, stream_plot_info_pk, PlotRefreshResult
+from chia.plotting.manager import PlotManager
+from chia.protocols import farmer_protocol
+from chia.rpc.farmer_rpc_api import FarmerRpcApi
+from chia.rpc.farmer_rpc_client import FarmerRpcClient
+from chia.rpc.harvester_rpc_api import HarvesterRpcApi
+from chia.rpc.harvester_rpc_client import HarvesterRpcClient
+from chia.rpc.rpc_server import start_rpc_server
+from chia.types.blockchain_format.sized_bytes import bytes32
+from chia.util.bech32m import decode_puzzle_hash, encode_puzzle_hash
 from tests.block_tools import get_plot_dir
 from chaingreen.util.byte_types import hexstr_to_bytes
 from chaingreen.util.config import load_config, save_config
@@ -201,6 +202,7 @@ class TestRpc:
                 await time_out_assert(5, harvester.plot_manager.needs_refresh, value=False)
                 result = await client_2.get_plots()
                 assert len(result["plots"]) == expect_total_plots
+                assert len(harvester.plot_manager.cache) == expect_total_plots
                 assert len(harvester.plot_manager.failed_to_open_filenames) == 0
 
             # Add plot_dir with two new plots
@@ -356,39 +358,6 @@ class TestRpc:
             await time_out_assert(5, plot_manager.needs_refresh, value=False)
             assert len(plot_manager.plots) == len(harvester.plot_manager.plots)
             plot_manager.stop_refreshing()
-
-            # Test re-trying if processing a plot failed
-            # First save the plot
-            retry_test_plot = Path(plot_dir_sub / filename_2).resolve()
-            retry_test_plot_save = Path(plot_dir_sub / "save").resolve()
-            copy(retry_test_plot, retry_test_plot_save)
-            # Invalidate the plot
-            with open(plot_dir_sub / filename_2, "r+b") as file:
-                file.write(bytes(100))
-            # Add it and validate it fails to load
-            await harvester.add_plot_directory(str(plot_dir_sub))
-            expected_result.loaded_plots = 0
-            expected_result.removed_plots = 0
-            expected_result.processed_files = 1
-            expected_result.remaining_files = 0
-            harvester.plot_manager.start_refreshing()
-            await time_out_assert(5, harvester.plot_manager.needs_refresh, value=False)
-            assert retry_test_plot in harvester.plot_manager.failed_to_open_filenames
-            # Make sure the file stays in `failed_to_open_filenames` and doesn't get loaded or processed in the next
-            # update round
-            expected_result.loaded_plots = 0
-            expected_result.processed_files = 0
-            harvester.plot_manager.trigger_refresh()
-            await time_out_assert(5, harvester.plot_manager.needs_refresh, value=False)
-            assert retry_test_plot in harvester.plot_manager.failed_to_open_filenames
-            # Now decrease the re-try timeout, restore the valid plot file and make sure it properly loads now
-            harvester.plot_manager.refresh_parameter.retry_invalid_seconds = 0
-            move(retry_test_plot_save, retry_test_plot)
-            expected_result.loaded_plots = 1
-            expected_result.processed_files = 1
-            harvester.plot_manager.trigger_refresh()
-            await time_out_assert(5, harvester.plot_manager.needs_refresh, value=False)
-            assert retry_test_plot not in harvester.plot_manager.failed_to_open_filenames
 
             # Test re-trying if processing a plot failed
             # First save the plot
