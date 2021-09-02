@@ -685,7 +685,7 @@ class WalletStateManager:
 
         all_outgoing_tx: Dict[int, List[TransactionRecord]] = {}
         for wallet_id in wallet_ids:
-            all_outgoing_tx[wallet_id] = await self.tx_store.get_all_transactions(
+            all_outgoing_tx[wallet_id] = await self.tx_store.get_all_transactions_for_wallet(
                 wallet_id, TransactionType.OUTGOING_TX
             )
 
@@ -752,7 +752,7 @@ class WalletStateManager:
         removed = []
         all_unconfirmed: List[TransactionRecord] = await self.tx_store.get_all_unconfirmed()
         for coin in coins:
-            record = await self.coin_store.get_coin_record_by_coin_id(coin.name())
+            record = await self.coin_store.get_coin_record(coin.name())
             if coin.name() in trade_removals:
                 trade_coin_removed.append(coin)
             if record is None:
@@ -762,6 +762,7 @@ class WalletStateManager:
             for unconfirmed_record in all_unconfirmed:
                 for rem_coin in unconfirmed_record.removals:
                     if rem_coin.name() == coin.name():
+                        self.log.info(f"Setting tx_id: {unconfirmed_record.name} to confirmed")
                         await self.tx_store.set_confirmed(unconfirmed_record.name, height)
             if record is not None:
                 removed.append(record)
@@ -777,7 +778,7 @@ class WalletStateManager:
         wallet_type: WalletType,
         height: uint32,
         all_outgoing_transaction_records: List[TransactionRecord],
-    ):
+    ) -> WalletCoinRecord:
         """
         Adding coin to DB
         """
@@ -851,7 +852,7 @@ class WalletStateManager:
             wallet = self.wallets[wallet_id]
             await wallet.coin_added(coin, height)
 
-        self.state_changed("coin_added", wallet_id)
+        return coin_record
 
     async def add_pending_transaction(self, tx_record: TransactionRecord):
         """
@@ -889,7 +890,7 @@ class WalletStateManager:
         """
         Retrieves all confirmed and pending transactions
         """
-        records = await self.tx_store.get_all_transactions(wallet_id)
+        records = await self.tx_store.get_all_transactions_for_wallet(wallet_id)
         return records
 
     async def get_transaction(self, tx_id: bytes32) -> Optional[TransactionRecord]:
@@ -938,7 +939,7 @@ class WalletStateManager:
                 reorg_blocks.append(header_block_record)
                 if curr.height == 0:
                     break
-                curr = self.blockchain.block_record(curr.prev_hash)
+                curr = await self.blockchain.get_block_record_from_db(curr.prev_hash)
             reorg_blocks.reverse()
 
             # For each block, process additions to get all Coins, then process removals to get unspent coins
@@ -1018,7 +1019,7 @@ class WalletStateManager:
                 TransactionType.OUTGOING_TRADE,
                 TransactionType.INCOMING_TRADE,
             ]:
-                await self.tx_store.tx_reorged(record.name)
+                await self.tx_store.tx_reorged(record)
 
         # Removes wallets that were created from a blockchain transaction which got reorged.
         remove_ids = []
