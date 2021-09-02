@@ -44,7 +44,7 @@ from tests.core.fixtures import empty_blockchain  # noqa: F401
 from tests.core.fixtures import create_blockchain
 from tests.setup_nodes import bt, test_constants
 from tests.util.keyring import TempKeyring
-from chia.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import (
+from chaingreen.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import (
     DEFAULT_HIDDEN_PUZZLE_HASH,
     calculate_synthetic_secret_key,
 )
