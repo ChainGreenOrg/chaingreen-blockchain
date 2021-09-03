@@ -235,7 +235,7 @@ class BlockTools:
                 test_private_keys=test_private_keys[:num_pool_public_key_plots],
             )
             # Create more plots, but to a pool address instead of public key
-            plot_keys_2 = PlotKeys(self.farmer_pk, None, encode_puzzle_hash(self.pool_ph, "xch"))
+            plot_keys_2 = PlotKeys(self.farmer_pk, None, encode_puzzle_hash(self.pool_ph, "cgn"))
             args.num = num_pool_address_plots
             await create_plots(
                 args,

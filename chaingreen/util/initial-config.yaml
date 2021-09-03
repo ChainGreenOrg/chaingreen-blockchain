@@ -104,7 +104,7 @@ harvester:
 
 pool:
   # Replace this with a real puzzle hash
-  # xch_target_address: tcgrn1nuh3hryqqxy54vsty0kz59muuvhr9lq8ar8le90junf68qnp94xqmenazy
+  # cgn_target_address: tcgrn1nuh3hryqqxy54vsty0kz59muuvhr9lq8ar8le90junf68qnp94xqmenazy
   logging: *logging
   network_overrides: *network_overrides
   selected_network: *selected_network
@@ -124,7 +124,7 @@ farmer:
   pool_public_keys: []
 
   # Replace this with a real puzzle hash
-  # xch_target_address: tcgrn1nuh3hryqqxy54vsty0kz59muuvhr9lq8ar8le90junf68qnp94xqmenazy
+  # cgn_target_address: tcgrn1nuh3hryqqxy54vsty0kz59muuvhr9lq8ar8le90junf68qnp94xqmenazy
 
   # If True, starts an RPC server at the following port
   start_rpc_server: True
