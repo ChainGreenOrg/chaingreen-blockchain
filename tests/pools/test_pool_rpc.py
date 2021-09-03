@@ -162,7 +162,7 @@ class TestPoolWalletRpc:
         )
         plot_id = ProofOfSpace.calculate_plot_id_ph(p2_singleton_puzzle_hash, plot_public_key)
         try:
-            plot_keys = PlotKeys(bt.farmer_pk, None, encode_puzzle_hash(p2_singleton_puzzle_hash, "txch"))
+            plot_keys = PlotKeys(bt.farmer_pk, None, encode_puzzle_hash(p2_singleton_puzzle_hash, "tcgn"))
 
             await create_plots(
                 args,
@@ -460,7 +460,7 @@ class TestPoolWalletRpc:
         assert len(await wallet_node_0.wallet_state_manager.tx_store.get_unconfirmed_for_wallet(2)) == 0
 
         tr: TransactionRecord = await client.send_transaction(
-            1, 100, encode_puzzle_hash(status.p2_singleton_puzzle_hash, "txch")
+            1, 100, encode_puzzle_hash(status.p2_singleton_puzzle_hash, "tcgn")
         )
         await time_out_assert(
             10,
@@ -487,7 +487,7 @@ class TestPoolWalletRpc:
         for summary in summaries_response:
             if WalletType(int(summary["type"])) == WalletType.POOLING_WALLET:
                 assert False
-        # Balance stars at 6 XCH
+        # Balance stars at 6 CGN
         assert (await wallet_0.get_confirmed_balance()) == 6000000000000
         creation_tx: TransactionRecord = await client.create_new_pool_wallet(
             our_ph, "http://123.45.67.89", 10, "localhost:5000", "new", "FARMING_TO_POOL"
@@ -561,7 +561,7 @@ class TestPoolWalletRpc:
         assert (
             wallet_node_0.wallet_state_manager.get_peak().height == full_node_api.full_node.blockchain.get_peak().height
         )
-        # Balance stars at 6 XCH and 5 more blocks are farmed, total 22 XCH
+        # Balance stars at 6 CGN and 5 more blocks are farmed, total 22 CGN
         assert (await wallet_0.get_confirmed_balance()) == 21999999999999
 
     @pytest.mark.asyncio

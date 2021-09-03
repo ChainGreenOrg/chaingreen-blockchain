@@ -91,13 +91,13 @@ def get_transactions_cmd(
 @click.option(
     "-m",
     "--fee",
-    help="Set the fees for the transaction, in XCH",
+    help="Set the fees for the transaction, in CGN",
     type=str,
     default="0",
     show_default=True,
     required=True,
 )
-@click.option("-t", "--address", help="Address to send the XCH", type=str, required=True)
+@click.option("-t", "--address", help="Address to send the CGN", type=str, required=True)
 @click.option(
     "-o", "--override", help="Submits transaction without checking for unusual values", is_flag=True, default=False
 )

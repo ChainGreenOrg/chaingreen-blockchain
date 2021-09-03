@@ -135,7 +135,7 @@ class TestRLWallet:
         assert await wallet.get_confirmed_balance() == fund_owners_initial_balance - 101
         assert await check_balance(api_user, user_wallet_id) == 100
         receiving_wallet = wallet_node_2.wallet_state_manager.main_wallet
-        address = encode_puzzle_hash(await receiving_wallet.get_new_puzzlehash(), "xch")
+        address = encode_puzzle_hash(await receiving_wallet.get_new_puzzlehash(), "cgn")
         assert await receiving_wallet.get_spendable_balance() == 0
         val = await api_user.send_transaction({"wallet_id": user_wallet_id, "amount": 3, "fee": 2, "address": address})
         assert "transaction_id" in val
@@ -154,7 +154,7 @@ class TestRLWallet:
         await time_out_assert(15, wallet_height_at_least, True, wallet_node, 68)
         assert await check_balance(api_user, user_wallet_id) == 195
         # test spending
-        puzzle_hash = encode_puzzle_hash(await receiving_wallet.get_new_puzzlehash(), "xch")
+        puzzle_hash = encode_puzzle_hash(await receiving_wallet.get_new_puzzlehash(), "cgn")
         val = await api_user.send_transaction(
             {"wallet_id": user_wallet_id, "amount": 105, "fee": 0, "address": puzzle_hash}
         )
