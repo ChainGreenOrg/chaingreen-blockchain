@@ -35,29 +35,30 @@ from chaingreen.protocols.full_node_protocol import (
     RespondBlocks,
     RespondSignagePoint,
 )
-from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
-from chaingreen.server.node_discovery import FullNodePeers
-from chaingreen.server.outbound_message import Message, NodeType, make_msg
-from chaingreen.server.server import ChaingreenServer
-from chaingreen.types.blockchain_format.classgroup import ClassgroupElement
-from chaingreen.types.blockchain_format.pool_target import PoolTarget
-from chaingreen.types.blockchain_format.sized_bytes import bytes32
-from chaingreen.types.blockchain_format.sub_epoch_summary import SubEpochSummary
-from chaingreen.types.blockchain_format.vdf import CompressibleVDFField, VDFInfo, VDFProof
-from chaingreen.types.end_of_slot_bundle import EndOfSubSlotBundle
-from chaingreen.types.full_block import FullBlock
-from chaingreen.types.header_block import HeaderBlock
-from chaingreen.types.mempool_inclusion_status import MempoolInclusionStatus
-from chaingreen.types.spend_bundle import SpendBundle
-from chaingreen.types.unfinished_block import UnfinishedBlock
-from chaingreen.util.bech32m import encode_puzzle_hash
-from chaingreen.util.check_fork_next_block import check_fork_next_block
-from chaingreen.util.db_wrapper import DBWrapper
-from chaingreen.util.errors import ConsensusError, Err
-from chaingreen.util.ints import uint8, uint32, uint64, uint128
-from chaingreen.util.path import mkdir, path_from_root
-from chaingreen.util.safe_cancel_task import cancel_task_safe
-from chaingreen.util.profiler import profile_task
+from chia.protocols.protocol_message_types import ProtocolMessageTypes
+from chia.server.node_discovery import FullNodePeers
+from chia.server.outbound_message import Message, NodeType, make_msg
+from chia.server.server import ChiaServer
+from chia.types.blockchain_format.classgroup import ClassgroupElement
+from chia.types.blockchain_format.pool_target import PoolTarget
+from chia.types.blockchain_format.sized_bytes import bytes32
+from chia.types.blockchain_format.sub_epoch_summary import SubEpochSummary
+from chia.types.blockchain_format.vdf import CompressibleVDFField, VDFInfo, VDFProof
+from chia.types.end_of_slot_bundle import EndOfSubSlotBundle
+from chia.types.full_block import FullBlock
+from chia.types.header_block import HeaderBlock
+from chia.types.mempool_inclusion_status import MempoolInclusionStatus
+from chia.types.spend_bundle import SpendBundle
+from chia.types.unfinished_block import UnfinishedBlock
+from chia.util.bech32m import encode_puzzle_hash
+from chia.util.check_fork_next_block import check_fork_next_block
+from chia.util.db_wrapper import DBWrapper
+from chia.util.errors import ConsensusError, Err
+from chia.util.ints import uint8, uint32, uint64, uint128
+from chia.util.path import mkdir, path_from_root
+from chia.util.safe_cancel_task import cancel_task_safe
+from chia.util.profiler import profile_task
+from datetime import datetime
 
 
 class FullNode:
@@ -121,6 +122,17 @@ class FullNode:
         self.new_peak_sem = asyncio.Semaphore(8)
         # create the store (db) and full node instance
         self.connection = await aiosqlite.connect(self.db_path)
+        if self.config.get("log_sqlite_cmds", False):
+            sql_log_path = path_from_root(self.root_path, "log/sql.log")
+            self.log.info(f"logging SQL commands to {sql_log_path}")
+
+            def sql_trace_callback(req: str):
+                timestamp = datetime.now().strftime("%H:%M:%S.%f")
+                log = open(sql_log_path, "a")
+                log.write(timestamp + " " + req + "\n")
+                log.close()
+
+            await self.connection.set_trace_callback(sql_trace_callback)
         self.db_wrapper = DBWrapper(self.connection)
         self.block_store = await BlockStore.create(self.db_wrapper)
         self.sync_store = await SyncStore.create()
