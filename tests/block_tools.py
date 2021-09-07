@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple, Any
 
 from blspy import AugSchemeMPL, G1Element, G2Element, PrivateKey
-from chaingreenbip158 import PyBIP158
+from chiabip158 import PyBIP158
 
 from chaingreen.cmds.init_funcs import create_all_ssl, create_default_chaingreen_config
 from chaingreen.daemon.keychain_proxy import connect_to_keychain_and_validate, wrap_local_keychain
@@ -235,7 +235,7 @@ class BlockTools:
                 test_private_keys=test_private_keys[:num_pool_public_key_plots],
             )
             # Create more plots, but to a pool address instead of public key
-            plot_keys_2 = PlotKeys(self.farmer_pk, None, encode_puzzle_hash(self.pool_ph, "cgn"))
+            plot_keys_2 = PlotKeys(self.farmer_pk, None, encode_puzzle_hash(self.pool_ph, "xch"))
             args.num = num_pool_address_plots
             await create_plots(
                 args,
@@ -1264,7 +1264,7 @@ def get_challenges(
 
 
 def get_plot_dir() -> Path:
-    cache_path = Path(os.path.expanduser(os.getenv("CHAINGREEN_ROOT", "~/.chaingreen/"))) / "test-plots"
+    cache_path = Path(os.path.expanduser(os.getenv("CHAINGREEN_ROOT", "~/.chaingreentest/"))) / "test-plots"
     mkdir(cache_path)
     return cache_path
 

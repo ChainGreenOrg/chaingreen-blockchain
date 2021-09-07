@@ -101,8 +101,8 @@ def persistent_blocks(
 ):
     # try loading from disc, if not create new blocks.db file
     # TODO hash fixtures.py and blocktool.py, add to path, delete if the files changed
-    block_path_dir = Path("~/.chaingreen/blocks").expanduser()
-    file_path = Path(f"~/.chaingreen/blocks/{db_name}").expanduser()
+    block_path_dir = Path("~/.chaingreentest/blocks").expanduser()
+    file_path = Path(f"~/.chaingreentest/blocks/{db_name}").expanduser()
     if not path.exists(block_path_dir):
         mkdir(block_path_dir.parent)
         mkdir(block_path_dir)
