@@ -12,55 +12,55 @@ from blspy import AugSchemeMPL, G1Element, PrivateKey
 from chiabip158 import PyBIP158
 from cryptography.fernet import Fernet
 
-from chaingreen import __version__
-from chaingreen.consensus.block_record import BlockRecord
-from chaingreen.consensus.coinbase import pool_parent_id, farmer_parent_id
-from chaingreen.consensus.constants import ConsensusConstants
-from chaingreen.consensus.find_fork_point import find_fork_point_in_chain
-from chaingreen.full_node.weight_proof import WeightProofHandler
-from chaingreen.pools.pool_puzzles import SINGLETON_LAUNCHER_HASH, solution_to_extra_data
-from chaingreen.pools.pool_wallet import PoolWallet
-from chaingreen.protocols.wallet_protocol import PuzzleSolutionResponse, RespondPuzzleSolution
-from chaingreen.types.blockchain_format.coin import Coin
-from chaingreen.types.blockchain_format.program import Program
-from chaingreen.types.blockchain_format.sized_bytes import bytes32
-from chaingreen.types.coin_spend import CoinSpend
-from chaingreen.types.full_block import FullBlock
-from chaingreen.types.header_block import HeaderBlock
-from chaingreen.types.mempool_inclusion_status import MempoolInclusionStatus
-from chaingreen.util.byte_types import hexstr_to_bytes
-from chaingreen.util.db_wrapper import DBWrapper
-from chaingreen.util.errors import Err
-from chaingreen.util.hash import std_hash
-from chaingreen.util.ints import uint32, uint64, uint128
-from chaingreen.wallet.block_record import HeaderBlockRecord
-from chaingreen.wallet.cc_wallet.cc_wallet import CCWallet
-from chaingreen.wallet.derivation_record import DerivationRecord
-from chaingreen.wallet.derive_keys import master_sk_to_backup_sk, master_sk_to_wallet_sk
-from chaingreen.wallet.key_val_store import KeyValStore
-from chaingreen.wallet.rl_wallet.rl_wallet import RLWallet
-from chaingreen.wallet.settings.user_settings import UserSettings
-from chaingreen.wallet.trade_manager import TradeManager
-from chaingreen.wallet.transaction_record import TransactionRecord
-from chaingreen.wallet.util.backup_utils import open_backup_file
-from chaingreen.wallet.util.transaction_type import TransactionType
-from chaingreen.wallet.util.wallet_types import WalletType
-from chaingreen.wallet.wallet import Wallet
-from chaingreen.wallet.wallet_action import WalletAction
-from chaingreen.wallet.wallet_action_store import WalletActionStore
-from chaingreen.wallet.wallet_block_store import WalletBlockStore
-from chaingreen.wallet.wallet_blockchain import WalletBlockchain
-from chaingreen.wallet.wallet_coin_record import WalletCoinRecord
-from chaingreen.wallet.wallet_coin_store import WalletCoinStore
-from chaingreen.wallet.wallet_info import WalletInfo, WalletInfoBackup
-from chaingreen.wallet.wallet_interested_store import WalletInterestedStore
-from chaingreen.wallet.wallet_pool_store import WalletPoolStore
-from chaingreen.wallet.wallet_puzzle_store import WalletPuzzleStore
-from chaingreen.wallet.wallet_sync_store import WalletSyncStore
-from chaingreen.wallet.wallet_transaction_store import WalletTransactionStore
-from chaingreen.wallet.wallet_user_store import WalletUserStore
-from chaingreen.server.server import ChaingreenServer
-from chaingreen.wallet.did_wallet.did_wallet import DIDWallet
+from chia import __version__
+from chia.consensus.block_record import BlockRecord
+from chia.consensus.coinbase import pool_parent_id, farmer_parent_id
+from chia.consensus.constants import ConsensusConstants
+from chia.consensus.find_fork_point import find_fork_point_in_chain
+from chia.full_node.weight_proof import WeightProofHandler
+from chia.pools.pool_puzzles import SINGLETON_LAUNCHER_HASH, solution_to_pool_state
+from chia.pools.pool_wallet import PoolWallet
+from chia.protocols.wallet_protocol import PuzzleSolutionResponse, RespondPuzzleSolution
+from chia.types.blockchain_format.coin import Coin
+from chia.types.blockchain_format.program import Program
+from chia.types.blockchain_format.sized_bytes import bytes32
+from chia.types.coin_spend import CoinSpend
+from chia.types.full_block import FullBlock
+from chia.types.header_block import HeaderBlock
+from chia.types.mempool_inclusion_status import MempoolInclusionStatus
+from chia.util.byte_types import hexstr_to_bytes
+from chia.util.db_wrapper import DBWrapper
+from chia.util.errors import Err
+from chia.util.hash import std_hash
+from chia.util.ints import uint32, uint64, uint128
+from chia.wallet.block_record import HeaderBlockRecord
+from chia.wallet.cc_wallet.cc_wallet import CCWallet
+from chia.wallet.derivation_record import DerivationRecord
+from chia.wallet.derive_keys import master_sk_to_backup_sk, master_sk_to_wallet_sk
+from chia.wallet.key_val_store import KeyValStore
+from chia.wallet.rl_wallet.rl_wallet import RLWallet
+from chia.wallet.settings.user_settings import UserSettings
+from chia.wallet.trade_manager import TradeManager
+from chia.wallet.transaction_record import TransactionRecord
+from chia.wallet.util.backup_utils import open_backup_file
+from chia.wallet.util.transaction_type import TransactionType
+from chia.wallet.util.wallet_types import WalletType
+from chia.wallet.wallet import Wallet
+from chia.wallet.wallet_action import WalletAction
+from chia.wallet.wallet_action_store import WalletActionStore
+from chia.wallet.wallet_block_store import WalletBlockStore
+from chia.wallet.wallet_blockchain import WalletBlockchain
+from chia.wallet.wallet_coin_record import WalletCoinRecord
+from chia.wallet.wallet_coin_store import WalletCoinStore
+from chia.wallet.wallet_info import WalletInfo, WalletInfoBackup
+from chia.wallet.wallet_interested_store import WalletInterestedStore
+from chia.wallet.wallet_pool_store import WalletPoolStore
+from chia.wallet.wallet_puzzle_store import WalletPuzzleStore
+from chia.wallet.wallet_sync_store import WalletSyncStore
+from chia.wallet.wallet_transaction_store import WalletTransactionStore
+from chia.wallet.wallet_user_store import WalletUserStore
+from chia.server.server import ChiaServer
+from chia.wallet.did_wallet.did_wallet import DIDWallet
 
 
 def get_balance_from_coin_records(coin_records: Set[WalletCoinRecord]) -> uint128:
@@ -509,12 +509,15 @@ class WalletStateManager:
     async def get_confirmed_balance_for_wallet_already_locked(self, wallet_id: int) -> uint128:
         # This is a workaround to be able to call la locking operation when already locked
         # for example, in the create method of DID wallet
-        assert self.lock.locked() is False
+        if self.lock.locked() is False:
+            raise AssertionError("expected wallet_state_manager to be locked")
         unspent_coin_records = await self.coin_store.get_unspent_coins_for_wallet(wallet_id)
         return get_balance_from_coin_records(unspent_coin_records)
 
     async def get_confirmed_balance_for_wallet(
-        self, wallet_id: int, unspent_coin_records: Optional[Set[WalletCoinRecord]] = None
+        self,
+        wallet_id: int,
+        unspent_coin_records: Optional[Set[WalletCoinRecord]] = None,
     ) -> uint128:
         """
         Returns the confirmed balance, including coinbase rewards that are not spendable.
@@ -527,6 +530,9 @@ class WalletStateManager:
         return get_balance_from_coin_records(unspent_coin_records)
 
     async def get_confirmed_balance_for_wallet_with_lock(self, wallet_id: int) -> Set[WalletCoinRecord]:
+        if self.lock.locked() is True:
+            # raise AssertionError("expected wallet_state_manager to be unlocked")
+            pass
         async with self.lock:
             return await self.coin_store.get_unspent_coins_for_wallet(wallet_id)
 
@@ -539,20 +545,28 @@ class WalletStateManager:
         """
         # This API should change so that get_balance_from_coin_records is called for Set[WalletCoinRecord]
         # and this method is called only for the unspent_coin_records==None case.
-        confirmed = await self.get_confirmed_balance_for_wallet(wallet_id, unspent_coin_records)
+        confirmed_amount = await self.get_confirmed_balance_for_wallet(wallet_id, unspent_coin_records)
+        return await self._get_unconfirmed_balance(wallet_id, confirmed_amount)
+
+    async def get_unconfirmed_balance_already_locked(self, wallet_id) -> uint128:
+        confirmed_amount = await self.get_confirmed_balance_for_wallet_already_locked(wallet_id)
+        return await self._get_unconfirmed_balance(wallet_id, confirmed_amount)
+
+    async def _get_unconfirmed_balance(self, wallet_id, confirmed: uint128) -> uint128:
         unconfirmed_tx: List[TransactionRecord] = await self.tx_store.get_unconfirmed_for_wallet(wallet_id)
         removal_amount: int = 0
         addition_amount: int = 0
 
         for record in unconfirmed_tx:
             for removal in record.removals:
-                removal_amount += removal.amount
+                if await self.does_coin_belong_to_wallet(removal, wallet_id):
+                    removal_amount += removal.amount
             for addition in record.additions:
                 # This change or a self transaction
                 if await self.does_coin_belong_to_wallet(addition, wallet_id):
                     addition_amount += addition.amount
 
-        result = confirmed - removal_amount + addition_amount
+        result = (confirmed + addition_amount) - removal_amount
         return uint128(result)
 
     async def unconfirmed_additions_for_wallet(self, wallet_id: int) -> Dict[bytes32, Coin]:
@@ -599,6 +613,7 @@ class WalletStateManager:
             for cs in additional_coin_spends:
                 if cs.coin.puzzle_hash == SINGLETON_LAUNCHER_HASH:
                     already_have = False
+                    pool_state = None
                     for wallet_id, wallet in self.wallets.items():
                         if (
                             wallet.type() == WalletType.POOLING_WALLET
@@ -608,9 +623,12 @@ class WalletStateManager:
                             already_have = True
                     if not already_have:
                         try:
-                            solution_to_extra_data(cs)
+                            pool_state = solution_to_pool_state(cs)
                         except Exception as e:
                             self.log.debug(f"Not a pool wallet launcher {e}")
+                            continue
+                        if pool_state is None:
+                            self.log.debug("Not a pool wallet launcher")
                             continue
                         self.log.info("Found created launcher. Creating pool wallet")
                         pool_wallet = await PoolWallet.create(
