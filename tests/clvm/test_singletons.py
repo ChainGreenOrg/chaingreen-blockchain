@@ -25,7 +25,7 @@ from tests.clvm.test_puzzles import (
     secret_exponent_for_index,
 )
 
-from chia.clvm.spend_sim import SpendSim, SimClient
+from chaingreen.clvm.spend_sim import SpendSim, SimClient
 
 """
 This test suite aims to test:
