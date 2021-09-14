@@ -4,12 +4,13 @@ from blspy import AugSchemeMPL
 from clvm import KEYWORD_FROM_ATOM
 from clvm_tools.binutils import disassemble as bu_disassemble
 
-from chaingreen.types.blockchain_format.coin import Coin
-from chaingreen.types.blockchain_format.program import Program, INFINITE_COST
-from chaingreen.types.blockchain_format.sized_bytes import bytes32
-from chaingreen.types.condition_opcodes import ConditionOpcode
-from chaingreen.util.condition_tools import conditions_dict_for_solution, pkm_pairs_for_conditions_dict
-from chaingreen.util.hash import std_hash
+from chia.types.blockchain_format.coin import Coin
+from chia.types.blockchain_format.program import Program, INFINITE_COST
+from chia.types.blockchain_format.sized_bytes import bytes32
+from chia.consensus.default_constants import DEFAULT_CONSTANTS
+from chia.types.condition_opcodes import ConditionOpcode
+from chia.util.condition_tools import conditions_dict_for_solution, pkm_pairs_for_conditions_dict
+from chia.util.hash import std_hash
 
 CONDITIONS = dict((k, bytes(v)[0]) for k, v in ConditionOpcode.__members__.items())  # pylint: disable=E1101
 KFA = {v: k for k, v in CONDITIONS.items()}
@@ -40,7 +41,7 @@ def dump_coin(coin: Coin) -> str:
     return disassemble(coin_as_program(coin))
 
 
-def debug_spend_bundle(spend_bundle, agg_sig_additional_data=bytes([3] * 32)) -> None:
+def debug_spend_bundle(spend_bundle, agg_sig_additional_data=DEFAULT_CONSTANTS.AGG_SIG_ME_ADDITIONAL_DATA) -> None:
     """
     Print a lot of useful information about a `SpendBundle` that might help with debugging
     its clvm.
