@@ -1,5 +1,5 @@
 #
-# THIS FILE IS GENERATED. SEE https://github.com/Chia-Network/chaingreen-blockchain/tree/main/tests#readme
+# THIS FILE IS GENERATED. SEE https://github.com/Chia-Network/chia-blockchain/tree/main/tests#readme
 #
 name: Ubuntu TEST_NAME Test
 
@@ -63,7 +63,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
 
-CHECKOUT_TEST_BLOCKS_AND_PLOTS
+#CHECKOUT_TEST_BLOCKS_AND_PLOTS
 
     - name: Link home directory
       run: |
@@ -85,7 +85,7 @@ CHECKOUT_TEST_BLOCKS_AND_PLOTS
       run: |
         sh install.sh
 
-INSTALL_TIMELORD
+#INSTALL_TIMELORD
 
     - name: Install developer requirements
       run: |
@@ -97,7 +97,7 @@ INSTALL_TIMELORD
         . ./activate
         ./venv/bin/py.test TEST_DIR -s -v --durations 0PYTEST_PARALLEL_ARGS
 
-CHECK_RESOURCE_USAGE
+#CHECK_RESOURCE_USAGE
 #
-# THIS FILE IS GENERATED. SEE https://github.com/Chia-Network/chaingreen-blockchain/tree/main/tests#readme
+# THIS FILE IS GENERATED. SEE https://github.com/Chia-Network/chia-blockchain/tree/main/tests#readme
 #

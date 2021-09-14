@@ -1,16 +1,15 @@
 import asyncio
-
 import pytest
 import time
-
 from chaingreen.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
 from chaingreen.protocols.full_node_protocol import RespondBlock
-from chaingreen.server.server import ChaingreenServer
+from chaingreen.server.server import ChiaServer
 from chaingreen.simulator.simulator_protocol import FarmNewBlockProtocol, ReorgProtocol
 from chaingreen.types.peer_info import PeerInfo
 from chaingreen.util.ints import uint16, uint32, uint64
 from chaingreen.wallet.util.transaction_type import TransactionType
 from chaingreen.wallet.transaction_record import TransactionRecord
+from chaingreen.wallet.wallet_node import WalletNode
 from chaingreen.wallet.wallet_state_manager import WalletStateManager
 from tests.setup_nodes import self_hostname, setup_simulators_and_wallets
 from tests.time_out_assert import time_out_assert, time_out_assert_not_none
@@ -49,7 +48,7 @@ class TestWalletSimulator:
         num_blocks = 10
         full_nodes, wallets = wallet_node
         full_node_api = full_nodes[0]
-        server_1: ChaingreenServer = full_node_api.full_node.server
+        server_1: ChiaServer = full_node_api.full_node.server
         wallet_node, server_2 = wallets[0]
 
         wallet = wallet_node.wallet_state_manager.main_wallet
@@ -319,7 +318,7 @@ class TestWalletSimulator:
     #     introducer, introducer_server = await node_iters[2].__anext__()
     #
     #     async def has_full_node():
-    #         outbound: List[WSChaingreenConnection] = wallet.server.get_outgoing_connections()
+    #         outbound: List[WSChiaConnection] = wallet.server.get_outgoing_connections()
     #         for connection in outbound:
     #             if connection.connection_type is NodeType.FULL_NODE:
     #                 return True
@@ -559,7 +558,6 @@ class TestWalletSimulator:
         await server_3.start_client(PeerInfo(self_hostname, uint16(fn_server._port)), None)
         for i in range(0, num_blocks):
             await full_node_api.farm_new_transaction_block(FarmNewBlockProtocol(ph))
-        await time_out_assert(10, wallet_node.wallet_state_manager.blockchain.get_peak_height, 5)
 
         funds = sum(
             [calculate_pool_reward(uint32(i)) + calculate_base_farmer_reward(uint32(i)) for i in range(1, num_blocks)]
@@ -577,7 +575,7 @@ class TestWalletSimulator:
         await time_out_assert(5, wallet.get_confirmed_balance, funds)
         for i in range(0, 2):
             await full_node_api.farm_new_transaction_block(FarmNewBlockProtocol(32 * b"0"))
-        await time_out_assert(10, wallet_2.get_confirmed_balance, 1000)
+        await time_out_assert(5, wallet_2.get_confirmed_balance, 1000)
 
         await time_out_assert(5, wallet_node.wallet_state_manager.blockchain.get_peak_height, 7)
         peak_height = full_node_api.full_node.blockchain.get_peak().height

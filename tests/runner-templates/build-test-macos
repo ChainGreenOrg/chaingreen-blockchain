@@ -1,5 +1,5 @@
 #
-# THIS FILE IS GENERATED. SEE https://github.com/Chia-Network/chaingreen-blockchain/tree/main/tests#readme
+# THIS FILE IS GENERATED. SEE https://github.com/Chia-Network/chia-blockchain/tree/main/tests#readme
 #
 name: MacOS TEST_NAME Tests
 
@@ -63,7 +63,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
 
-CHECKOUT_TEST_BLOCKS_AND_PLOTS
+#CHECKOUT_TEST_BLOCKS_AND_PLOTS
 
     - name: Link home directory
       run: |
@@ -80,7 +80,7 @@ CHECKOUT_TEST_BLOCKS_AND_PLOTS
         brew install boost
         sh install.sh
 
-INSTALL_TIMELORD
+#INSTALL_TIMELORD
 
     - name: Install developer requirements
       run: |
@@ -92,5 +92,5 @@ INSTALL_TIMELORD
         . ./activate
         ./venv/bin/py.test TEST_DIR -s -v --durations 0PYTEST_PARALLEL_ARGS
 #
-# THIS FILE IS GENERATED. SEE https://github.com/Chia-Network/chaingreen-blockchain/tree/main/tests#readme
+# THIS FILE IS GENERATED. SEE https://github.com/Chia-Network/chia-blockchain/tree/main/tests#readme
 #

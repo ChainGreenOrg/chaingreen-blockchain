@@ -31,12 +31,12 @@ from chaingreen.consensus.block_record import BlockRecord
 from chaingreen.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
 from chaingreen.consensus.blockchain_interface import BlockchainInterface
 from chaingreen.consensus.coinbase import create_puzzlehash_for_pk, create_farmer_coin, create_pool_coin
+from chaingreen.consensus.condition_costs import ConditionCost
 from chaingreen.consensus.constants import ConsensusConstants
 from chaingreen.consensus.default_constants import DEFAULT_CONSTANTS
 from chaingreen.consensus.deficit import calculate_deficit
 from chaingreen.consensus.full_block_to_block_record import block_to_block_record
 from chaingreen.consensus.make_sub_epoch_summary import next_sub_epoch_summary
-from chaingreen.consensus.cost_calculator import NPCResult, calculate_cost_of_program
 from chaingreen.consensus.pot_iterations import (
     calculate_ip_iters,
     calculate_iterations_quality,
@@ -52,6 +52,7 @@ from chaingreen.types.blockchain_format.classgroup import ClassgroupElement
 from chaingreen.types.blockchain_format.coin import Coin, hash_coin_list
 from chaingreen.types.blockchain_format.foliage import Foliage, FoliageBlockData, FoliageTransactionBlock, TransactionsInfo
 from chaingreen.types.blockchain_format.pool_target import PoolTarget
+from chaingreen.types.blockchain_format.program import INFINITE_COST
 from chaingreen.types.blockchain_format.proof_of_space import ProofOfSpace
 from chaingreen.types.blockchain_format.reward_chain_block import RewardChainBlockUnfinished
 from chaingreen.types.blockchain_format.sized_bytes import bytes32
@@ -63,16 +64,14 @@ from chaingreen.types.blockchain_format.slots import (
 )
 from chaingreen.types.blockchain_format.sub_epoch_summary import SubEpochSummary
 from chaingreen.types.blockchain_format.vdf import VDFInfo, VDFProof
-from chaingreen.types.condition_with_args import ConditionWithArgs
 from chaingreen.types.end_of_slot_bundle import EndOfSubSlotBundle
 from chaingreen.types.full_block import FullBlock
 from chaingreen.types.generator_types import BlockGenerator, CompressorArg
 from chaingreen.types.spend_bundle import SpendBundle
 from chaingreen.types.unfinished_block import UnfinishedBlock
-from chaingreen.types.name_puzzle_condition import NPC
 from chaingreen.util.bech32m import encode_puzzle_hash
 from chaingreen.util.block_cache import BlockCache
-from chaingreen.util.condition_tools import ConditionOpcode, conditions_by_opcode
+from chaingreen.util.condition_tools import ConditionOpcode
 from chaingreen.util.config import load_config, save_config
 from chaingreen.util.hash import std_hash
 from chaingreen.util.ints import uint8, uint16, uint32, uint64, uint128
@@ -249,7 +248,7 @@ class BlockTools:
             sys.exit(1)
 
         refresh_done = False
-        refresh_parameter: PlotsRefreshParameter = PlotsRefreshParameter(120, 2, 10)
+        refresh_parameter: PlotsRefreshParameter = PlotsRefreshParameter(batch_size=2)
 
         def test_callback(update_result: PlotRefreshResult):
             if update_result.remaining_files == 0:
@@ -1264,7 +1263,7 @@ def get_challenges(
 
 
 def get_plot_dir() -> Path:
-    cache_path = Path(os.path.expanduser(os.getenv("CHAINGREEN_ROOT", "~/.chaingreentest/"))) / "test-plots"
+    cache_path = Path(os.path.expanduser(os.getenv("CHIA_ROOT", "~/.chaingreen/"))) / "test-plots"
     mkdir(cache_path)
     return cache_path
 
@@ -1462,43 +1461,26 @@ def get_full_block_and_block_record(
     return full_block, block_record
 
 
-def get_name_puzzle_conditions_test(generator: BlockGenerator, max_cost: int) -> NPCResult:
-    """
-    This is similar to get_name_puzzle_conditions(), but it doesn't validate
-    the conditions. We rely on this in tests to create invalid blocks.
-    safe_mode is implicitly True in this call
-    """
+def compute_cost_test(generator: BlockGenerator, cost_per_byte: int) -> Tuple[Optional[uint16], uint64]:
     try:
         block_program, block_program_args = setup_generator_args(generator)
-        clvm_cost, result = GENERATOR_MOD.run_safe_with_cost(max_cost, block_program, block_program_args)
-
-        npc_list: List[NPC] = []
+        clvm_cost, result = GENERATOR_MOD.run_safe_with_cost(INFINITE_COST, block_program, block_program_args)
+        size_cost = len(bytes(generator.program)) * cost_per_byte
+        condition_cost = 0
 
         for res in result.first().as_iter():
-            conditions_list: List[ConditionWithArgs] = []
-
-            spent_coin_parent_id: bytes32 = res.first().as_atom()
-            res = res.rest()
-            spent_coin_puzzle_hash: bytes32 = res.first().as_atom()
-            res = res.rest()
-            spent_coin_amount: uint64 = uint64(res.first().as_int())
-            res = res.rest()
-            spent_coin: Coin = Coin(spent_coin_parent_id, spent_coin_puzzle_hash, spent_coin_amount)
-
+            res = res.rest()  # skip parent coind id
+            res = res.rest()  # skip puzzle hash
+            res = res.rest()  # skip amount
             for cond in res.first().as_iter():
                 condition = cond.first().as_atom()
-                cvl = ConditionWithArgs(ConditionOpcode(condition), cond.rest().as_atom_list())
-                conditions_list.append(cvl)
-
-            conditions_dict = conditions_by_opcode(conditions_list)
-            if conditions_dict is None:
-                conditions_dict = {}
-            npc_list.append(
-                NPC(spent_coin.name(), spent_coin.puzzle_hash, [(a, b) for a, b in conditions_dict.items()])
-            )
-        return NPCResult(None, npc_list, uint64(clvm_cost))
+                if condition in [ConditionOpcode.AGG_SIG_UNSAFE, ConditionOpcode.AGG_SIG_ME]:
+                    condition_cost += ConditionCost.AGG_SIG.value
+                elif condition == ConditionOpcode.CREATE_COIN:
+                    condition_cost += ConditionCost.CREATE_COIN.value
+        return None, uint64(clvm_cost + size_cost + condition_cost)
     except Exception:
-        return NPCResult(uint16(Err.GENERATOR_RUNTIME_ERROR.value), [], uint64(0))
+        return uint16(Err.GENERATOR_RUNTIME_ERROR.value), uint64(0)
 
 
 def create_test_foliage(
@@ -1592,8 +1574,8 @@ def create_test_foliage(
         # Calculate the cost of transactions
         if block_generator is not None:
             generator_block_heights_list = block_generator.block_height_list()
-            result: NPCResult = get_name_puzzle_conditions_test(block_generator, constants.MAX_BLOCK_COST_CLVM)
-            cost = calculate_cost_of_program(block_generator.program, result, constants.COST_PER_BYTE)
+            err, cost = compute_cost_test(block_generator, constants.COST_PER_BYTE)
+            assert err is None
 
             removal_amount = 0
             addition_amount = 0
