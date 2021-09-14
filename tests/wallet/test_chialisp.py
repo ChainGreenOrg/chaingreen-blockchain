@@ -1,6 +1,6 @@
 import pytest
 
-from chaingreen.wallet.chialisp import (
+from chaingreen.wallet.chaingreenlisp import (
     apply,
     args,
     cons,
