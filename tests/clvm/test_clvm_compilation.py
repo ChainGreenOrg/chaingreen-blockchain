@@ -6,7 +6,7 @@ from clvm_tools.clvmc import compile_clvm
 from chaingreen.types.blockchain_format.program import Program, SerializedProgram
 
 wallet_program_files = set(
-    chaingreen[
+    [
         "chaingreen/wallet/puzzles/calculate_synthetic_public_key.clvm",
         "chaingreen/wallet/puzzles/cc.clvm",
         "chaingreen/wallet/puzzles/chialisp_deserialisation.clvm",
@@ -71,8 +71,7 @@ class TestClvmCompilation(TestCase):
 
     def test_all_programs_listed(self):
         """
-        Checks to see if a new .clvm file was added to chaingreen/wallet/puzzles, but not added to \
-            `wallet_program_files`
+        Checks to see if a new .clvm file was added to chaingreen/wallet/puzzles, but not added to `wallet_program_files`
         """
         existing_files = list_files(CLVM_PROGRAM_ROOT, "*.clvm")
         existing_file_paths = set([Path(x).relative_to(CLVM_PROGRAM_ROOT) for x in existing_files])

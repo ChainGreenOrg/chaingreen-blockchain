@@ -9,8 +9,8 @@ from cryptography.hazmat.primitives import hashes, serialization
 
 from chaingreen.protocols.shared_protocol import protocol_version
 from chaingreen.server.outbound_message import NodeType
-from chaingreen.server.server import ChaingreenServer, ssl_context_for_client
-from chaingreen.server.ws_connection import WSChaingreenConnection
+from chaingreen.server.server import ChiaServer, ssl_context_for_client
+from chaingreen.server.ws_connection import WSChiaConnection
 from chaingreen.ssl.create_ssl import generate_ca_signed_cert
 from chaingreen.types.blockchain_format.sized_bytes import bytes32
 from chaingreen.types.peer_info import PeerInfo
@@ -21,24 +21,21 @@ from tests.time_out_assert import time_out_assert
 log = logging.getLogger(__name__)
 
 
-async def disconnect_all_and_reconnect(server: ChaingreenServer, reconnect_to: ChaingreenServer) -> bool:
+async def disconnect_all_and_reconnect(server: ChiaServer, reconnect_to: ChiaServer) -> bool:
     cons = list(server.all_connections.values())[:]
     for con in cons:
         await con.close()
     return await server.start_client(PeerInfo(self_hostname, uint16(reconnect_to._port)), None)
 
 
-async def add_dummy_connection(server: ChaingreenServer, dummy_port: int) -> Tuple[asyncio.Queue, bytes32]:
+async def add_dummy_connection(server: ChiaServer, dummy_port: int) -> Tuple[asyncio.Queue, bytes32]:
     timeout = aiohttp.ClientTimeout(total=10)
     session = aiohttp.ClientSession(timeout=timeout)
     incoming_queue: asyncio.Queue = asyncio.Queue()
     dummy_crt_path = server._private_key_path.parent / "dummy.crt"
     dummy_key_path = server._private_key_path.parent / "dummy.key"
     generate_ca_signed_cert(
-        server.chaingreen_ca_crt_path.read_bytes(),
-        server.chaingreen_ca_key_path.read_bytes(),
-        dummy_crt_path,
-        dummy_key_path,
+        server.chaingreen_ca_crt_path.read_bytes(), server.chaingreen_ca_key_path.read_bytes(), dummy_crt_path, dummy_key_path
     )
     ssl_context = ssl_context_for_client(
         server.chaingreen_ca_crt_path, server.chaingreen_ca_key_path, dummy_crt_path, dummy_key_path
@@ -48,7 +45,7 @@ async def add_dummy_connection(server: ChaingreenServer, dummy_port: int) -> Tup
     peer_id = bytes32(der_cert.fingerprint(hashes.SHA256()))
     url = f"wss://{self_hostname}:{server._port}/ws"
     ws = await session.ws_connect(url, autoclose=True, autoping=True, ssl=ssl_context)
-    wsc = WSChaingreenConnection(
+    wsc = WSChiaConnection(
         NodeType.FULL_NODE,
         ws,
         server._port,
@@ -67,7 +64,7 @@ async def add_dummy_connection(server: ChaingreenServer, dummy_port: int) -> Tup
     return incoming_queue, peer_id
 
 
-async def connect_and_get_peer(server_1: ChaingreenServer, server_2: ChaingreenServer) -> WSChaingreenConnection:
+async def connect_and_get_peer(server_1: ChiaServer, server_2: ChiaServer) -> WSChiaConnection:
     """
     Connect server_2 to server_1, and get return the connection in server_1.
     """

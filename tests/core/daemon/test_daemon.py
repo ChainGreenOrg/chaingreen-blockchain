@@ -1,5 +1,3 @@
-import aiohttp
-import pytest
 from chaingreen.server.outbound_message import NodeType
 from chaingreen.server.server import ssl_context_for_server
 from chaingreen.types.peer_info import PeerInfo
