@@ -7,42 +7,36 @@ from typing import Callable, Dict, List, Optional, Tuple, Set
 from blspy import AugSchemeMPL, G2Element
 from chiabip158 import PyBIP158
 
-import chaingreen.server.ws_connection as ws
-from chaingreen.consensus.block_creation import create_unfinished_block
-from chaingreen.consensus.block_record import BlockRecord
-from chaingreen.consensus.pot_iterations import calculate_ip_iters, calculate_iterations_quality, calculate_sp_iters
-from chaingreen.full_node.bundle_tools import best_solution_generator_from_template, simple_solution_generator
-from chaingreen.full_node.full_node import FullNode
-from chaingreen.full_node.mempool_check_conditions import get_puzzle_and_solution_for_coin
-from chaingreen.full_node.signage_point import SignagePoint
-from chaingreen.protocols import (
-    farmer_protocol,
-    full_node_protocol,
-    introducer_protocol,
-    timelord_protocol,
-    wallet_protocol,
-)
-from chaingreen.protocols.full_node_protocol import RejectBlock, RejectBlocks
-from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
-from chaingreen.protocols.wallet_protocol import PuzzleSolutionResponse, RejectHeaderBlocks, RejectHeaderRequest
-from chaingreen.server.outbound_message import Message, make_msg
-from chaingreen.types.blockchain_format.coin import Coin, hash_coin_list
-from chaingreen.types.blockchain_format.pool_target import PoolTarget
-from chaingreen.types.blockchain_format.program import Program
-from chaingreen.types.blockchain_format.sized_bytes import bytes32
-from chaingreen.types.coin_record import CoinRecord
-from chaingreen.types.end_of_slot_bundle import EndOfSubSlotBundle
-from chaingreen.types.full_block import FullBlock
-from chaingreen.types.generator_types import BlockGenerator
-from chaingreen.types.mempool_inclusion_status import MempoolInclusionStatus
-from chaingreen.types.mempool_item import MempoolItem
-from chaingreen.types.peer_info import PeerInfo
-from chaingreen.types.unfinished_block import UnfinishedBlock
-from chaingreen.util.api_decorators import api_request, peer_required, bytes_required, execute_task
-from chaingreen.util.generator_tools import get_block_header
-from chaingreen.util.hash import std_hash
-from chaingreen.util.ints import uint8, uint32, uint64, uint128
-from chaingreen.util.merkle_set import MerkleSet
+import chia.server.ws_connection as ws
+from chia.consensus.block_creation import create_unfinished_block
+from chia.consensus.block_record import BlockRecord
+from chia.consensus.pot_iterations import calculate_ip_iters, calculate_iterations_quality, calculate_sp_iters
+from chia.full_node.bundle_tools import best_solution_generator_from_template, simple_solution_generator
+from chia.full_node.full_node import FullNode
+from chia.full_node.mempool_check_conditions import get_puzzle_and_solution_for_coin
+from chia.full_node.signage_point import SignagePoint
+from chia.protocols import farmer_protocol, full_node_protocol, introducer_protocol, timelord_protocol, wallet_protocol
+from chia.protocols.full_node_protocol import RejectBlock, RejectBlocks
+from chia.protocols.protocol_message_types import ProtocolMessageTypes
+from chia.protocols.wallet_protocol import PuzzleSolutionResponse, RejectHeaderBlocks, RejectHeaderRequest, CoinState
+from chia.server.outbound_message import Message, make_msg
+from chia.types.blockchain_format.coin import Coin, hash_coin_list
+from chia.types.blockchain_format.pool_target import PoolTarget
+from chia.types.blockchain_format.program import Program
+from chia.types.blockchain_format.sized_bytes import bytes32
+from chia.types.coin_record import CoinRecord
+from chia.types.end_of_slot_bundle import EndOfSubSlotBundle
+from chia.types.full_block import FullBlock
+from chia.types.generator_types import BlockGenerator
+from chia.types.mempool_inclusion_status import MempoolInclusionStatus
+from chia.types.mempool_item import MempoolItem
+from chia.types.peer_info import PeerInfo
+from chia.types.unfinished_block import UnfinishedBlock
+from chia.util.api_decorators import api_request, peer_required, bytes_required, execute_task
+from chia.util.generator_tools import get_block_header
+from chia.util.hash import std_hash
+from chia.util.ints import uint8, uint32, uint64, uint128
+from chia.util.merkle_set import MerkleSet
 
 
 class FullNodeAPI:
@@ -1317,3 +1311,75 @@ class FullNodeAPI:
         if self.full_node.sync_store.get_sync_mode():
             return None
         await self.full_node.respond_compact_vdf(request, peer)
+
+    @peer_required
+    @api_request
+    async def register_interest_in_puzzle_hash(
+        self, request: wallet_protocol.RegisterForPhUpdates, peer: ws.WSChiaConnection
+    ):
+        if peer.peer_node_id not in self.full_node.peer_puzzle_hash:
+            self.full_node.peer_puzzle_hash[peer.peer_node_id] = set()
+
+        if peer.peer_node_id not in self.full_node.peer_sub_counter:
+            self.full_node.peer_sub_counter[peer.peer_node_id] = 0
+
+        # Add peer to the "Subscribed" dictionary
+        for puzzle_hash in request.puzzle_hashes:
+            if puzzle_hash not in self.full_node.ph_subscriptions:
+                self.full_node.ph_subscriptions[puzzle_hash] = set()
+            if (
+                peer.peer_node_id not in self.full_node.ph_subscriptions[puzzle_hash]
+                and self.full_node.peer_sub_counter[peer.peer_node_id] < 100000
+            ):
+                self.full_node.ph_subscriptions[puzzle_hash].add(peer.peer_node_id)
+                self.full_node.peer_puzzle_hash[peer.peer_node_id].add(puzzle_hash)
+                self.full_node.peer_sub_counter[peer.peer_node_id] += 1
+
+        # Send all coins with requested puzzle hash that have been created after the specified height
+        states: List[CoinState] = await self.full_node.coin_store.get_coin_states_by_puzzle_hashes(
+            include_spent_coins=True, puzzle_hashes=request.puzzle_hashes, start_height=request.min_height
+        )
+
+        response = wallet_protocol.RespondToPhUpdates(request.puzzle_hashes, request.min_height, states)
+        msg = make_msg(ProtocolMessageTypes.respond_to_ph_update, response)
+        return msg
+
+    @peer_required
+    @api_request
+    async def register_interest_in_coin(
+        self, request: wallet_protocol.RegisterForCoinUpdates, peer: ws.WSChiaConnection
+    ):
+        if peer.peer_node_id not in self.full_node.peer_coin_ids:
+            self.full_node.peer_coin_ids[peer.peer_node_id] = set()
+
+        if peer.peer_node_id not in self.full_node.peer_sub_counter:
+            self.full_node.peer_sub_counter[peer.peer_node_id] = 0
+
+        for coin_id in request.coin_ids:
+            if coin_id not in self.full_node.coin_subscriptions:
+                self.full_node.coin_subscriptions[coin_id] = set()
+            if (
+                peer.peer_node_id not in self.full_node.coin_subscriptions[coin_id]
+                and self.full_node.peer_sub_counter[peer.peer_node_id] < 100000
+            ):
+                self.full_node.coin_subscriptions[coin_id].add(peer.peer_node_id)
+                self.full_node.peer_coin_ids[peer.peer_node_id].add(coin_id)
+                self.full_node.peer_sub_counter[peer.peer_node_id] += 1
+
+        states: List[CoinState] = await self.full_node.coin_store.get_coin_state_by_ids(
+            include_spent_coins=True, coin_ids=request.coin_ids, start_height=request.min_height
+        )
+
+        response = wallet_protocol.RespondToCoinUpdates(request.coin_ids, request.min_height, states)
+        msg = make_msg(ProtocolMessageTypes.respond_to_coin_update, response)
+        return msg
+
+    @api_request
+    async def request_children(self, request: wallet_protocol.RequestChildren) -> Optional[Message]:
+        coin_records: List[CoinRecord] = await self.full_node.coin_store.get_coin_records_by_parent_ids(
+            True, [request.coin_name]
+        )
+        states = [record.coin_state for record in coin_records]
+        response = wallet_protocol.RespondChildren(states)
+        msg = make_msg(ProtocolMessageTypes.respond_children, response)
+        return msg
