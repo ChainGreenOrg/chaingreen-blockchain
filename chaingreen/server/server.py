@@ -15,18 +15,20 @@ from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 
-from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
-from chaingreen.protocols.shared_protocol import protocol_version
-from chaingreen.server.introducer_peers import IntroducerPeers
-from chaingreen.server.outbound_message import Message, NodeType
-from chaingreen.server.ssl_context import private_ssl_paths, public_ssl_paths
-from chaingreen.server.ws_connection import WSChaingreenConnection
-from chaingreen.types.blockchain_format.sized_bytes import bytes32
-from chaingreen.types.peer_info import PeerInfo
-from chaingreen.util.errors import Err, ProtocolError
-from chaingreen.util.ints import uint16
-from chaingreen.util.network import is_localhost, is_in_network
-from chaingreen.util.ssl import verify_ssl_certs_and_keys
+from chia.protocols.protocol_message_types import ProtocolMessageTypes
+from chia.protocols.protocol_state_machine import message_requires_reply
+from chia.protocols.protocol_timing import INVALID_PROTOCOL_BAN_SECONDS, API_EXCEPTION_BAN_SECONDS
+from chia.protocols.shared_protocol import protocol_version
+from chia.server.introducer_peers import IntroducerPeers
+from chia.server.outbound_message import Message, NodeType
+from chia.server.ssl_context import private_ssl_paths, public_ssl_paths
+from chia.server.ws_connection import WSChiaConnection
+from chia.types.blockchain_format.sized_bytes import bytes32
+from chia.types.peer_info import PeerInfo
+from chia.util.errors import Err, ProtocolError
+from chia.util.ints import uint16
+from chia.util.network import is_localhost, is_in_network
+from chia.util.ssl import verify_ssl_certs_and_keys
 
 
 def ssl_context_for_server(
@@ -159,8 +161,8 @@ class ChaingreenServer:
 
         self.tasks_from_peer: Dict[bytes32, Set[bytes32]] = {}
         self.banned_peers: Dict[str, float] = {}
-        self.invalid_protocol_ban_seconds = 10
-        self.api_exception_ban_seconds = 10
+        self.invalid_protocol_ban_seconds = INVALID_PROTOCOL_BAN_SECONDS
+        self.api_exception_ban_seconds = API_EXCEPTION_BAN_SECONDS
         self.exempt_peer_networks: List[Union[IPv4Network, IPv6Network]] = [
             ip_network(net, strict=False) for net in config.get("exempt_peer_networks", [])
         ]
@@ -626,13 +628,29 @@ class ChaingreenServer:
                 for message in messages:
                     await connection.send_message(message)
 
+    async def validate_broadcast_message_type(self, messages: List[Message], node_type: NodeType):
+        for message in messages:
+            if message_requires_reply(ProtocolMessageTypes(message.type)):
+                # Internal protocol logic error - we will raise, blocking messages to all peers
+                self.log.error(f"Attempt to broadcast message requiring protocol response: {message.type}")
+                for _, connection in self.all_connections.items():
+                    if connection.connection_type is node_type:
+                        await connection.close(
+                            self.invalid_protocol_ban_seconds,
+                            WSCloseCode.INTERNAL_ERROR,
+                            Err.INTERNAL_PROTOCOL_ERROR,
+                        )
+                raise ProtocolError(Err.INTERNAL_PROTOCOL_ERROR, [message.type])
+
     async def send_to_all(self, messages: List[Message], node_type: NodeType):
+        await self.validate_broadcast_message_type(messages, node_type)
         for _, connection in self.all_connections.items():
             if connection.connection_type is node_type:
                 for message in messages:
                     await connection.send_message(message)
 
     async def send_to_all_except(self, messages: List[Message], node_type: NodeType, exclude: bytes32):
+        await self.validate_broadcast_message_type(messages, node_type)
         for _, connection in self.all_connections.items():
             if connection.connection_type is node_type and connection.peer_node_id != exclude:
                 for message in messages:

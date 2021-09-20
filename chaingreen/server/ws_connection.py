@@ -6,15 +6,17 @@ from typing import Any, Callable, Dict, List, Optional
 
 from aiohttp import WSCloseCode, WSMessage, WSMsgType
 
-from chaingreen.cmds.init_funcs import chaingreen_full_version_str
-from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
-from chaingreen.protocols.shared_protocol import Capability, Handshake
-from chaingreen.server.outbound_message import Message, NodeType, make_msg
-from chaingreen.server.rate_limits import RateLimiter
-from chaingreen.types.blockchain_format.sized_bytes import bytes32
-from chaingreen.types.peer_info import PeerInfo
-from chaingreen.util.errors import Err, ProtocolError
-from chaingreen.util.ints import uint8, uint16
+from chia.cmds.init_funcs import chia_full_version_str
+from chia.protocols.protocol_message_types import ProtocolMessageTypes
+from chia.protocols.protocol_state_machine import message_response_ok
+from chia.protocols.protocol_timing import INTERNAL_PROTOCOL_ERROR_BAN_SECONDS
+from chia.protocols.shared_protocol import Capability, Handshake
+from chia.server.outbound_message import Message, NodeType, make_msg
+from chia.server.rate_limits import RateLimiter
+from chia.types.blockchain_format.sized_bytes import bytes32
+from chia.types.peer_info import PeerInfo
+from chia.util.errors import Err, ProtocolError
+from chia.util.ints import uint8, uint16
 
 # Each message is prepended with LENGTH_BYTES bytes specifying the length
 from chaingreen.util.network import class_for_type, is_localhost
@@ -216,6 +218,12 @@ class WSChaingreenConnection:
             raise
         self.close_callback(self, ban_time)
 
+    async def ban_peer_bad_protocol(self, log_err_msg: str):
+        """Ban peer for protocol violation"""
+        ban_seconds = INTERNAL_PROTOCOL_ERROR_BAN_SECONDS
+        self.log.error(f"Banning peer for {ban_seconds} seconds: {self.peer_host} {log_err_msg}")
+        await self.close(ban_seconds, WSCloseCode.PROTOCOL_ERROR, Err.INVALID_PROTOCOL_MESSAGE)
+
     def cancel_pending_timeouts(self):
         for _, task in self.pending_timeouts.items():
             task.cancel()
@@ -273,14 +281,22 @@ class WSChaingreenConnection:
             if attribute is None:
                 raise AttributeError(f"Node type {self.connection_type} does not have method {attr_name}")
 
-            msg = Message(uint8(getattr(ProtocolMessageTypes, attr_name).value), None, args[0])
+            msg: Message = Message(uint8(getattr(ProtocolMessageTypes, attr_name).value), None, args[0])
             request_start_t = time.time()
-            result = await self.create_request(msg, timeout)
+            result = await self.send_request(msg, timeout)
             self.log.debug(
                 f"Time for request {attr_name}: {self.get_peer_logging()} = {time.time() - request_start_t}, "
                 f"None? {result is None}"
             )
             if result is not None:
+                sent_message_type = ProtocolMessageTypes(msg.type)
+                recv_message_type = ProtocolMessageTypes(result.type)
+                if not message_response_ok(sent_message_type, recv_message_type):
+                    # peer protocol violation
+                    error_message = f"WSConnection.invoke sent message {sent_message_type.name} "
+                    f"but received {recv_message_type.name}"
+                    await self.ban_peer_bad_protocol(self.error_message)
+                    raise ProtocolError(Err.INVALID_PROTOCOL_MESSAGE, [error_message])
                 ret_attr = getattr(class_for_type(self.local_type), ProtocolMessageTypes(result.type).name, None)
 
                 req_annotations = ret_attr.__annotations__
@@ -296,7 +312,7 @@ class WSChaingreenConnection:
 
         return invoke
 
-    async def create_request(self, message_no_id: Message, timeout: int) -> Optional[Message]:
+    async def send_request(self, message_no_id: Message, timeout: int) -> Optional[Message]:
         """Sends a message and waits for a response."""
         if self.closed:
             return None
