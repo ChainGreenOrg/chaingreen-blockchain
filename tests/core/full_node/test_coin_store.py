@@ -7,18 +7,19 @@ import aiosqlite
 import pytest
 import tempfile
 
-from chaingreen.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
-from chaingreen.consensus.blockchain import Blockchain, ReceiveBlockResult
-from chaingreen.consensus.coinbase import create_farmer_coin, create_pool_coin
-from chaingreen.full_node.block_store import BlockStore
-from chaingreen.full_node.coin_store import CoinStore
-from chaingreen.full_node.mempool_check_conditions import get_name_puzzle_conditions
-from chaingreen.types.blockchain_format.coin import Coin
-from chaingreen.types.coin_record import CoinRecord
-from chaingreen.types.full_block import FullBlock
-from chaingreen.types.generator_types import BlockGenerator
-from chaingreen.util.generator_tools import tx_removals_and_additions
-from chaingreen.util.ints import uint64, uint32
+from chia.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
+from chia.consensus.blockchain import Blockchain, ReceiveBlockResult
+from chia.consensus.coinbase import create_farmer_coin, create_pool_coin
+from chia.full_node.block_store import BlockStore
+from chia.full_node.coin_store import CoinStore
+from chia.full_node.hint_store import HintStore
+from chia.full_node.mempool_check_conditions import get_name_puzzle_conditions
+from chia.types.blockchain_format.coin import Coin
+from chia.types.coin_record import CoinRecord
+from chia.types.full_block import FullBlock
+from chia.types.generator_types import BlockGenerator
+from chia.util.generator_tools import tx_removals_and_additions
+from chia.util.ints import uint64, uint32
 from tests.wallet_tools import WalletTool
 from chaingreen.util.db_wrapper import DBWrapper
 from tests.setup_nodes import bt, test_constants
@@ -263,7 +264,8 @@ class TestCoinStoreWithBlocks:
             blocks = bt.get_consecutive_blocks(initial_block_count)
             coin_store = await CoinStore.create(db_wrapper, cache_size=uint32(cache_size))
             store = await BlockStore.create(db_wrapper)
-            b: Blockchain = await Blockchain.create(coin_store, store, test_constants)
+            hint_store = await HintStore.create(db_wrapper)
+            b: Blockchain = await Blockchain.create(coin_store, store, test_constants, hint_store)
             try:
 
                 records: List[Optional[CoinRecord]] = []
@@ -327,7 +329,8 @@ class TestCoinStoreWithBlocks:
             )
             coin_store = await CoinStore.create(db_wrapper, cache_size=uint32(cache_size))
             store = await BlockStore.create(db_wrapper)
-            b: Blockchain = await Blockchain.create(coin_store, store, test_constants)
+            hint_store = await HintStore.create(db_wrapper)
+            b: Blockchain = await Blockchain.create(coin_store, store, test_constants, hint_store)
             for block in blocks:
                 res, err, _, _ = await b.receive_block(block)
                 assert err is None
