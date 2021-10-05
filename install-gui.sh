@@ -19,7 +19,7 @@ if [ "$(uname)" = "Linux" ]; then
 	if type apt-get; then
 		# Debian/Ubuntu
 		UBUNTU=true
-		
+
 		# Check if we are running a Raspberry PI 4
 		if [ "$(uname -m)" = "aarch64" ] \
 		&& [ "$(uname -n)" = "raspberrypi" ]; then
