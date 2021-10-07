@@ -8,10 +8,12 @@ from typing import Dict, List
 
 import pkg_resources
 
-from chaingreen.util.chaingreen_logging import initialize_logging
-from chaingreen.util.config import load_config
-from chaingreen.util.default_root import DEFAULT_ROOT_PATH
-from chaingreen.util.setproctitle import setproctitle
+from chia.types.peer_info import PeerInfo
+from chia.util.chia_logging import initialize_logging
+from chia.util.config import load_config
+from chia.util.default_root import DEFAULT_ROOT_PATH
+from chia.util.ints import uint16
+from chia.util.setproctitle import setproctitle
 
 active_processes: List = []
 stopped = False
@@ -49,7 +51,11 @@ async def spawn_process(host: str, port: int, counter: int):
         try:
             dirname = path_to_vdf_client.parent
             basename = path_to_vdf_client.name
-            resolved = socket.gethostbyname(host)
+            check_addr = PeerInfo(host, uint16(port))
+            if check_addr.is_valid():
+                resolved = host
+            else:
+                resolved = socket.gethostbyname(host)
             proc = await asyncio.create_subprocess_shell(
                 f"{basename} {resolved} {port} {counter}",
                 stdout=asyncio.subprocess.PIPE,
