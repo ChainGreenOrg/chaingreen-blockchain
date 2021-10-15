@@ -38,16 +38,14 @@ from chaingreen.util.ints import uint8, uint16, uint32, uint64
 from chaingreen.util.recursive_replace import recursive_replace
 from chaingreen.util.vdf_prover import get_vdf_info_and_proof
 from tests.wallet_tools import WalletTool
-from tests.core.fixtures import empty_blockchain  # noqa: F401
-from chaingreen.wallet.cc_wallet.cc_wallet import CCWallet
-from chaingreen.wallet.transaction_record import TransactionRecord
+from chia.wallet.cc_wallet.cc_wallet import CCWallet
+from chia.wallet.transaction_record import TransactionRecord
 
 from tests.connection_utils import add_dummy_connection, connect_and_get_peer
 from tests.core.full_node.test_coin_store import get_future_reward_coins
 from tests.core.full_node.test_mempool_performance import wallet_height_at_least
 from tests.core.make_block_generator import make_spend_bundle
 from tests.core.node_height import node_height_at_least
-from tests.core.fixtures import empty_blockchain  # noqa: F401
 from tests.setup_nodes import bt, self_hostname, setup_simulators_and_wallets, test_constants
 from tests.time_out_assert import time_out_assert, time_out_assert_custom_interval, time_out_messages
 
