@@ -2,37 +2,34 @@ import collections
 import logging
 from typing import Dict, List, Optional, Set, Tuple, Union, Callable
 
-from blspy import G1Element
 from chiabip158 import PyBIP158
 from clvm.casts import int_from_bytes
 
-from chaingreen.consensus.block_record import BlockRecord
-from chaingreen.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
-from chaingreen.consensus.block_root_validation import validate_block_merkle_roots
-from chaingreen.full_node.mempool_check_conditions import mempool_check_conditions_dict
-from chaingreen.consensus.blockchain_interface import BlockchainInterface
-from chaingreen.consensus.coinbase import create_farmer_coin, create_pool_coin
-from chaingreen.consensus.constants import ConsensusConstants
-from chaingreen.consensus.cost_calculator import NPCResult, calculate_cost_of_program
-from chaingreen.consensus.find_fork_point import find_fork_point_in_chain
-from chaingreen.full_node.block_store import BlockStore
-from chaingreen.full_node.coin_store import CoinStore
-from chaingreen.full_node.mempool_check_conditions import get_name_puzzle_conditions
-from chaingreen.types.blockchain_format.coin import Coin
-from chaingreen.types.blockchain_format.sized_bytes import bytes32
-from chaingreen.types.coin_record import CoinRecord
-from chaingreen.types.condition_opcodes import ConditionOpcode
-from chaingreen.types.condition_with_args import ConditionWithArgs
-from chaingreen.types.full_block import FullBlock
-from chaingreen.types.generator_types import BlockGenerator
-from chaingreen.types.name_puzzle_condition import NPC
-from chaingreen.types.unfinished_block import UnfinishedBlock
-from chaingreen.util import cached_bls
-from chaingreen.util.condition_tools import (
-    pkm_pairs_for_conditions_dict,
-)
-from chaingreen.util.errors import Err
-from chaingreen.util.generator_tools import (
+from chia.consensus.block_record import BlockRecord
+from chia.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
+from chia.consensus.block_root_validation import validate_block_merkle_roots
+from chia.full_node.mempool_check_conditions import mempool_check_conditions_dict
+from chia.consensus.blockchain_interface import BlockchainInterface
+from chia.consensus.coinbase import create_farmer_coin, create_pool_coin
+from chia.consensus.constants import ConsensusConstants
+from chia.consensus.cost_calculator import NPCResult, calculate_cost_of_program
+from chia.consensus.find_fork_point import find_fork_point_in_chain
+from chia.full_node.block_store import BlockStore
+from chia.full_node.coin_store import CoinStore
+from chia.full_node.mempool_check_conditions import get_name_puzzle_conditions
+from chia.types.blockchain_format.coin import Coin
+from chia.types.blockchain_format.sized_bytes import bytes32
+from chia.types.coin_record import CoinRecord
+from chia.types.condition_opcodes import ConditionOpcode
+from chia.types.condition_with_args import ConditionWithArgs
+from chia.types.full_block import FullBlock
+from chia.types.generator_types import BlockGenerator
+from chia.types.name_puzzle_condition import NPC
+from chia.types.unfinished_block import UnfinishedBlock
+from chia.util import cached_bls
+from chia.util.condition_tools import pkm_pairs
+from chia.util.errors import Err
+from chia.util.generator_tools import (
     additions_for_npc,
     tx_removals_and_additions,
 )
@@ -435,9 +432,6 @@ async def validate_block_body(
             return Err.WRONG_PUZZLE_HASH, None
 
     # 21. Verify conditions
-    # create hash_key list for aggsig check
-    pairs_pks: List[G1Element] = []
-    pairs_msgs: List[bytes] = []
     for npc in npc_list:
         assert height is not None
         unspent = removal_coin_records[npc.coin_name]
@@ -449,11 +443,9 @@ async def validate_block_body(
         )
         if error:
             return error, None
-        for pk, m in pkm_pairs_for_conditions_dict(
-            npc.condition_dict, npc.coin_name, constants.AGG_SIG_ME_ADDITIONAL_DATA
-        ):
-            pairs_pks.append(pk)
-            pairs_msgs.append(m)
+
+    # create hash_key list for aggsig check
+    pairs_pks, pairs_msgs = pkm_pairs(npc_list, constants.AGG_SIG_ME_ADDITIONAL_DATA)
 
     # 22. Verify aggregated signature
     # TODO: move this to pre_validate_blocks_multiprocessing so we can sync faster

@@ -8,32 +8,30 @@ from typing import Dict, List, Optional, Set, Tuple
 from blspy import G1Element
 from chiabip158 import PyBIP158
 
-from chaingreen.util import cached_bls
-from chaingreen.consensus.block_record import BlockRecord
-from chaingreen.consensus.constants import ConsensusConstants
-from chaingreen.consensus.cost_calculator import NPCResult, calculate_cost_of_program
-from chaingreen.full_node.bundle_tools import simple_solution_generator
-from chaingreen.full_node.coin_store import CoinStore
-from chaingreen.full_node.mempool import Mempool
-from chaingreen.full_node.mempool_check_conditions import mempool_check_conditions_dict, get_name_puzzle_conditions
-from chaingreen.full_node.pending_tx_cache import PendingTxCache
-from chaingreen.types.blockchain_format.coin import Coin
-from chaingreen.types.blockchain_format.program import SerializedProgram
-from chaingreen.types.blockchain_format.sized_bytes import bytes32
-from chaingreen.types.coin_record import CoinRecord
-from chaingreen.types.condition_opcodes import ConditionOpcode
-from chaingreen.types.condition_with_args import ConditionWithArgs
-from chaingreen.types.mempool_inclusion_status import MempoolInclusionStatus
-from chaingreen.types.mempool_item import MempoolItem
-from chaingreen.types.spend_bundle import SpendBundle
-from chaingreen.util.clvm import int_from_bytes
-from chaingreen.util.condition_tools import (
-    pkm_pairs_for_conditions_dict,
-)
-from chaingreen.util.errors import Err
-from chaingreen.util.generator_tools import additions_for_npc
-from chaingreen.util.ints import uint32, uint64
-from chaingreen.util.streamable import recurse_jsonify
+from chia.util import cached_bls
+from chia.consensus.block_record import BlockRecord
+from chia.consensus.constants import ConsensusConstants
+from chia.consensus.cost_calculator import NPCResult, calculate_cost_of_program
+from chia.full_node.bundle_tools import simple_solution_generator
+from chia.full_node.coin_store import CoinStore
+from chia.full_node.mempool import Mempool
+from chia.full_node.mempool_check_conditions import mempool_check_conditions_dict, get_name_puzzle_conditions
+from chia.full_node.pending_tx_cache import PendingTxCache
+from chia.types.blockchain_format.coin import Coin
+from chia.types.blockchain_format.program import SerializedProgram
+from chia.types.blockchain_format.sized_bytes import bytes32
+from chia.types.coin_record import CoinRecord
+from chia.types.condition_opcodes import ConditionOpcode
+from chia.types.condition_with_args import ConditionWithArgs
+from chia.types.mempool_inclusion_status import MempoolInclusionStatus
+from chia.types.mempool_item import MempoolItem
+from chia.types.spend_bundle import SpendBundle
+from chia.util.clvm import int_from_bytes
+from chia.util.condition_tools import pkm_pairs
+from chia.util.errors import Err
+from chia.util.generator_tools import additions_for_npc
+from chia.util.ints import uint32, uint64
+from chia.util.streamable import recurse_jsonify
 
 log = logging.getLogger(__name__)
 
@@ -380,8 +378,6 @@ class MempoolManager:
             return None, MempoolInclusionStatus.FAILED, tmp_error
 
         # Verify conditions, create hash_key list for aggsig check
-        pks: List[G1Element] = []
-        msgs: List[bytes32] = []
         error: Optional[Err] = None
         for npc in npc_list:
             coin_record: CoinRecord = removal_record_dict[npc.coin_name]
@@ -411,16 +407,14 @@ class MempoolManager:
                     return uint64(cost), MempoolInclusionStatus.PENDING, error
                 break
 
-            if validate_signature:
-                for pk, message in pkm_pairs_for_conditions_dict(
-                    npc.condition_dict, npc.coin_name, self.constants.AGG_SIG_ME_ADDITIONAL_DATA
-                ):
-                    pks.append(pk)
-                    msgs.append(message)
         if error:
             return None, MempoolInclusionStatus.FAILED, error
 
         if validate_signature:
+            pks: List[G1Element] = []
+            msgs: List[bytes32] = []
+            pks, msgs = pkm_pairs(npc_list, self.constants.AGG_SIG_ME_ADDITIONAL_DATA)
+
             # Verify aggregated signature
             if not cached_bls.aggregate_verify(pks, msgs, new_spend.aggregated_signature, True):
                 log.warning(f"Aggsig validation error {pks} {msgs} {new_spend}")
