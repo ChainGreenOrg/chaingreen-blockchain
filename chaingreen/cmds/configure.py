@@ -93,8 +93,8 @@ def configure(
         if testnet == "true" or testnet == "t":
             print("Setting Testnet")
             testnet_port = "58444"
-            testnet_introducer = "beta1_introducer.chia.net"
-            testnet_dns_introducer = "dns-introducer-testnet7.chia.net"
+            testnet_introducer = "beta1_introducer.chaingreen.net"
+            testnet_dns_introducer = "dns-introducer-testnet7.chaingreen.net"
             testnet = "testnet7"
             config["full_node"]["port"] = int(testnet_port)
             config["full_node"]["introducer_peer"]["port"] = int(testnet_port)
@@ -120,8 +120,8 @@ def configure(
         elif testnet == "false" or testnet == "f":
             print("Setting Mainnet")
             mainnet_port = "8444"
-            mainnet_introducer = "introducer.chia.net"
-            mainnet_dns_introducer = "dns-introducer.chia.net"
+            mainnet_introducer = "introducer.chaingreen.net"
+            mainnet_dns_introducer = "dns-introducer.chaingreen.net"
             net = "mainnet"
             config["full_node"]["port"] = int(mainnet_port)
             config["full_node"]["introducer_peer"]["port"] = int(mainnet_port)

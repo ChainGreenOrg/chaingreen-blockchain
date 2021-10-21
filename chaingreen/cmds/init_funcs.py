@@ -22,10 +22,10 @@ from chaingreen.util.config import (
     save_config,
     unflatten_properties,
 )
-from chia.util.ints import uint32
-from chia.util.keychain import Keychain
-from chia.util.path import mkdir
-from chia.util.ssl_check import (
+from chaingreen.util.ints import uint32
+from chaingreen.util.keychain import Keychain
+from chaingreen.util.path import mkdir
+from chaingreen.util.ssl_check import (
     DEFAULT_PERMISSIONS_CERT_FILE,
     DEFAULT_PERMISSIONS_KEY_FILE,
     RESTRICT_MASK_CERT_FILE,
@@ -338,7 +338,7 @@ def chaingreen_full_version_str() -> str:
     return f"{major}.{minor}.{patch}{dev}"
 
 
-def chia_init(root_path: Path, *, should_check_keys: bool = True, fix_ssl_permissions: bool = False):
+def chaingreen_init(root_path: Path, *, should_check_keys: bool = True, fix_ssl_permissions: bool = False):
     """
     Standard first run initialization or migration steps. Handles config creation,
     generation of SSL certs, and setting target addresses (via check_keys).

@@ -37,9 +37,9 @@ from chaingreen.full_node.weight_proof import (  # type: ignore
     _validate_sub_epoch_segments,
     _validate_summaries_weight,
 )
-from chia.types.full_block import FullBlock
-from chia.types.header_block import HeaderBlock
-from chia.util.ints import uint32, uint64
+from chaingreen.types.full_block import FullBlock
+from chaingreen.types.header_block import HeaderBlock
+from chaingreen.util.ints import uint32, uint64
 
 
 @pytest.fixture(scope="session")

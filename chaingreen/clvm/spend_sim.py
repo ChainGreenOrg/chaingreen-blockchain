@@ -30,7 +30,7 @@ The purpose of this file is to provide a lightweight simulator for the testing o
 The Node object uses actual MempoolManager, Mempool and CoinStore objects, while substituting FullBlock and
 BlockRecord objects for trimmed down versions.
 
-There is also a provided NodeClient object which implements many of the methods from chia.rpc.full_node_rpc_client
+There is also a provided NodeClient object which implements many of the methods from chaingreen.rpc.full_node_rpc_client
 and is designed so that you could test with it and then swap in a real rpc client that uses the same code you tested.
 """
 

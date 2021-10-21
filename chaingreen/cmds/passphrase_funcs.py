@@ -2,11 +2,11 @@ import click
 import colorama
 import sys
 
-from chia.daemon.client import acquire_connection_to_daemon
-from chia.util.keychain import Keychain, obtain_current_passphrase, supports_os_passphrase_storage
-from chia.util.keyring_wrapper import DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE
-from chia.util.misc import prompt_yes_no
-from chia.util.ws_message import WsRpcMessage
+from chaingreen.daemon.client import acquire_connection_to_daemon
+from chaingreen.util.keychain import Keychain, obtain_current_passphrase, supports_os_passphrase_storage
+from chaingreen.util.keyring_wrapper import DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE
+from chaingreen.util.misc import prompt_yes_no
+from chaingreen.util.ws_message import WsRpcMessage
 from getpass import getpass
 from io import TextIOWrapper
 from pathlib import Path
@@ -81,7 +81,7 @@ def prompt_to_save_passphrase() -> bool:
             print(
                 "\n"
                 "Your passphrase can be stored in your system's secure credential store. "
-                "Other Chia processes will be able to access your keys without prompting for your passphrase."
+                "Other chaingreen processes will be able to access your keys without prompting for your passphrase."
             )
             if warning is not None:
                 colorama.init()

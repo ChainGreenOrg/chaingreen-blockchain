@@ -1,4 +1,4 @@
-from chia.protocols.protocol_message_types import ProtocolMessageTypes as pmt, ProtocolMessageTypes
+from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes as pmt, ProtocolMessageTypes
 
 NO_REPLY_EXPECTED = [
     # full_node -> full_node messages

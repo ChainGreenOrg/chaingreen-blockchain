@@ -38,8 +38,8 @@ from chaingreen.util.ints import uint8, uint16, uint32, uint64
 from chaingreen.util.recursive_replace import recursive_replace
 from chaingreen.util.vdf_prover import get_vdf_info_and_proof
 from tests.wallet_tools import WalletTool
-from chia.wallet.cc_wallet.cc_wallet import CCWallet
-from chia.wallet.transaction_record import TransactionRecord
+from chaingreen.wallet.cc_wallet.cc_wallet import CCWallet
+from chaingreen.wallet.transaction_record import TransactionRecord
 
 from tests.connection_utils import add_dummy_connection, connect_and_get_peer
 from tests.core.full_node.test_coin_store import get_future_reward_coins

@@ -15,20 +15,20 @@ from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 
-from chia.protocols.protocol_message_types import ProtocolMessageTypes
-from chia.protocols.protocol_state_machine import message_requires_reply
-from chia.protocols.protocol_timing import INVALID_PROTOCOL_BAN_SECONDS, API_EXCEPTION_BAN_SECONDS
-from chia.protocols.shared_protocol import protocol_version
-from chia.server.introducer_peers import IntroducerPeers
-from chia.server.outbound_message import Message, NodeType
-from chia.server.ssl_context import private_ssl_paths, public_ssl_paths
-from chia.server.ws_connection import WSChiaConnection
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.peer_info import PeerInfo
-from chia.util.errors import Err, ProtocolError
-from chia.util.ints import uint16
-from chia.util.network import is_localhost, is_in_network
-from chia.util.ssl_check import verify_ssl_certs_and_keys
+from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
+from chaingreen.protocols.protocol_state_machine import message_requires_reply
+from chaingreen.protocols.protocol_timing import INVALID_PROTOCOL_BAN_SECONDS, API_EXCEPTION_BAN_SECONDS
+from chaingreen.protocols.shared_protocol import protocol_version
+from chaingreen.server.introducer_peers import IntroducerPeers
+from chaingreen.server.outbound_message import Message, NodeType
+from chaingreen.server.ssl_context import private_ssl_paths, public_ssl_paths
+from chaingreen.server.ws_connection import WSChaingreenConnection
+from chaingreen.types.blockchain_format.sized_bytes import bytes32
+from chaingreen.types.peer_info import PeerInfo
+from chaingreen.util.errors import Err, ProtocolError
+from chaingreen.util.ints import uint16
+from chaingreen.util.network import is_localhost, is_in_network
+from chaingreen.util.ssl_check import verify_ssl_certs_and_keys
 
 
 def ssl_context_for_server(
@@ -282,7 +282,7 @@ class ChaingreenServer:
 
             if connection.peer_port == 8444 or connection.peer_server_port == 8444:
                 
-                self.log.info(f"Stop communicating with Chia node: {connection.get_peer_info()}")
+                self.log.info(f"Stop communicating with chaingreen node: {connection.get_peer_info()}")
                 await connection.close()
                 close_event.set()
 
@@ -726,11 +726,11 @@ class ChaingreenServer:
         ip = None
         port = self._port
 
-        # Use chia's service first.
+        # Use chaingreen's service first.
         try:
             timeout = ClientTimeout(total=15)
             async with ClientSession(timeout=timeout) as session:
-                async with session.get("https://ip.chia.net/") as resp:
+                async with session.get("https://ip.chaingreen.net/") as resp:
                     if resp.status == 200:
                         ip = str(await resp.text())
                         ip = ip.rstrip()

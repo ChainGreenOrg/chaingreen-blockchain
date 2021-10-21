@@ -6,17 +6,17 @@ from typing import Any, Callable, Dict, List, Optional
 
 from aiohttp import WSCloseCode, WSMessage, WSMsgType
 
-from chia.cmds.init_funcs import chia_full_version_str
-from chia.protocols.protocol_message_types import ProtocolMessageTypes
-from chia.protocols.protocol_state_machine import message_response_ok
-from chia.protocols.protocol_timing import INTERNAL_PROTOCOL_ERROR_BAN_SECONDS
-from chia.protocols.shared_protocol import Capability, Handshake
-from chia.server.outbound_message import Message, NodeType, make_msg
-from chia.server.rate_limits import RateLimiter
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.peer_info import PeerInfo
-from chia.util.errors import Err, ProtocolError
-from chia.util.ints import uint8, uint16
+from chaingreen.cmds.init_funcs import chaingreen_full_version_str
+from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
+from chaingreen.protocols.protocol_state_machine import message_response_ok
+from chaingreen.protocols.protocol_timing import INTERNAL_PROTOCOL_ERROR_BAN_SECONDS
+from chaingreen.protocols.shared_protocol import Capability, Handshake
+from chaingreen.server.outbound_message import Message, NodeType, make_msg
+from chaingreen.server.rate_limits import RateLimiter
+from chaingreen.types.blockchain_format.sized_bytes import bytes32
+from chaingreen.types.peer_info import PeerInfo
+from chaingreen.util.errors import Err, ProtocolError
+from chaingreen.util.ints import uint8, uint16
 
 # Each message is prepended with LENGTH_BYTES bytes specifying the length
 from chaingreen.util.network import class_for_type, is_localhost

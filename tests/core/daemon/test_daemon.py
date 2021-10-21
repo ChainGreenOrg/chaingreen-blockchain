@@ -1,9 +1,9 @@
-from chia.server.outbound_message import NodeType
-from chia.types.peer_info import PeerInfo
+from chaingreen.server.outbound_message import NodeType
+from chaingreen.types.peer_info import PeerInfo
 from tests.block_tools import BlockTools, create_block_tools, create_block_tools_async
-from chia.util.ints import uint16
-from chia.util.keyring_wrapper import DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE
-from chia.util.ws_message import create_payload
+from chaingreen.util.ints import uint16
+from chaingreen.util.keyring_wrapper import DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE
+from chaingreen.util.ws_message import create_payload
 from tests.core.node_height import node_height_at_least
 from tests.setup_nodes import setup_daemon, self_hostname, setup_full_system
 from tests.simulation.test_simulation import test_constants_modified

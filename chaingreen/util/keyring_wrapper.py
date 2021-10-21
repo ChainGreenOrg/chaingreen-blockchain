@@ -2,9 +2,9 @@ import asyncio
 import keyring as keyring_main
 
 from blspy import PrivateKey  # pyright: reportMissingImports=false
-from chia.util.default_root import DEFAULT_KEYS_ROOT_PATH
-from chia.util.file_keyring import FileKeyring
-from chia.util.misc import prompt_yes_no
+from chaingreen.util.default_root import DEFAULT_KEYS_ROOT_PATH
+from chaingreen.util.file_keyring import FileKeyring
+from chaingreen.util.misc import prompt_yes_no
 from keyrings.cryptfile.cryptfile import CryptFileKeyring  # pyright: reportMissingImports=false
 from keyring.backends.macOS import Keyring as MacKeyring
 from keyring.backends.Windows import WinVaultKeyring as WinKeyring
@@ -19,10 +19,10 @@ from typing import Any, List, Optional, Tuple, Type, Union
 # WARNING: Changing the default passphrase will prevent passphrase-less users from accessing
 # their existing keys. Using a new default passphrase requires migrating existing users to
 # the new passphrase.
-DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE = "$ chia passphrase set # all the cool kids are doing it!"
+DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE = "$ chaingreen passphrase set # all the cool kids are doing it!"
 
-MASTER_PASSPHRASE_SERVICE_NAME = "Chia Passphrase"
-MASTER_PASSPHRASE_USER_NAME = "Chia Passphrase"
+MASTER_PASSPHRASE_SERVICE_NAME = "Chaingreen Passphrase"
+MASTER_PASSPHRASE_USER_NAME = "Chaingreen Passphrase"
 
 
 LegacyKeyring = Union[MacKeyring, WinKeyring, CryptFileKeyring]
@@ -51,7 +51,7 @@ def get_os_passphrase_store() -> Optional[OSPassphraseStore]:
 
 def check_legacy_keyring_keys_present(keyring: Union[MacKeyring, WinKeyring]) -> bool:
     from keyring.credentials import SimpleCredential
-    from chia.util.keychain import default_keychain_user, default_keychain_service, get_private_key_user, MAX_KEYS
+    from chaingreen.util.keychain import default_keychain_user, default_keychain_service, get_private_key_user, MAX_KEYS
 
     keychain_user: str = default_keychain_user()
     keychain_service: str = default_keychain_service()
@@ -124,7 +124,7 @@ class KeyringWrapper:
         self.cached_passphrase = self._get_initial_cached_passphrase()
 
     def _configure_backend(self) -> Union[LegacyKeyring, FileKeyring]:
-        from chia.util.keychain import supports_keyring_passphrase
+        from chaingreen.util.keychain import supports_keyring_passphrase
 
         keyring: Union[LegacyKeyring, FileKeyring]
 
@@ -158,7 +158,7 @@ class KeyringWrapper:
         Grab the saved passphrase from the OS credential store (if available), otherwise
         use the default passphrase
         """
-        from chia.util.keychain import supports_os_passphrase_storage
+        from chaingreen.util.keychain import supports_os_passphrase_storage
 
         passphrase: Optional[str] = None
 
@@ -245,7 +245,7 @@ class KeyringWrapper:
         Sets a new master passphrase for the keyring
         """
 
-        from chia.util.keychain import (
+        from chaingreen.util.keychain import (
             KeyringCurrentPassphraseIsInvalid,
             KeyringRequiresMigration,
             supports_os_passphrase_storage,
@@ -397,7 +397,7 @@ class KeyringWrapper:
         return prompt_yes_no("Begin keyring migration? (y/n) ")
 
     def migrate_legacy_keys(self) -> MigrationResults:
-        from chia.util.keychain import get_private_key_user, Keychain, MAX_KEYS
+        from chaingreen.util.keychain import get_private_key_user, Keychain, MAX_KEYS
 
         print("Migrating contents from legacy keyring")
 
@@ -429,7 +429,7 @@ class KeyringWrapper:
         )
 
     def verify_migration_results(self, migration_results: MigrationResults) -> bool:
-        from chia.util.keychain import Keychain
+        from chaingreen.util.keychain import Keychain
 
         # Stop using the legacy keyring. This will direct subsequent reads to the new keyring.
         self.legacy_keyring = None
@@ -505,7 +505,7 @@ class KeyringWrapper:
         perform a before/after comparison of the keyring contents, and on success we'll prompt
         to cleanup the legacy keyring.
         """
-        from chia.cmds.passphrase_funcs import async_update_daemon_migration_completed_if_running
+        from chaingreen.cmds.passphrase_funcs import async_update_daemon_migration_completed_if_running
 
         # Make sure the user is ready to begin migration.
         response = self.confirm_migration()

@@ -9,17 +9,17 @@ import pytest
 from blspy import AugSchemeMPL
 from chiapos import DiskPlotter
 
-from chia.consensus.coinbase import create_puzzlehash_for_pk
-from chia.plotting.util import stream_plot_info_ph, stream_plot_info_pk, PlotRefreshResult, PlotRefreshEvents
-from chia.plotting.manager import PlotManager
-from chia.protocols import farmer_protocol
-from chia.rpc.farmer_rpc_api import FarmerRpcApi
-from chia.rpc.farmer_rpc_client import FarmerRpcClient
-from chia.rpc.harvester_rpc_api import HarvesterRpcApi
-from chia.rpc.harvester_rpc_client import HarvesterRpcClient
-from chia.rpc.rpc_server import start_rpc_server
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.bech32m import decode_puzzle_hash, encode_puzzle_hash
+from chaingreen.consensus.coinbase import create_puzzlehash_for_pk
+from chaingreen.plotting.util import stream_plot_info_ph, stream_plot_info_pk, PlotRefreshResult, PlotRefreshEvents
+from chaingreen.plotting.manager import PlotManager
+from chaingreen.protocols import farmer_protocol
+from chaingreen.rpc.farmer_rpc_api import FarmerRpcApi
+from chaingreen.rpc.farmer_rpc_client import FarmerRpcClient
+from chaingreen.rpc.harvester_rpc_api import HarvesterRpcApi
+from chaingreen.rpc.harvester_rpc_client import HarvesterRpcClient
+from chaingreen.rpc.rpc_server import start_rpc_server
+from chaingreen.types.blockchain_format.sized_bytes import bytes32
+from chaingreen.util.bech32m import decode_puzzle_hash, encode_puzzle_hash
 from tests.block_tools import get_plot_dir
 from chaingreen.util.byte_types import hexstr_to_bytes
 from chaingreen.util.config import load_config, save_config

@@ -2,9 +2,9 @@ import os
 import shutil
 import tempfile
 
-from chia.util.file_keyring import FileKeyring
-from chia.util.keychain import Keychain, default_keychain_service, default_keychain_user, get_private_key_user
-from chia.util.keyring_wrapper import KeyringWrapper
+from chaingreen.util.file_keyring import FileKeyring
+from chaingreen.util.keychain import Keychain, default_keychain_service, default_keychain_user, get_private_key_user
+from chaingreen.util.keyring_wrapper import KeyringWrapper
 from functools import wraps
 from keyring.util import platform_
 from keyrings.cryptfile.cryptfile import CryptFileKeyring  # pyright: reportMissingImports=false
@@ -100,7 +100,7 @@ class TempKeyring:
         self,
         *,
         user: str = "testing-1.8.0",
-        service: str = "testing-chia-1.8.0",
+        service: str = "testing-chaingreen-1.8.0",
         populate: bool = False,
         setup_cryptfilekeyring: bool = False,
         existing_keyring_path: str = None,
@@ -137,7 +137,7 @@ class TempKeyring:
         # Patch supports_keyring_passphrase() to return True
         mock_supports_keyring_passphrase.return_value = True
 
-        mock_supports_os_passphrase_storage_patch = patch("chia.util.keychain.supports_os_passphrase_storage")
+        mock_supports_os_passphrase_storage_patch = patch("chaingreen.util.keychain.supports_os_passphrase_storage")
         mock_supports_os_passphrase_storage = mock_supports_os_passphrase_storage_patch.start()
 
         # Patch supports_os_passphrase_storage() to return use_os_credential_store

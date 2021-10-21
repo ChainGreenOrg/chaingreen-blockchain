@@ -1,12 +1,12 @@
 from typing import List, Optional, Set, Dict
 import aiosqlite
-from chia.protocols.wallet_protocol import CoinState
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.coin_record import CoinRecord
-from chia.util.db_wrapper import DBWrapper
-from chia.util.ints import uint32, uint64
-from chia.util.lru_cache import LRUCache
+from chaingreen.protocols.wallet_protocol import CoinState
+from chaingreen.types.blockchain_format.coin import Coin
+from chaingreen.types.blockchain_format.sized_bytes import bytes32
+from chaingreen.types.coin_record import CoinRecord
+from chaingreen.util.db_wrapper import DBWrapper
+from chaingreen.util.ints import uint32, uint64
+from chaingreen.util.lru_cache import LRUCache
 from time import time
 import logging
 
@@ -55,7 +55,7 @@ class CoinStore:
 
         await self.coin_record_db.execute("CREATE INDEX IF NOT EXISTS coin_spent_index on coin_record(spent_index)")
 
-        # earlier versions of chia created this index despite no lookups needing
+        # earlier versions of chaingreen created this index despite no lookups needing
         # it. For now, just don't create it for new installs. In the future we
         # may remove the index from existing installations as well
         # await self.coin_record_db.execute("DROP INDEX IF EXISTS coin_spent")

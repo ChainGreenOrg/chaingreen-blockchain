@@ -10,59 +10,59 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 import aiosqlite
 from blspy import AugSchemeMPL
 
-import chia.server.ws_connection as ws  # lgtm [py/import-and-import-from]
-from chia.consensus.block_creation import unfinished_block_to_full_block
-from chia.consensus.block_record import BlockRecord
-from chia.consensus.blockchain import Blockchain, ReceiveBlockResult
-from chia.consensus.blockchain_interface import BlockchainInterface
-from chia.consensus.constants import ConsensusConstants
-from chia.consensus.difficulty_adjustment import get_next_sub_slot_iters_and_difficulty
-from chia.consensus.make_sub_epoch_summary import next_sub_epoch_summary
-from chia.consensus.multiprocess_validation import PreValidationResult
-from chia.consensus.pot_iterations import calculate_sp_iters
-from chia.full_node.block_store import BlockStore
-from chia.full_node.bundle_tools import detect_potential_template_generator
-from chia.full_node.coin_store import CoinStore
-from chia.full_node.full_node_store import FullNodeStore
-from chia.full_node.hint_store import HintStore
-from chia.full_node.mempool_manager import MempoolManager
-from chia.full_node.signage_point import SignagePoint
-from chia.full_node.sync_store import SyncStore
-from chia.full_node.weight_proof import WeightProofHandler
-from chia.protocols import farmer_protocol, full_node_protocol, timelord_protocol, wallet_protocol
-from chia.protocols.full_node_protocol import (
+import chaingreen.server.ws_connection as ws  # lgtm [py/import-and-import-from]
+from chaingreen.consensus.block_creation import unfinished_block_to_full_block
+from chaingreen.consensus.block_record import BlockRecord
+from chaingreen.consensus.blockchain import Blockchain, ReceiveBlockResult
+from chaingreen.consensus.blockchain_interface import BlockchainInterface
+from chaingreen.consensus.constants import ConsensusConstants
+from chaingreen.consensus.difficulty_adjustment import get_next_sub_slot_iters_and_difficulty
+from chaingreen.consensus.make_sub_epoch_summary import next_sub_epoch_summary
+from chaingreen.consensus.multiprocess_validation import PreValidationResult
+from chaingreen.consensus.pot_iterations import calculate_sp_iters
+from chaingreen.full_node.block_store import BlockStore
+from chaingreen.full_node.bundle_tools import detect_potential_template_generator
+from chaingreen.full_node.coin_store import CoinStore
+from chaingreen.full_node.full_node_store import FullNodeStore
+from chaingreen.full_node.hint_store import HintStore
+from chaingreen.full_node.mempool_manager import MempoolManager
+from chaingreen.full_node.signage_point import SignagePoint
+from chaingreen.full_node.sync_store import SyncStore
+from chaingreen.full_node.weight_proof import WeightProofHandler
+from chaingreen.protocols import farmer_protocol, full_node_protocol, timelord_protocol, wallet_protocol
+from chaingreen.protocols.full_node_protocol import (
     RequestBlocks,
     RespondBlock,
     RespondBlocks,
     RespondSignagePoint,
 )
-from chia.protocols.protocol_message_types import ProtocolMessageTypes
-from chia.protocols.wallet_protocol import CoinState, CoinStateUpdate
-from chia.server.node_discovery import FullNodePeers
-from chia.server.outbound_message import Message, NodeType, make_msg
-from chia.server.server import ChiaServer
-from chia.types.blockchain_format.classgroup import ClassgroupElement
-from chia.types.blockchain_format.pool_target import PoolTarget
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.blockchain_format.sub_epoch_summary import SubEpochSummary
-from chia.types.blockchain_format.vdf import CompressibleVDFField, VDFInfo, VDFProof
-from chia.types.coin_record import CoinRecord
-from chia.types.end_of_slot_bundle import EndOfSubSlotBundle
-from chia.types.full_block import FullBlock
-from chia.types.header_block import HeaderBlock
-from chia.types.mempool_inclusion_status import MempoolInclusionStatus
-from chia.types.spend_bundle import SpendBundle
-from chia.types.unfinished_block import UnfinishedBlock
-from chia.util.bech32m import encode_puzzle_hash
-from chia.util.check_fork_next_block import check_fork_next_block
-from chia.util.db_wrapper import DBWrapper
-from chia.util.errors import ConsensusError, Err
-from chia.util.ints import uint8, uint32, uint64, uint128
-from chia.util.path import mkdir, path_from_root
-from chia.util.safe_cancel_task import cancel_task_safe
-from chia.util.profiler import profile_task
+from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
+from chaingreen.protocols.wallet_protocol import CoinState, CoinStateUpdate
+from chaingreen.server.node_discovery import FullNodePeers
+from chaingreen.server.outbound_message import Message, NodeType, make_msg
+from chaingreen.server.server import ChaingreenServer
+from chaingreen.types.blockchain_format.classgroup import ClassgroupElement
+from chaingreen.types.blockchain_format.pool_target import PoolTarget
+from chaingreen.types.blockchain_format.sized_bytes import bytes32
+from chaingreen.types.blockchain_format.sub_epoch_summary import SubEpochSummary
+from chaingreen.types.blockchain_format.vdf import CompressibleVDFField, VDFInfo, VDFProof
+from chaingreen.types.coin_record import CoinRecord
+from chaingreen.types.end_of_slot_bundle import EndOfSubSlotBundle
+from chaingreen.types.full_block import FullBlock
+from chaingreen.types.header_block import HeaderBlock
+from chaingreen.types.mempool_inclusion_status import MempoolInclusionStatus
+from chaingreen.types.spend_bundle import SpendBundle
+from chaingreen.types.unfinished_block import UnfinishedBlock
+from chaingreen.util.bech32m import encode_puzzle_hash
+from chaingreen.util.check_fork_next_block import check_fork_next_block
+from chaingreen.util.db_wrapper import DBWrapper
+from chaingreen.util.errors import ConsensusError, Err
+from chaingreen.util.ints import uint8, uint32, uint64, uint128
+from chaingreen.util.path import mkdir, path_from_root
+from chaingreen.util.safe_cancel_task import cancel_task_safe
+from chaingreen.util.profiler import profile_task
 from datetime import datetime
-from chia.util.db_synchronous import db_synchronous_on
+from chaingreen.util.db_synchronous import db_synchronous_on
 
 
 class FullNode:
@@ -582,7 +582,7 @@ class FullNode:
             self.sync_store.peer_disconnected(connection.peer_node_id)
         self.remove_subscriptions(connection)
 
-    def remove_subscriptions(self, peer: ws.WSChiaConnection):
+    def remove_subscriptions(self, peer: ws.WSchaingreenConnection):
         # Remove all ph | coin id subscription for this peer
         node_id = peer.peer_node_id
         if node_id in self.peer_puzzle_hash:
@@ -907,7 +907,7 @@ class FullNode:
         for peer, changes in changes_for_peer.items():
             if peer not in self.server.all_connections:
                 continue
-            ws_peer: ws.WSChiaConnection = self.server.all_connections[peer]
+            ws_peer: ws.WSchaingreenConnection = self.server.all_connections[peer]
             state = CoinStateUpdate(height, fork_height, peak_hash, list(changes))
             msg = make_msg(ProtocolMessageTypes.coin_state_update, state)
             await ws_peer.send_message(msg)
@@ -1086,7 +1086,7 @@ class FullNode:
         block: FullBlock,
         record: BlockRecord,
         fork_height: uint32,
-        peer: Optional[ws.WSChiaConnection],
+        peer: Optional[ws.WSchaingreenConnection],
         coin_changes: Tuple[List[CoinRecord], Dict[bytes, Dict[bytes32, CoinRecord]]],
     ):
         """

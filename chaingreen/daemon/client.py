@@ -162,7 +162,7 @@ async def acquire_connection_to_daemon(root_path: Path, quiet: bool = False):
     block exits scope, execution resumes in this function, wherein the connection is
     closed.
     """
-    from chia.daemon.client import connect_to_daemon_and_validate
+    from chaingreen.daemon.client import connect_to_daemon_and_validate
 
     daemon: Optional[DaemonProxy] = None
     try:
