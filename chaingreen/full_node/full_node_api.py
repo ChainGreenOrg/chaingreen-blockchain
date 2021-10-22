@@ -71,7 +71,7 @@ class FullNodeAPI:
     @peer_required
     @api_request
     @reply_type([ProtocolMessageTypes.respond_peers])
-    async def request_peers(self, _request: full_node_protocol.RequestPeers, peer: ws.WSChiaConnection):
+    async def request_peers(self, _request: full_node_protocol.RequestPeers, peer: ws.WSChaingreenConnection):
         if peer.peer_server_port is None:
             return None
         peer_info = PeerInfo(peer.peer_host, peer.peer_server_port)
@@ -1291,7 +1291,7 @@ class FullNodeAPI:
     @api_request
     @bytes_required
     async def new_compact_vdf(
-        self, request: full_node_protocol.NewCompactVDF, peer: ws.WSChiaConnection, request_bytes: bytes = b""
+        self, request: full_node_protocol.NewCompactVDF, peer: ws.WSChaingreenConnection, request_bytes: bytes = b""
     ):
         if self.full_node.sync_store.get_sync_mode():
             return None
@@ -1317,7 +1317,7 @@ class FullNodeAPI:
     @peer_required
     @api_request
     @reply_type([ProtocolMessageTypes.respond_compact_vdf])
-    async def request_compact_vdf(self, request: full_node_protocol.RequestCompactVDF, peer: ws.WSChiaConnection):
+    async def request_compact_vdf(self, request: full_node_protocol.RequestCompactVDF, peer: ws.WSChaingreenConnection):
         if self.full_node.sync_store.get_sync_mode():
             return None
         await self.full_node.request_compact_vdf(request, peer)
@@ -1332,7 +1332,7 @@ class FullNodeAPI:
     @peer_required
     @api_request
     async def register_interest_in_puzzle_hash(
-        self, request: wallet_protocol.RegisterForPhUpdates, peer: ws.WSChiaConnection
+        self, request: wallet_protocol.RegisterForPhUpdates, peer: ws.WSChaingreenConnection
     ):
         if peer.peer_node_id not in self.full_node.peer_puzzle_hash:
             self.full_node.peer_puzzle_hash[peer.peer_node_id] = set()
@@ -1373,7 +1373,7 @@ class FullNodeAPI:
     @peer_required
     @api_request
     async def register_interest_in_coin(
-        self, request: wallet_protocol.RegisterForCoinUpdates, peer: ws.WSChiaConnection
+        self, request: wallet_protocol.RegisterForCoinUpdates, peer: ws.WSChaingreenConnection
     ):
         if peer.peer_node_id not in self.full_node.peer_coin_ids:
             self.full_node.peer_coin_ids[peer.peer_node_id] = set()

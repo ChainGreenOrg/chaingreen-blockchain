@@ -20,7 +20,7 @@ A state machine can be built from this message map.
 
 VAILD_REPLY_MESSAGE_MAP = {
     # messages for all services
-    # pmt.handshake is handled in WSChiaConnection.perform_handshake
+    # pmt.handshake is handled in WSChaingreenConnection.perform_handshake
     # full_node -> full_node protocol messages
     pmt.request_transaction: [pmt.respond_transaction],
     pmt.request_proof_of_weight: [pmt.respond_proof_of_weight],

@@ -511,5 +511,5 @@ class FarmerAPI:
 
     @api_request
     @peer_required
-    async def respond_plots(self, _: harvester_protocol.RespondPlots, peer: ws.WSChiaConnection):
+    async def respond_plots(self, _: harvester_protocol.RespondPlots, peer: ws.WSChaingreenConnection):
         self.farmer.log.warning(f"Respond plots came too late from: {peer.get_peer_logging()}")
