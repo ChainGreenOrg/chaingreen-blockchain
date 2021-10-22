@@ -1,0 +1,6 @@
+[submodule "mozilla-ca"]
+	path = mozilla-ca
+	url = https://github.com/Chia-Network/mozilla-ca.git
+[submodule "chaingreen-gui-test"]
+	path = chaingreen-gui-test
+	url = https://github.com/todortron/chaingreen-gui-test.git
