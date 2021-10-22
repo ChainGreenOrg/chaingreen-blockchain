@@ -582,7 +582,7 @@ class FullNode:
             self.sync_store.peer_disconnected(connection.peer_node_id)
         self.remove_subscriptions(connection)
 
-    def remove_subscriptions(self, peer: ws.WSchaingreenConnection):
+    def remove_subscriptions(self, peer: ws.WSChaingreenConnection):
         # Remove all ph | coin id subscription for this peer
         node_id = peer.peer_node_id
         if node_id in self.peer_puzzle_hash:
@@ -907,7 +907,7 @@ class FullNode:
         for peer, changes in changes_for_peer.items():
             if peer not in self.server.all_connections:
                 continue
-            ws_peer: ws.WSchaingreenConnection = self.server.all_connections[peer]
+            ws_peer: ws.WSChaingreenConnection = self.server.all_connections[peer]
             state = CoinStateUpdate(height, fork_height, peak_hash, list(changes))
             msg = make_msg(ProtocolMessageTypes.coin_state_update, state)
             await ws_peer.send_message(msg)
@@ -1086,7 +1086,7 @@ class FullNode:
         block: FullBlock,
         record: BlockRecord,
         fork_height: uint32,
-        peer: Optional[ws.WSchaingreenConnection],
+        peer: Optional[ws.WSChaingreenConnection],
         coin_changes: Tuple[List[CoinRecord], Dict[bytes, Dict[bytes32, CoinRecord]]],
     ):
         """
