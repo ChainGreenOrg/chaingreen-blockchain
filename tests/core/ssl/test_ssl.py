@@ -6,7 +6,7 @@ import pytest
 from chaingreen.protocols.shared_protocol import protocol_version
 from chaingreen.server.outbound_message import NodeType
 from chaingreen.server.server import ChiaServer, ssl_context_for_client
-from chaingreen.server.ws_connection import WSChiaConnection
+from chaingreen.server.ws_connection import WSChaingreenConnection
 from chaingreen.ssl.create_ssl import generate_ca_signed_cert
 from chaingreen.types.peer_info import PeerInfo
 from tests.block_tools import test_constants
@@ -28,7 +28,7 @@ async def establish_connection(server: ChiaServer, dummy_port: int, ssl_context)
         incoming_queue: asyncio.Queue = asyncio.Queue()
         url = f"wss://{self_hostname}:{server._port}/ws"
         ws = await session.ws_connect(url, autoclose=False, autoping=True, ssl=ssl_context)
-        wsc = WSChiaConnection(
+        wsc = WSChaingreenConnection(
             NodeType.FULL_NODE,
             ws,
             server._port,

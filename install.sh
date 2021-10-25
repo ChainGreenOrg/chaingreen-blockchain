@@ -82,7 +82,7 @@ fi
 find_python() {
 	set +e
 	unset BEST_VERSION
-	for V in 37 3.7 38 3.8 39 3.9 3; do
+	for V in 39 3.9 38 3.8 37 3.7 3; do
 		if which python$V >/dev/null; then
 			if [ "$BEST_VERSION" = "" ]; then
 				BEST_VERSION=$V
@@ -104,7 +104,7 @@ fi
 INSTALL_PYTHON_PATH=python${INSTALL_PYTHON_VERSION:-3.7}
 
 echo "Python version is $INSTALL_PYTHON_VERSION"
-$INSTALL_PYTHON_PATH -m venv venv
+python3.8 -m venv venv
 if [ ! -f "activate" ]; then
 	ln -s venv/bin/activate .
 fi
@@ -120,8 +120,8 @@ python -m pip install --extra-index-url https://pypi.chia.net/simple/ miniupnpc=
 python -m pip install -e . --extra-index-url https://pypi.chia.net/simple/
 
 echo ""
-echo "Chaingreen blockchain install.sh complete."
-echo "For assistance join us on Keybase in the #testnet chat channel:"
+echo "Chia blockchain install.sh complete."
+echo "For assistance join us on Keybase in the #support chat channel:"
 echo "https://keybase.io/team/chia_network.public"
 echo ""
 echo "Try the Quick Start Guide to running chia-blockchain:"

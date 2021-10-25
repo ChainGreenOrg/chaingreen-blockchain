@@ -25,13 +25,12 @@ from chaingreen.util.config import (
 from chaingreen.util.ints import uint32
 from chaingreen.util.keychain import Keychain
 from chaingreen.util.path import mkdir
-from chaingreen.util.ssl import (
+from chaingreen.util.ssl_check import (
     DEFAULT_PERMISSIONS_CERT_FILE,
     DEFAULT_PERMISSIONS_KEY_FILE,
     RESTRICT_MASK_CERT_FILE,
     RESTRICT_MASK_KEY_FILE,
     check_and_fix_permissions_for_ssl_file,
-    check_ssl,
     fix_ssl,
 )
 from chaingreen.wallet.derive_keys import master_sk_to_pool_sk, master_sk_to_wallet_sk
@@ -89,10 +88,14 @@ def check_keys(new_root: Path, keychain: Optional[Keychain] = None) -> None:
             if all_targets[-1] == config["pool"].get("cgn_target_address"):
                 stop_searching_for_pool = True
 
-    # Set the destinations
+    # Set the destinations, if necessary
+    updated_target: bool = False
     if "cgn_target_address" not in config["farmer"]:
-        print(f"Setting the cgn destination address for coinbase fees reward to {all_targets[0]}")
+        print(
+            f"Setting the cgn destination for the farmer reward (1/8 plus fees, solo and pooling) to {all_targets[0]}"
+        )
         config["farmer"]["cgn_target_address"] = all_targets[0]
+        updated_target = True
     elif config["farmer"]["cgn_target_address"] not in all_targets:
         print(
             f"WARNING: using a farmer address which we don't have the private"
@@ -103,13 +106,19 @@ def check_keys(new_root: Path, keychain: Optional[Keychain] = None) -> None:
     if "pool" not in config:
         config["pool"] = {}
     if "cgn_target_address" not in config["pool"]:
-        print(f"Setting the cgn destination address for coinbase reward to {all_targets[0]}")
+        print(f"Setting the cgn destination address for pool reward (7/8 for solo only) to {all_targets[0]}")
         config["pool"]["cgn_target_address"] = all_targets[0]
+        updated_target = True
     elif config["pool"]["cgn_target_address"] not in all_targets:
         print(
             f"WARNING: using a pool address which we don't have the private"
             f" keys for. We searched the first {number_of_ph_to_search} addresses. Consider overriding "
             f"{config['pool']['cgn_target_address']} with {all_targets[0]}"
+        )
+    if updated_target:
+        print(
+            f"To change the cgn destination addresses, edit the `cgn_target_address` entries in"
+            f" {(new_root / 'config' / 'config.yaml').absolute()}."
         )
 
     # Set the pool pks in the farmer
@@ -329,9 +338,7 @@ def chaingreen_full_version_str() -> str:
     return f"{major}.{minor}.{patch}{dev}"
 
 
-def chaingreen_init(
-    root_path: Path, *, should_check_keys: bool = True, should_check_ssl: bool = True, fix_ssl_permissions: bool = False
-):
+def chaingreen_init(root_path: Path, *, should_check_keys: bool = True, fix_ssl_permissions: bool = False):
     """
     Standard first run initialization or migration steps. Handles config creation,
     generation of SSL certs, and setting target addresses (via check_keys).
@@ -353,8 +360,6 @@ def chaingreen_init(
         # before a new update.
         if fix_ssl_permissions:
             fix_ssl(root_path)
-        elif should_check_ssl:
-            check_ssl(root_path)
         if should_check_keys:
             check_keys(root_path)
         print(f"{root_path} already exists, no migration action taken")
@@ -364,8 +369,6 @@ def chaingreen_init(
     create_all_ssl(root_path)
     if fix_ssl_permissions:
         fix_ssl(root_path)
-    elif should_check_ssl:
-        check_ssl(root_path)
     if should_check_keys:
         check_keys(root_path)
     print("")

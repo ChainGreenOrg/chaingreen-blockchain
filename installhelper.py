@@ -47,17 +47,17 @@ def make_semver(version_str):
 
 
 def update_version():
-    with open(f"{os.path.dirname(__file__)}/chaingreen-blockchain-gui/package.json") as f:
+    with open(f"{os.path.dirname(__file__)}/chaingreen-gui-test/package.json") as f:
         data = json.load(f)
 
     version: str = "0.0"
     output = subprocess.run(["chaingreen", "version"], capture_output=True)
     if output.returncode == 0:
-        version = str(output.stdout.strip(), "utf-8")
+        version = str(output.stdout.strip(), "utf-8").splitlines()[-1]
 
     data["version"] = make_semver(version)
 
-    with open(f"{os.path.dirname(__file__)}/chaingreen-blockchain-gui/package.json", "w") as w:
+    with open(f"{os.path.dirname(__file__)}/chaingreen-gui-test/package.json", "w") as w:
         json.dump(data, indent=4, fp=w)
 
 

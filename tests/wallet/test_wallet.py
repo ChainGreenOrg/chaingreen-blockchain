@@ -318,7 +318,7 @@ class TestWalletSimulator:
     #     introducer, introducer_server = await node_iters[2].__anext__()
     #
     #     async def has_full_node():
-    #         outbound: List[WSChiaConnection] = wallet.server.get_outgoing_connections()
+    #         outbound: List[WSChaingreenConnection] = wallet.server.get_outgoing_connections()
     #         for connection in outbound:
     #             if connection.connection_type is NodeType.FULL_NODE:
     #                 return True

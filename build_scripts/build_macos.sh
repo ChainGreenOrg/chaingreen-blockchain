@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -euo pipefail
+
 pip install setuptools_scm
 # The environment variable CHAINGREEN_INSTALLER_VERSION needs to be defined.
 # If the env variable NOTARIZE and the username and password variables are
@@ -15,7 +18,7 @@ echo "Installing npm and electron packagers"
 npm install electron-installer-dmg -g
 npm install electron-packager -g
 npm install electron/electron-osx-sign -g
-npm install @chia-network/notarize-cli -g
+npm install notarize-cli -g
 
 echo "Create dist/"
 sudo rm -rf dist
@@ -44,18 +47,27 @@ if [ "$LAST_EXIT_CODE" -ne 0 ]; then
 	exit $LAST_EXIT_CODE
 fi
 
-electron-packager . Chaingreen --asar.unpack="**/daemon/**" --platform=darwin \
---icon=src/assets/img/chia.icns --overwrite --app-bundle-id=net.chaingreen.blockchain \
---appVersion=$CHAINGREEN_INSTALLER_VERSION
+# sets the version for chia-blockchain in package.json
+brew install jq
+cp package.json package.json.orig
+jq --arg VER "$CHIA_INSTALLER_VERSION" '.version=$VER' package.json > temp.json && mv temp.json package.json
+
+electron-packager . Chia --asar.unpack="**/daemon/**" --platform=darwin \
+--icon=src/assets/img/Chia.icns --overwrite --app-bundle-id=net.chia.blockchain \
+--appVersion=$CHIA_INSTALLER_VERSION
 LAST_EXIT_CODE=$?
+
+# reset the package.json to the original
+mv package.json.orig package.json
+
 if [ "$LAST_EXIT_CODE" -ne 0 ]; then
 	echo >&2 "electron-packager failed!"
 	exit $LAST_EXIT_CODE
 fi
 
-if [ "$NOTARIZE" ]; then
-  electron-osx-sign Chaingreen-darwin-x64/Chaingreen.app --platform=darwin \
-  --hardened-runtime=true --provisioning-profile=chaingreenblockchain.provisionprofile \
+if [ "$NOTARIZE" == true ]; then
+  electron-osx-sign Chia-darwin-x64/Chia.app --platform=darwin \
+  --hardened-runtime=true --provisioning-profile=chiablockchain.provisionprofile \
   --entitlements=entitlements.mac.plist --entitlements-inherit=entitlements.mac.plist \
   --no-gatekeeper-assess
 fi
@@ -79,7 +91,7 @@ if [ "$LAST_EXIT_CODE" -ne 0 ]; then
 	exit $LAST_EXIT_CODE
 fi
 
-if [ "$NOTARIZE" ]; then
+if [ "$NOTARIZE" == true ]; then
 	echo "Notarize $DMG_NAME on ci"
 	cd final_installer || exit
   notarize-cli --file=$DMG_NAME --bundle-id net.chaingreen.blockchain \
