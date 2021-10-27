@@ -102,7 +102,7 @@ fi
 INSTALL_PYTHON_PATH=python${INSTALL_PYTHON_VERSION:-3.7}
 
 echo "Python version is $INSTALL_PYTHON_VERSION"
-python3.8 -m venv venv
+$INSTALL_PYTHON_PATH -m venv venv
 if [ ! -f "activate" ]; then
 	ln -s venv/bin/activate .
 fi
