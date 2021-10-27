@@ -19,8 +19,6 @@ if [ "$(uname -m)" = "armv7l" ]; then
   echo ""
 	echo "WARNING:"
 	echo "The Chaingreen Blockchain requires a 64 bit OS and this is 32 bit armv7l"
-	echo "For more information, see"
-	echo "https://github.com/Chia-Network/chia-blockchain/wiki/Raspberry-Pi"
 	echo "Exiting."
 	exit 1
 fi
@@ -120,12 +118,7 @@ python -m pip install --extra-index-url https://pypi.chia.net/simple/ miniupnpc=
 python -m pip install -e . --extra-index-url https://pypi.chia.net/simple/
 
 echo ""
-echo "Chia blockchain install.sh complete."
-echo "For assistance join us on Keybase in the #support chat channel:"
-echo "https://keybase.io/team/chia_network.public"
-echo ""
-echo "Try the Quick Start Guide to running chia-blockchain:"
-echo "https://github.com/Chia-Network/chia-blockchain/wiki/Quick-Start-Guide"
+echo "Chaingreen blockchain install.sh complete."
 echo ""
 echo "To install the GUI type 'sh install-gui.sh' after '. ./activate'."
 echo ""
