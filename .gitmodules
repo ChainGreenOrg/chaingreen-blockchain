@@ -3,4 +3,4 @@
 	url = https://github.com/Chia-Network/mozilla-ca.git
 [submodule "chaingreen-blockchain-gui"]
 	path = chaingreen-blockchain-gui
-	url = https://github.com/todortron/chaingreen-blockchain-gui.git
+	url = https://github.com/ChainGreenOrg/chaingreen-blockchain-gui.git

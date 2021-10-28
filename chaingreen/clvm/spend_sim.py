@@ -30,7 +30,7 @@ The purpose of this file is to provide a lightweight simulator for the testing o
 The Node object uses actual MempoolManager, Mempool and CoinStore objects, while substituting FullBlock and
 BlockRecord objects for trimmed down versions.
 
-There is also a provided NodeClient object which implements many of the methods from chia.rpc.full_node_rpc_client
+There is also a provided NodeClient object which implements many of the methods from chaingreen.rpc.full_node_rpc_client
 and is designed so that you could test with it and then swap in a real rpc client that uses the same code you tested.
 """
 
@@ -129,8 +129,9 @@ class SpendSim:
             uint64(calculate_base_farmer_reward(next_block_height) + fees),
             self.defaults.GENESIS_CHALLENGE,
         )
-        await self.mempool_manager.coin_store._add_coin_record(self.new_coin_record(pool_coin, True), False)
-        await self.mempool_manager.coin_store._add_coin_record(self.new_coin_record(farmer_coin, True), False)
+        await self.mempool_manager.coin_store._add_coin_records(
+            [self.new_coin_record(pool_coin, True), self.new_coin_record(farmer_coin, True)]
+        )
 
         # Coin store gets updated
         generator_bundle: Optional[SpendBundle] = None
@@ -147,10 +148,12 @@ class SpendSim:
                     return_additions = additions
                     return_removals = removals
 
-                for addition in additions:
-                    await self.mempool_manager.coin_store._add_coin_record(self.new_coin_record(addition), False)
-                for removal in removals:
-                    await self.mempool_manager.coin_store._set_spent(removal.name(), uint32(self.block_height + 1))
+                await self.mempool_manager.coin_store._add_coin_records(
+                    [self.new_coin_record(addition) for addition in additions]
+                )
+                await self.mempool_manager.coin_store._set_spent(
+                    [r.name() for r in removals], uint32(self.block_height + 1)
+                )
 
         # SimBlockRecord is created
         generator: Optional[BlockGenerator] = await self.generate_transaction_generator(generator_bundle)
@@ -200,7 +203,9 @@ class SimClient:
         self.service = service
 
     async def push_tx(self, spend_bundle: SpendBundle) -> Tuple[MempoolInclusionStatus, Optional[Err]]:
-        cost_result: NPCResult = await self.service.mempool_manager.pre_validate_spendbundle(spend_bundle)
+        cost_result: NPCResult = await self.service.mempool_manager.pre_validate_spendbundle(
+            spend_bundle, spend_bundle.name()
+        )
         cost, status, error = await self.service.mempool_manager.add_spendbundle(
             spend_bundle, cost_result, spend_bundle.name()
         )

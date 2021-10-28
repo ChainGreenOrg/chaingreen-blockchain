@@ -92,6 +92,8 @@ class FullNodeDiscovery:
     async def initialize_address_manager(self) -> None:
         mkdir(self.peer_db_path.parent)
         self.connection = await aiosqlite.connect(self.peer_db_path)
+        await self.connection.execute("pragma journal_mode=wal")
+        await self.connection.execute("pragma synchronous=OFF")
         self.address_manager_store = await AddressManagerStore.create(self.connection)
         if not await self.address_manager_store.is_empty():
             self.address_manager = await self.address_manager_store.deserialize()
@@ -219,6 +221,7 @@ class FullNodeDiscovery:
                             0,
                         )
                     )
+                self.log.info(f"===========_query_dns peers {peers}")
                 self.log.info(f"Received {len(peers)} peers from DNS seeder, using rdtype = {rdtype}.")
                 if len(peers) > 0:
                     await self._respond_peers_common(full_node_protocol.RespondPeers(peers), None, False)
@@ -253,6 +256,7 @@ class FullNodeDiscovery:
 
     async def _connect_to_peers(self, random) -> None:
         next_feeler = self._poisson_next_send(time.time() * 1000 * 1000, 240, random)
+        self.log.info(f"===========next_feeler {next_feeler}")
         retry_introducers = False
         introducer_attempts: int = 0
         dns_server_index: int = 0
@@ -304,10 +308,13 @@ class FullNodeDiscovery:
                 # Only connect out to one peer per network group (/16 for IPv4).
                 groups = set()
                 full_node_connected = self.server.get_full_node_outgoing_connections()
+                #self.log.debug(f"full_node_connected: {full_node_connected}")
                 connected = [c.get_peer_info() for c in full_node_connected]
                 connected = [c for c in connected if c is not None]
+                #self.log.debug(f"connected: {connected}")
                 for conn in full_node_connected:
                     peer = conn.get_peer_info()
+                    #self.log.debug(f"connected_peer: {peer}")
                     if peer is None:
                         continue
                     if peer.port == 8444 or conn.server_port == 8444:
@@ -385,6 +392,7 @@ class FullNodeDiscovery:
                         continue
                     if time.time() - last_timestamp_local_info > 1800 or local_peerinfo is None:
                         local_peerinfo = await self.server.get_peer_info()
+                        self.log.info(f"===========local_peerinfo {local_peerinfo}")
                         last_timestamp_local_info = uint64(int(time.time()))
                     if local_peerinfo is not None and addr == local_peerinfo:
                         continue
@@ -549,6 +557,7 @@ class FullNodePeers(FullNodeDiscovery):
                         self.neighbour_known_peers[neighbour].clear()
                 # Self advertise every 24 hours.
                 peer = await self.server.get_peer_info()
+                self.log.debug(f"FullNodePeers peer: {peer}")
                 if peer is None:
                     continue
                 timestamped_peer = [
@@ -592,6 +601,7 @@ class FullNodePeers(FullNodeDiscovery):
             if self.address_manager is None:
                 return None
             peers = await self.address_manager.get_peers()
+            self.log.debug(f"FullNodePeers peers: {peers}")
             await self.add_peers_neighbour(peers, peer_info)
 
             msg = make_msg(
@@ -627,6 +637,7 @@ class FullNodePeers(FullNodeDiscovery):
                     continue
                 # https://en.bitcoin.it/wiki/Satoshi_Client_Node_Discovery#Address_Relay
                 connections = self.server.get_full_node_connections()
+                self.log.debug(f"FullNodePeers connections: {connections}")
                 hashes = []
                 cur_day = int(time.time()) // (24 * 60 * 60)
                 for connection in connections:

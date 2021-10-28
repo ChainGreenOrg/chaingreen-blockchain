@@ -3,7 +3,7 @@ import pytest
 import time
 from chaingreen.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
 from chaingreen.protocols.full_node_protocol import RespondBlock
-from chaingreen.server.server import ChiaServer
+from chaingreen.server.server import ChaingreenServer
 from chaingreen.simulator.simulator_protocol import FarmNewBlockProtocol, ReorgProtocol
 from chaingreen.types.peer_info import PeerInfo
 from chaingreen.util.ints import uint16, uint32, uint64
@@ -48,7 +48,7 @@ class TestWalletSimulator:
         num_blocks = 10
         full_nodes, wallets = wallet_node
         full_node_api = full_nodes[0]
-        server_1: ChiaServer = full_node_api.full_node.server
+        server_1: ChaingreenServer = full_node_api.full_node.server
         wallet_node, server_2 = wallets[0]
 
         wallet = wallet_node.wallet_state_manager.main_wallet
@@ -318,7 +318,7 @@ class TestWalletSimulator:
     #     introducer, introducer_server = await node_iters[2].__anext__()
     #
     #     async def has_full_node():
-    #         outbound: List[WSChiaConnection] = wallet.server.get_outgoing_connections()
+    #         outbound: List[WSChaingreenConnection] = wallet.server.get_outgoing_connections()
     #         for connection in outbound:
     #             if connection.connection_type is NodeType.FULL_NODE:
     #                 return True

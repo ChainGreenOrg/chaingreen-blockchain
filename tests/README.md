@@ -43,7 +43,7 @@ If you are certain that all the tests in a directory can run in parallel, set `p
 
 ### Optional job stages
 
-Set `checkout_blocks_and_plots` to `False` to omit checking out the [test-cache](https://github.com/Chia-Network/test-cache) repo.
+Set `checkout_blocks_and_plots` to `False` to omit checking out the [test-cache](https://github.com/ChainGreenOrg/test-cache) repo.
 
 Set `install_timelord` to `False` to omit the step of installing a Time Lord for your directory's job.
 

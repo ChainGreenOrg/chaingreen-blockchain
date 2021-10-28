@@ -16,6 +16,7 @@ from chaingreen.cmds.wallet import wallet_cmd
 from chaingreen.cmds.plotnft import plotnft_cmd
 from chaingreen.util.default_root import DEFAULT_KEYS_ROOT_PATH, DEFAULT_ROOT_PATH
 from chaingreen.util.keychain import set_keys_root_path, supports_keyring_passphrase
+from chaingreen.util.ssl_check import check_ssl
 from typing import Optional
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
@@ -46,7 +47,7 @@ def monkey_patch_click() -> None:
 @click.option(
     "--keys-root-path", default=DEFAULT_KEYS_ROOT_PATH, help="Keyring file root", type=click.Path(), show_default=True
 )
-@click.option("--passphrase-file", type=click.File("r"), help="File or descriptor to read the keyring passphase from")
+@click.option("--passphrase-file", type=click.File("r"), help="File or descriptor to read the keyring passphrase from")
 @click.pass_context
 def cli(
     ctx: click.Context,
@@ -72,6 +73,8 @@ def cli(
         except Exception as e:
             print(f"Failed to read passphrase: {e}")
 
+    check_ssl(Path(root_path))
+
 
 if not supports_keyring_passphrase():
     from chaingreen.cmds.passphrase_funcs import remove_passphrase_options_from_cmd
@@ -91,7 +94,7 @@ def version_cmd() -> None:
     help="If the keyring is passphrase-protected, the daemon will wait for an unlock command before accessing keys",
     default=False,
     is_flag=True,
-    hidden=True,  # --wait-for-unlock is only set when launched by chia start <service>
+    hidden=True,  # --wait-for-unlock is only set when launched by chaingreen start <service>
 )
 @click.pass_context
 def run_daemon_cmd(ctx: click.Context, wait_for_unlock: bool) -> None:

@@ -16,6 +16,8 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 
 from chaingreen.protocols.protocol_message_types import ProtocolMessageTypes
+from chaingreen.protocols.protocol_state_machine import message_requires_reply
+from chaingreen.protocols.protocol_timing import INVALID_PROTOCOL_BAN_SECONDS, API_EXCEPTION_BAN_SECONDS
 from chaingreen.protocols.shared_protocol import protocol_version
 from chaingreen.server.introducer_peers import IntroducerPeers
 from chaingreen.server.outbound_message import Message, NodeType
@@ -26,7 +28,7 @@ from chaingreen.types.peer_info import PeerInfo
 from chaingreen.util.errors import Err, ProtocolError
 from chaingreen.util.ints import uint16
 from chaingreen.util.network import is_localhost, is_in_network
-from chaingreen.util.ssl import verify_ssl_certs_and_keys
+from chaingreen.util.ssl_check import verify_ssl_certs_and_keys
 
 
 def ssl_context_for_server(
@@ -39,7 +41,7 @@ def ssl_context_for_server(
     log: Optional[logging.Logger] = None,
 ) -> Optional[ssl.SSLContext]:
     if check_permissions:
-        verify_ssl_certs_and_keys([(ca_cert, ca_key), (private_cert_path, private_key_path)], log)
+        verify_ssl_certs_and_keys([ca_cert, private_cert_path], [ca_key, private_key_path], log)
 
     ssl_context = ssl._create_unverified_context(purpose=ssl.Purpose.SERVER_AUTH, cafile=str(ca_cert))
     ssl_context.check_hostname = False
@@ -52,7 +54,7 @@ def ssl_context_for_root(
     ca_cert_file: str, *, check_permissions: bool = True, log: Optional[logging.Logger] = None
 ) -> Optional[ssl.SSLContext]:
     if check_permissions:
-        verify_ssl_certs_and_keys([(Path(ca_cert_file), None)], log)
+        verify_ssl_certs_and_keys([Path(ca_cert_file)], [], log)
 
     ssl_context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH, cafile=ca_cert_file)
     return ssl_context
@@ -68,7 +70,7 @@ def ssl_context_for_client(
     log: Optional[logging.Logger] = None,
 ) -> Optional[ssl.SSLContext]:
     if check_permissions:
-        verify_ssl_certs_and_keys([(ca_cert, ca_key), (private_cert_path, private_key_path)], log)
+        verify_ssl_certs_and_keys([ca_cert, private_cert_path], [ca_key, private_key_path], log)
 
     ssl_context = ssl._create_unverified_context(purpose=ssl.Purpose.SERVER_AUTH, cafile=str(ca_cert))
     ssl_context.check_hostname = False
@@ -159,8 +161,8 @@ class ChaingreenServer:
 
         self.tasks_from_peer: Dict[bytes32, Set[bytes32]] = {}
         self.banned_peers: Dict[str, float] = {}
-        self.invalid_protocol_ban_seconds = 10
-        self.api_exception_ban_seconds = 10
+        self.invalid_protocol_ban_seconds = INVALID_PROTOCOL_BAN_SECONDS
+        self.api_exception_ban_seconds = API_EXCEPTION_BAN_SECONDS
         self.exempt_peer_networks: List[Union[IPv4Network, IPv6Network]] = [
             ip_network(net, strict=False) for net in config.get("exempt_peer_networks", [])
         ]
@@ -280,7 +282,7 @@ class ChaingreenServer:
 
             if connection.peer_port == 8444 or connection.peer_server_port == 8444:
                 
-                self.log.info(f"Stop communicating with Chia node: {connection.get_peer_info()}")
+                self.log.info(f"Stop communicating with chaingreen node: {connection.get_peer_info()}")
                 await connection.close()
                 close_event.set()
 
@@ -384,7 +386,11 @@ class ChaingreenServer:
         session = None
         connection: Optional[WSChaingreenConnection] = None
         try:
-            timeout = ClientTimeout(total=30)
+            # Crawler/DNS introducer usually uses a lower timeout than the default
+            timeout_value = (
+                30 if "peer_connect_timeout" not in self.config else float(self.config["peer_connect_timeout"])
+            )
+            timeout = ClientTimeout(total=timeout_value)
             session = ClientSession(timeout=timeout)
 
             try:
@@ -558,8 +564,10 @@ class ChaingreenServer:
 
                     if hasattr(f, "peer_required"):
                         coroutine = f(full_message.data, connection)
+                        self.log.debug(f"coroutine: {coroutine}")
                     else:
                         coroutine = f(full_message.data)
+                        self.log.debug(f"coroutine: {coroutine}")
 
                     async def wrapped_coroutine() -> Optional[Message]:
                         try:
@@ -620,13 +628,29 @@ class ChaingreenServer:
                 for message in messages:
                     await connection.send_message(message)
 
+    async def validate_broadcast_message_type(self, messages: List[Message], node_type: NodeType):
+        for message in messages:
+            if message_requires_reply(ProtocolMessageTypes(message.type)):
+                # Internal protocol logic error - we will raise, blocking messages to all peers
+                self.log.error(f"Attempt to broadcast message requiring protocol response: {message.type}")
+                for _, connection in self.all_connections.items():
+                    if connection.connection_type is node_type:
+                        await connection.close(
+                            self.invalid_protocol_ban_seconds,
+                            WSCloseCode.INTERNAL_ERROR,
+                            Err.INTERNAL_PROTOCOL_ERROR,
+                        )
+                raise ProtocolError(Err.INTERNAL_PROTOCOL_ERROR, [message.type])
+
     async def send_to_all(self, messages: List[Message], node_type: NodeType):
+        await self.validate_broadcast_message_type(messages, node_type)
         for _, connection in self.all_connections.items():
             if connection.connection_type is node_type:
                 for message in messages:
                     await connection.send_message(message)
 
     async def send_to_all_except(self, messages: List[Message], node_type: NodeType, exclude: bytes32):
+        await self.validate_broadcast_message_type(messages, node_type)
         for _, connection in self.all_connections.items():
             if connection.connection_type is node_type and connection.peer_node_id != exclude:
                 for message in messages:
@@ -649,6 +673,7 @@ class ChaingreenServer:
     def get_full_node_outgoing_connections(self) -> List[WSChaingreenConnection]:
         result = []
         connections = self.get_full_node_connections()
+        #self.log.debug(f"get_full_node_outgoing_connections {connections}")
         for connection in connections:
             if connection.is_outbound:
                 result.append(connection)
@@ -700,6 +725,17 @@ class ChaingreenServer:
     async def get_peer_info(self) -> Optional[PeerInfo]:
         ip = None
         port = self._port
+
+        # Use chaingreen's service first.
+        try:
+            timeout = ClientTimeout(total=15)
+            async with ClientSession(timeout=timeout) as session:
+                async with session.get("https://ip.chaingreen.net/") as resp:
+                    if resp.status == 200:
+                        ip = str(await resp.text())
+                        ip = ip.rstrip()
+        except Exception:
+            ip = None
 
         # Fallback to `checkip` from amazon.
         if ip is None:

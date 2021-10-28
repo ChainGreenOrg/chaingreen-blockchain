@@ -5,8 +5,8 @@ import pytest
 
 from chaingreen.protocols.shared_protocol import protocol_version
 from chaingreen.server.outbound_message import NodeType
-from chaingreen.server.server import ChiaServer, ssl_context_for_client
-from chaingreen.server.ws_connection import WSChiaConnection
+from chaingreen.server.server import ChaingreenServer, ssl_context_for_client
+from chaingreen.server.ws_connection import WSChaingreenConnection
 from chaingreen.ssl.create_ssl import generate_ca_signed_cert
 from chaingreen.types.peer_info import PeerInfo
 from tests.block_tools import test_constants
@@ -21,14 +21,14 @@ from tests.setup_nodes import (
 )
 
 
-async def establish_connection(server: ChiaServer, dummy_port: int, ssl_context) -> bool:
+async def establish_connection(server: ChaingreenServer, dummy_port: int, ssl_context) -> bool:
     timeout = aiohttp.ClientTimeout(total=10)
     session = aiohttp.ClientSession(timeout=timeout)
     try:
         incoming_queue: asyncio.Queue = asyncio.Queue()
         url = f"wss://{self_hostname}:{server._port}/ws"
         ws = await session.ws_connect(url, autoclose=False, autoping=True, ssl=ssl_context)
-        wsc = WSChiaConnection(
+        wsc = WSChaingreenConnection(
             NodeType.FULL_NODE,
             ws,
             server._port,
@@ -75,7 +75,7 @@ class TestSSL:
     async def test_public_connections(self, wallet_node):
         full_nodes, wallets = wallet_node
         full_node_api = full_nodes[0]
-        server_1: ChiaServer = full_node_api.full_node.server
+        server_1: ChaingreenServer = full_node_api.full_node.server
         wallet_node, server_2 = wallets[0]
 
         success = await server_2.start_client(PeerInfo(self_hostname, uint16(server_1._port)), None)
