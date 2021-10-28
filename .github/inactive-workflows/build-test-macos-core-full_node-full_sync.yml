@@ -4,6 +4,7 @@
 name: MacOS core-full_node-full_sync Tests
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

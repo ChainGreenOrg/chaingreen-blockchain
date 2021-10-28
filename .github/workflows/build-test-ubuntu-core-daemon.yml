@@ -4,6 +4,7 @@
 name: Ubuntu core-daemon Test
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

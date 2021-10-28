@@ -1,6 +1,7 @@
 name: Lint and upload source distribution
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

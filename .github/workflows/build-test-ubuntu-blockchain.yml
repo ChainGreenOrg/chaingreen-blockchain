@@ -4,6 +4,7 @@
 name: Ubuntu blockchain Test
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

@@ -4,6 +4,7 @@
 name: MacOS pools Tests
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

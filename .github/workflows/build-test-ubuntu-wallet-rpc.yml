@@ -4,6 +4,7 @@
 name: Ubuntu wallet-rpc Test
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

@@ -4,6 +4,7 @@
 name: Ubuntu TEST_NAME Test
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

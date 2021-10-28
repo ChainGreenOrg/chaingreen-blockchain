@@ -4,6 +4,7 @@
 name: Ubuntu core-full_node-full_sync Test
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

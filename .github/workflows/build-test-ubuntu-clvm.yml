@@ -4,6 +4,7 @@
 name: Ubuntu clvm Test
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

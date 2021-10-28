@@ -4,6 +4,7 @@
 name: MacOS generator Tests
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

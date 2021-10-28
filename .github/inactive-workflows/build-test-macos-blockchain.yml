@@ -4,6 +4,7 @@
 name: MacOS blockchain Tests
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
