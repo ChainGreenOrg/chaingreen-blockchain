@@ -4,6 +4,7 @@
 name: MacOS clvm Tests
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

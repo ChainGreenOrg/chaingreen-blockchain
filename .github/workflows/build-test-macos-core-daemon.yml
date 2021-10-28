@@ -4,6 +4,7 @@
 name: MacOS core-daemon Tests
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

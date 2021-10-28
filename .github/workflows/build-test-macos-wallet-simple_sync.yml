@@ -4,6 +4,7 @@
 name: MacOS wallet-simple_sync Tests
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

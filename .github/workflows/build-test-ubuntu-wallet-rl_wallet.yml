@@ -4,6 +4,7 @@
 name: Ubuntu wallet-rl_wallet Test
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

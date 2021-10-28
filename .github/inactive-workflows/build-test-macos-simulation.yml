@@ -4,6 +4,7 @@
 name: MacOS simulation Tests
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

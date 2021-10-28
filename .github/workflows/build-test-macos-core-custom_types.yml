@@ -4,6 +4,7 @@
 name: MacOS core-custom_types Tests
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

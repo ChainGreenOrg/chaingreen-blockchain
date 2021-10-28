@@ -4,6 +4,7 @@
 name: MacOS core-util Tests
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

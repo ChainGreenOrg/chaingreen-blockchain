@@ -4,6 +4,7 @@
 name: MacOS wallet-cc_wallet Tests
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
