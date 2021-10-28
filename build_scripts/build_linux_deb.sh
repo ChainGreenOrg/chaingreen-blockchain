@@ -5,7 +5,7 @@ if [ ! "$1" ]; then
 	exit 1
 elif [ "$1" = "amd64" ]; then
 	PLATFORM="$1"
-	DIR_NAME="chia-blockchain-linux-x64"
+	DIR_NAME="chaingreen-blockchain-linux-x64"
 else
 	PLATFORM="$1"
 	DIR_NAME="chaingreen-blockchain-linux-arm64"
@@ -33,7 +33,7 @@ mkdir dist
 
 echo "Create executables with pyinstaller"
 pip install pyinstaller==4.5
-SPEC_FILE=$(python -c 'import chia; print(chia.PYINSTALLER_SPEC_PATH)')
+SPEC_FILE=$(python -c 'import chaingreen; print(chaingreen.PYINSTALLER_SPEC_PATH)')
 pyinstaller --log-level=INFO "$SPEC_FILE"
 LAST_EXIT_CODE=$?
 if [ "$LAST_EXIT_CODE" -ne 0 ]; then
@@ -55,13 +55,13 @@ if [ "$LAST_EXIT_CODE" -ne 0 ]; then
 	exit $LAST_EXIT_CODE
 fi
 
-# sets the version for chia-blockchain in package.json
+# sets the version for chaingreen-blockchain in package.json
 cp package.json package.json.orig
-jq --arg VER "$CHIA_INSTALLER_VERSION" '.version=$VER' package.json > temp.json && mv temp.json package.json
+jq --arg VER "$CHAINGREEN_INSTALLER_VERSION" '.version=$VER' package.json > temp.json && mv temp.json package.json
 
-electron-packager . chia-blockchain --asar.unpack="**/daemon/**" --platform=linux \
---icon=src/assets/img/Chia.icns --overwrite --app-bundle-id=net.chia.blockchain \
---appVersion=$CHIA_INSTALLER_VERSION
+electron-packager . chaingreen-blockchain --asar.unpack="**/daemon/**" --platform=linux \
+--icon=src/assets/img/chia.icns --overwrite --app-bundle-id=net.chaingreen.blockchain \
+--appVersion=$CHAINGREEN_INSTALLER_VERSION
 LAST_EXIT_CODE=$?
 
 # reset the package.json to the original
