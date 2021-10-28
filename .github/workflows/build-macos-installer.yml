@@ -1,7 +1,6 @@
-name: MacOS installer on Catalina and Python 3.8
+name: MacOS installer on Catalina and Python 3.9
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
@@ -13,7 +12,7 @@ on:
 
 jobs:
   build:
-    name: MacOS installer on Catalina and Python 3.8
+    name: MacOS installer on Catalina and Python 3.9
     runs-on: ${{ matrix.os }}
     timeout-minutes: 40
     strategy:
@@ -35,6 +34,9 @@ jobs:
       with:
         fetch-depth: 0
         submodules: recursive
+
+    - name: Cleanup any leftovers that exist from previous runs
+      run: bash build_scripts/clean-runner.sh || true
 
     - name: Setup Python environment
       uses: actions/setup-python@v2
@@ -93,7 +95,7 @@ jobs:
         sh install.sh
 
     - name: Setup Node 16.x
-      uses: actions/setup-node@v2.4.0
+      uses: actions/setup-node@v2.4.1
       with:
         node-version: '16.x'
 
