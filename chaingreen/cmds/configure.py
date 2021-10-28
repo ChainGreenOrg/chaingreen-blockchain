@@ -18,6 +18,7 @@ def configure(
     set_outbound_peer_count: str,
     set_peer_count: str,
     testnet: str,
+    peer_connect_timeout: str,
 ):
     config: Dict = load_config(DEFAULT_ROOT_PATH, "config.yaml")
     change_made = False
@@ -89,29 +90,66 @@ def configure(
         print("Target peer count updated")
         change_made = True
     if testnet is not None:
-        print("Setting Testnet")
-        testnet_port = "58744"
-        testnet_introducer = "testnet0.introducer.chaingreen.org"
-        testnet = "testnet0"
-        config["full_node"]["port"] = int(testnet_port)
-        config["full_node"]["introducer_peer"]["port"] = int(testnet_port)
-        config["farmer"]["full_node_peer"]["port"] = int(testnet_port)
-        config["timelord"]["full_node_peer"]["port"] = int(testnet_port)
-        config["wallet"]["full_node_peer"]["port"] = int(testnet_port)
-        config["wallet"]["introducer_peer"]["port"] = int(testnet_port)
-        config["introducer"]["port"] = int(testnet_port)
-        config["full_node"]["introducer_peer"]["host"] = testnet_introducer
-        config["selected_network"] = testnet
-        config["harvester"]["selected_network"] = testnet
-        config["pool"]["selected_network"] = testnet
-        config["farmer"]["selected_network"] = testnet
-        config["timelord"]["selected_network"] = testnet
-        config["full_node"]["selected_network"] = testnet
-        config["ui"]["selected_network"] = testnet
-        config["introducer"]["selected_network"] = testnet
-        config["wallet"]["selected_network"] = testnet
-        print("Default full node port, introducer and network setting updated")
+        if testnet == "true" or testnet == "t":
+            print("Setting Testnet")
+            testnet_port = "58744"
+            testnet_introducer = "beta1_introducer.chaingreen.net"
+            testnet_dns_introducer = "dns-introducer-testnet7.chaingreen.net"
+            testnet = "testnet7"
+            config["full_node"]["port"] = int(testnet_port)
+            config["full_node"]["introducer_peer"]["port"] = int(testnet_port)
+            config["farmer"]["full_node_peer"]["port"] = int(testnet_port)
+            config["timelord"]["full_node_peer"]["port"] = int(testnet_port)
+            config["wallet"]["full_node_peer"]["port"] = int(testnet_port)
+            config["wallet"]["introducer_peer"]["port"] = int(testnet_port)
+            config["introducer"]["port"] = int(testnet_port)
+            config["full_node"]["introducer_peer"]["host"] = testnet_introducer
+            config["full_node"]["dns_servers"] = [testnet_dns_introducer]
+            config["selected_network"] = testnet
+            config["harvester"]["selected_network"] = testnet
+            config["pool"]["selected_network"] = testnet
+            config["farmer"]["selected_network"] = testnet
+            config["timelord"]["selected_network"] = testnet
+            config["full_node"]["selected_network"] = testnet
+            config["ui"]["selected_network"] = testnet
+            config["introducer"]["selected_network"] = testnet
+            config["wallet"]["selected_network"] = testnet
+            print("Default full node port, introducer and network setting updated")
+            change_made = True
+
+        elif testnet == "false" or testnet == "f":
+            print("Setting Mainnet")
+            mainnet_port = "8744"
+            mainnet_introducer = "introducer.chaingreen.net"
+            mainnet_dns_introducer = "dns-introducer.chaingreen.net"
+            net = "mainnet"
+            config["full_node"]["port"] = int(mainnet_port)
+            config["full_node"]["introducer_peer"]["port"] = int(mainnet_port)
+            config["farmer"]["full_node_peer"]["port"] = int(mainnet_port)
+            config["timelord"]["full_node_peer"]["port"] = int(mainnet_port)
+            config["wallet"]["full_node_peer"]["port"] = int(mainnet_port)
+            config["wallet"]["introducer_peer"]["port"] = int(mainnet_port)
+            config["introducer"]["port"] = int(mainnet_port)
+            config["full_node"]["introducer_peer"]["host"] = mainnet_introducer
+            config["full_node"]["dns_servers"] = [mainnet_dns_introducer]
+            config["selected_network"] = net
+            config["harvester"]["selected_network"] = net
+            config["pool"]["selected_network"] = net
+            config["farmer"]["selected_network"] = net
+            config["timelord"]["selected_network"] = net
+            config["full_node"]["selected_network"] = net
+            config["ui"]["selected_network"] = net
+            config["introducer"]["selected_network"] = net
+            config["wallet"]["selected_network"] = net
+            print("Default full node port, introducer and network setting updated")
+            change_made = True
+        else:
+            print("Please choose True or False")
+
+    if peer_connect_timeout is not None:
+        config["full_node"]["peer_connect_timeout"] = int(peer_connect_timeout)
         change_made = True
+
     if change_made:
         print("Restart any running chaingreen services for changes to take effect")
         save_config(root_path, "config.yaml", config)
@@ -157,6 +195,7 @@ def configure(
     type=str,
 )
 @click.option("--set-peer-count", help="Update the target peer count (default 80)", type=str)
+@click.option("--set-peer-connect-timeout", help="Update the peer connect timeout (default 30)", type=str)
 @click.pass_context
 def configure_cmd(
     ctx,
@@ -169,6 +208,7 @@ def configure_cmd(
     set_outbound_peer_count,
     set_peer_count,
     testnet,
+    set_peer_connect_timeout,
 ):
     configure(
         ctx.obj["root_path"],
@@ -181,4 +221,5 @@ def configure_cmd(
         set_outbound_peer_count,
         set_peer_count,
         testnet,
+        set_peer_connect_timeout,
     )

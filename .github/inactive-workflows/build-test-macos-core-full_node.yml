@@ -44,10 +44,10 @@ jobs:
 
     - name: Create keychain for CI use
       run: |
-        security create-keychain -p foo chiachain
-        security default-keychain -s chiachain
-        security unlock-keychain -p foo chiachain
-        security set-keychain-settings -t 7200 -u chiachain
+        security create-keychain -p foo chaingreenchain
+        security default-keychain -s chaingreenchain
+        security unlock-keychain -p foo chaingreenchain
+        security set-keychain-settings -t 7200 -u chaingreenchain
 
     - name: Get pip cache dir
       id: pip-cache
@@ -100,7 +100,7 @@ jobs:
     - name: Test core-full_node code with pytest
       run: |
         . ./activate
-        ./venv/bin/py.test tests/core/full_node/test_address_manager.py tests/core/full_node/test_block_store.py tests/core/full_node/test_coin_store.py tests/core/full_node/test_conditions.py tests/core/full_node/test_full_node.py tests/core/full_node/test_full_node_store.py tests/core/full_node/test_mempool.py tests/core/full_node/test_mempool_performance.py tests/core/full_node/test_node_load.py tests/core/full_node/test_performance.py tests/core/full_node/test_sync_store.py tests/core/full_node/test_transactions.py -s -v --durations 0
+        ./venv/bin/py.test tests/core/full_node/test_address_manager.py tests/core/full_node/test_block_store.py tests/core/full_node/test_coin_store.py tests/core/full_node/test_conditions.py tests/core/full_node/test_full_node.py tests/core/full_node/test_full_node_store.py tests/core/full_node/test_hint_store.py tests/core/full_node/test_mempool.py tests/core/full_node/test_mempool_performance.py tests/core/full_node/test_node_load.py tests/core/full_node/test_performance.py tests/core/full_node/test_sync_store.py tests/core/full_node/test_transactions.py -s -v --durations 0
 #
 # THIS FILE IS GENERATED. SEE https://github.com/Chia-Network/chia-blockchain/tree/main/tests#readme
 #

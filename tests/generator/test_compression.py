@@ -29,7 +29,7 @@ from clvm.serialize import sexp_from_stream
 from clvm_tools import binutils
 
 TEST_GEN_DESERIALIZE = load_clvm("test_generator_deserialize.clvm", package_or_requirement="chaingreen.wallet.puzzles")
-DESERIALIZE_MOD = load_clvm("chialisp_deserialisation.clvm", package_or_requirement="chaingreen.wallet.puzzles")
+DESERIALIZE_MOD = load_clvm("chaingreenlisp_deserialisation.clvm", package_or_requirement="chaingreen.wallet.puzzles")
 
 DECOMPRESS_PUZZLE = load_clvm("decompress_puzzle.clvm", package_or_requirement="chaingreen.wallet.puzzles")
 DECOMPRESS_CSE = load_clvm("decompress_coin_spend_entry.clvm", package_or_requirement="chaingreen.wallet.puzzles")

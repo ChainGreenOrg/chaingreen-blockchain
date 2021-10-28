@@ -27,11 +27,7 @@ from chaingreen.types.mempool_inclusion_status import MempoolInclusionStatus
 from chaingreen.types.mempool_item import MempoolItem
 from chaingreen.types.spend_bundle import SpendBundle
 from chaingreen.util.clvm import int_from_bytes
-from chaingreen.util.condition_tools import (
-    pkm_pairs_for_conditions_dict,
-    coin_announcements_names_for_npc,
-    puzzle_announcements_names_for_npc,
-)
+from chaingreen.util.condition_tools import pkm_pairs
 from chaingreen.util.errors import Err
 from chaingreen.util.generator_tools import additions_for_npc
 from chaingreen.util.ints import uint32, uint64
@@ -43,9 +39,7 @@ log = logging.getLogger(__name__)
 def get_npc_multiprocess(spend_bundle_bytes: bytes, max_cost: int, cost_per_byte: int) -> bytes:
     program = simple_solution_generator(SpendBundle.from_bytes(spend_bundle_bytes))
     # npc contains names of the coins removed, puzzle_hashes and their spend conditions
-    return bytes(
-        get_name_puzzle_conditions(program, max_cost, cost_per_byte=cost_per_byte, safe_mode=True, rust_checker=True)
-    )
+    return bytes(get_name_puzzle_conditions(program, max_cost, cost_per_byte=cost_per_byte, safe_mode=True))
 
 
 class MempoolManager:
@@ -119,8 +113,6 @@ class MempoolManager:
                 f"full: {cost_sum / self.constants.MAX_BLOCK_COST_CLVM}"
             )
             agg = SpendBundle.aggregate(spend_bundles)
-            assert set(agg.additions()) == set(additions)
-            assert set(agg.removals()) == set(removals)
             return agg, additions, removals
         else:
             return None
@@ -207,7 +199,7 @@ class MempoolManager:
         log.info(f"Replacing conflicting tx in mempool. New tx fee: {fees}, old tx fees: {conflicting_fees}")
         return True
 
-    async def pre_validate_spendbundle(self, new_spend: SpendBundle) -> NPCResult:
+    async def pre_validate_spendbundle(self, new_spend: SpendBundle, spend_name: bytes32) -> NPCResult:
         """
         Errors are included within the cached_result.
         This runs in another process so we don't block the main thread
@@ -220,9 +212,13 @@ class MempoolManager:
             int(self.limit_factor * self.constants.MAX_BLOCK_COST_CLVM),
             self.constants.COST_PER_BYTE,
         )
+        ret = NPCResult.from_bytes(cached_result_bytes)
         end_time = time.time()
-        log.info(f"It took {end_time - start_time} to pre validate transaction")
-        return NPCResult.from_bytes(cached_result_bytes)
+        log.log(
+            logging.WARNING if end_time - start_time > 1 else logging.DEBUG,
+            f"pre_validate_spendbundle took {end_time - start_time:0.4f} seconds for {spend_name}",
+        )
+        return ret
 
     async def add_spendbundle(
         self,
@@ -256,6 +252,8 @@ class MempoolManager:
             return None, MempoolInclusionStatus.FAILED, Err(npc_result.error)
         # build removal list
         removal_names: List[bytes32] = [npc.coin_name for npc in npc_list]
+        if set(removal_names) != set([s.name() for s in new_spend.removals()]):
+            return None, MempoolInclusionStatus.FAILED, Err.INVALID_SPEND_BUNDLE
 
         additions = additions_for_npc(npc_list)
 
@@ -380,11 +378,7 @@ class MempoolManager:
             return None, MempoolInclusionStatus.FAILED, tmp_error
 
         # Verify conditions, create hash_key list for aggsig check
-        pks: List[G1Element] = []
-        msgs: List[bytes32] = []
         error: Optional[Err] = None
-        coin_announcements_in_spend: Set[bytes32] = coin_announcements_names_for_npc(npc_list)
-        puzzle_announcements_in_spend: Set[bytes32] = puzzle_announcements_names_for_npc(npc_list)
         for npc in npc_list:
             coin_record: CoinRecord = removal_record_dict[npc.coin_name]
             # Check that the revealed removal puzzles actually match the puzzle hash
@@ -399,8 +393,6 @@ class MempoolManager:
             assert self.peak.timestamp is not None
             error = mempool_check_conditions_dict(
                 coin_record,
-                coin_announcements_in_spend,
-                puzzle_announcements_in_spend,
                 npc.condition_dict,
                 uint32(chialisp_height),
                 self.peak.timestamp,
@@ -415,16 +407,14 @@ class MempoolManager:
                     return uint64(cost), MempoolInclusionStatus.PENDING, error
                 break
 
-            if validate_signature:
-                for pk, message in pkm_pairs_for_conditions_dict(
-                    npc.condition_dict, npc.coin_name, self.constants.AGG_SIG_ME_ADDITIONAL_DATA
-                ):
-                    pks.append(pk)
-                    msgs.append(message)
         if error:
             return None, MempoolInclusionStatus.FAILED, error
 
         if validate_signature:
+            pks: List[G1Element] = []
+            msgs: List[bytes32] = []
+            pks, msgs = pkm_pairs(npc_list, self.constants.AGG_SIG_ME_ADDITIONAL_DATA)
+
             # Verify aggregated signature
             if not cached_bls.aggregate_verify(pks, msgs, new_spend.aggregated_signature, True):
                 log.warning(f"Aggsig validation error {pks} {msgs} {new_spend}")
@@ -436,11 +426,14 @@ class MempoolManager:
                 self.mempool.remove_from_pool(mempool_item)
 
         new_item = MempoolItem(new_spend, uint64(fees), npc_result, cost, spend_name, additions, removals, program)
-        self.mempool.add_to_pool(new_item, additions, removal_coin_dict)
-        log.info(
-            f"add_spendbundle took {time.time() - start_time} seconds, cost {cost} "
-            f"({round(100.0 * cost/self.constants.MAX_BLOCK_COST_CLVM, 3)}%)"
+        self.mempool.add_to_pool(new_item)
+        now = time.time()
+        log.log(
+            logging.WARNING if now - start_time > 1 else logging.DEBUG,
+            f"add_spendbundle {spend_name} took {now - start_time:0.2f} seconds. "
+            f"Cost: {cost} ({round(100.0 * cost/self.constants.MAX_BLOCK_COST_CLVM, 3)}% of max block cost)",
         )
+
         return uint64(cost), MempoolInclusionStatus.SUCCESS, None
 
     async def check_removals(self, removals: Dict[bytes32, CoinRecord]) -> Tuple[Optional[Err], List[Coin]]:

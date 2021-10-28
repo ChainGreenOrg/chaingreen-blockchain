@@ -47,6 +47,7 @@ class AuthenticationPayload(Streamable):
 @streamable
 class GetPoolInfoResponse(Streamable):
     name: str
+    pool_url: str
     logo_url: str
     minimum_difficulty: uint64
     relative_lock_height: uint32
@@ -55,6 +56,11 @@ class GetPoolInfoResponse(Streamable):
     description: str
     target_puzzle_hash: bytes32
     authentication_token_timeout: uint8
+    total_farmers: str
+    height: uint32
+    difficulty: uint64
+    networkSpaceInTiB: str
+    ticker: str
 
 
 # POST /partial

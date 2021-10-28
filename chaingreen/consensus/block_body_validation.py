@@ -2,7 +2,6 @@ import collections
 import logging
 from typing import Dict, List, Optional, Set, Tuple, Union, Callable
 
-from blspy import G1Element
 from chiabip158 import PyBIP158
 from clvm.casts import int_from_bytes
 
@@ -28,11 +27,7 @@ from chaingreen.types.generator_types import BlockGenerator
 from chaingreen.types.name_puzzle_condition import NPC
 from chaingreen.types.unfinished_block import UnfinishedBlock
 from chaingreen.util import cached_bls
-from chaingreen.util.condition_tools import (
-    pkm_pairs_for_conditions_dict,
-    coin_announcements_names_for_npc,
-    puzzle_announcements_names_for_npc,
-)
+from chaingreen.util.condition_tools import pkm_pairs
 from chaingreen.util.errors import Err
 from chaingreen.util.generator_tools import (
     additions_for_npc,
@@ -159,8 +154,6 @@ async def validate_block_body(
     removals: List[bytes32] = []
     coinbase_additions: List[Coin] = list(expected_reward_coins)
     additions: List[Coin] = []
-    coin_announcement_names: Set[bytes32] = set()
-    puzzle_announcement_names: Set[bytes32] = set()
     npc_list: List[NPC] = []
     removals_puzzle_dic: Dict[bytes32, bytes32] = {}
     cost: uint64 = uint64(0)
@@ -223,8 +216,6 @@ async def validate_block_body(
             removals_puzzle_dic[npc.coin_name] = npc.puzzle_hash
 
         additions = additions_for_npc(npc_list)
-        coin_announcement_names = coin_announcements_names_for_npc(npc_list)
-        puzzle_announcement_names = puzzle_announcements_names_for_npc(npc_list)
     else:
         assert npc_result is None
 
@@ -325,7 +316,6 @@ async def validate_block_body(
                     min(constants.MAX_BLOCK_COST_CLVM, curr.transactions_info.cost),
                     cost_per_byte=constants.COST_PER_BYTE,
                     safe_mode=False,
-                    rust_checker=curr.height > constants.RUST_CONDITION_CHECKER,
                 )
                 removals_in_curr, additions_in_curr = tx_removals_and_additions(curr_npc_result.npc_list)
             else:
@@ -442,27 +432,20 @@ async def validate_block_body(
             return Err.WRONG_PUZZLE_HASH, None
 
     # 21. Verify conditions
-    # create hash_key list for aggsig check
-    pairs_pks: List[G1Element] = []
-    pairs_msgs: List[bytes] = []
     for npc in npc_list:
         assert height is not None
         unspent = removal_coin_records[npc.coin_name]
         error = mempool_check_conditions_dict(
             unspent,
-            coin_announcement_names,
-            puzzle_announcement_names,
             npc.condition_dict,
             prev_transaction_block_height,
             block.foliage_transaction_block.timestamp,
         )
         if error:
             return error, None
-        for pk, m in pkm_pairs_for_conditions_dict(
-            npc.condition_dict, npc.coin_name, constants.AGG_SIG_ME_ADDITIONAL_DATA
-        ):
-            pairs_pks.append(pk)
-            pairs_msgs.append(m)
+
+    # create hash_key list for aggsig check
+    pairs_pks, pairs_msgs = pkm_pairs(npc_list, constants.AGG_SIG_ME_ADDITIONAL_DATA)
 
     # 22. Verify aggregated signature
     # TODO: move this to pre_validate_blocks_multiprocessing so we can sync faster
