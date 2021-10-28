@@ -27,7 +27,7 @@ def print_transaction(tx: TransactionRecord, verbose: bool, name) -> None:
         to_address = encode_puzzle_hash(tx.to_puzzle_hash, name)
         print(f"Transaction {tx.name}")
         print(f"Status: {'Confirmed' if tx.confirmed else ('In mempool' if tx.is_in_mempool() else 'Pending')}")
-        print(f"Amount {'sent' if tx.sent else 'received'}: {chia_amount} {name}")
+        print(f"Amount {'sent' if tx.sent else 'received'}: {chaingreen_amount} {name}")
         print(f"To address: {to_address}")
         print("Created at:", datetime.fromtimestamp(tx.created_at_time).strftime("%Y-%m-%d %H:%M:%S"))
         print("")
@@ -123,13 +123,13 @@ def wallet_coin_unit(typ: WalletType, address_prefix: str) -> Tuple[str, int]:
         return "", units["colouredcoin"]
     if typ in [WalletType.STANDARD_WALLET, WalletType.POOLING_WALLET, WalletType.MULTI_SIG, WalletType.RATE_LIMITED]:
         return address_prefix, units["chaingreen"]
-    return "", units["mojo"]
+    return "", units["mio"]
 
 
 def print_balance(amount: int, scale: int, address_prefix: str) -> str:
     ret = f"{amount/scale} {address_prefix} "
     if scale > 1:
-        ret += f"({amount} mojo)"
+        ret += f"({amount} mio)"
     return ret
 
 

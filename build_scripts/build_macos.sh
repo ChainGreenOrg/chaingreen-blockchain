@@ -26,7 +26,7 @@ mkdir dist
 
 echo "Create executables with pyinstaller"
 pip install pyinstaller==4.5
-SPEC_FILE=$(python -c 'import chia; print(chia.PYINSTALLER_SPEC_PATH)')
+SPEC_FILE=$(python -c 'import chaingreen; print(chaingreen.PYINSTALLER_SPEC_PATH)')
 pyinstaller --log-level=INFO "$SPEC_FILE"
 LAST_EXIT_CODE=$?
 if [ "$LAST_EXIT_CODE" -ne 0 ]; then
@@ -47,14 +47,14 @@ if [ "$LAST_EXIT_CODE" -ne 0 ]; then
 	exit $LAST_EXIT_CODE
 fi
 
-# sets the version for chia-blockchain in package.json
+# sets the version for chaingreen-blockchain in package.json
 brew install jq
 cp package.json package.json.orig
-jq --arg VER "$CHIA_INSTALLER_VERSION" '.version=$VER' package.json > temp.json && mv temp.json package.json
+jq --arg VER "$CHAINGREEN_INSTALLER_VERSION" '.version=$VER' package.json > temp.json && mv temp.json package.json
 
-electron-packager . Chia --asar.unpack="**/daemon/**" --platform=darwin \
---icon=src/assets/img/Chia.icns --overwrite --app-bundle-id=net.chia.blockchain \
---appVersion=$CHIA_INSTALLER_VERSION
+electron-packager . Chaingreen --asar.unpack="**/daemon/**" --platform=darwin \
+--icon=src/assets/img/Chaingreen.icns --overwrite --app-bundle-id=net.chaingreen.blockchain \
+--appVersion=$CHAINGREEN_INSTALLER_VERSION
 LAST_EXIT_CODE=$?
 
 # reset the package.json to the original
@@ -66,7 +66,7 @@ if [ "$LAST_EXIT_CODE" -ne 0 ]; then
 fi
 
 if [ "$NOTARIZE" == true ]; then
-  electron-osx-sign Chia-darwin-x64/Chia.app --platform=darwin \
+  electron-osx-sign Chaingreen-darwin-x64/Chaingreen.app --platform=darwin \
   --hardened-runtime=true --provisioning-profile=chiablockchain.provisionprofile \
   --entitlements=entitlements.mac.plist --entitlements-inherit=entitlements.mac.plist \
   --no-gatekeeper-assess

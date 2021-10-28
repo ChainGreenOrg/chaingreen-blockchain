@@ -85,7 +85,7 @@ if [ ! "$CI" ]; then
 	echo "Running git submodule update."
 	echo ""
 	git submodule update
-	cd chaingreen-gui-test
+	cd chaingreen-blockchain-gui
 
 	if [ "$SUBMODULE_BRANCH" ];
 	then

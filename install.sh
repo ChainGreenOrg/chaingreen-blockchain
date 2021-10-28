@@ -104,7 +104,7 @@ fi
 INSTALL_PYTHON_PATH=python${INSTALL_PYTHON_VERSION:-3.7}
 
 echo "Python version is $INSTALL_PYTHON_VERSION"
-python3.8 -m venv venv
+$INSTALL_PYTHON_PATH -m venv venv
 if [ ! -f "activate" ]; then
 	ln -s venv/bin/activate .
 fi
@@ -120,11 +120,11 @@ python -m pip install --extra-index-url https://pypi.chia.net/simple/ miniupnpc=
 python -m pip install -e . --extra-index-url https://pypi.chia.net/simple/
 
 echo ""
-echo "Chia blockchain install.sh complete."
+echo "Chaingreen blockchain install.sh complete."
 echo "For assistance join us on Keybase in the #support chat channel:"
 echo "https://keybase.io/team/chia_network.public"
 echo ""
-echo "Try the Quick Start Guide to running chia-blockchain:"
+echo "Try the Quick Start Guide to running chaingreen-blockchain:"
 echo "https://github.com/Chia-Network/chia-blockchain/wiki/Quick-Start-Guide"
 echo ""
 echo "To install the GUI type 'sh install-gui.sh' after '. ./activate'."
