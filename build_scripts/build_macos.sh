@@ -44,16 +44,12 @@ echo ""
 git submodule update
 cd chaingreen-blockchain-gui
 
-SUBMODULE_BRANCH=$1
-if [ "$SUBMODULE_BRANCH" ];
-then
 git fetch
-	git checkout "$SUBMODULE_BRANCH"
+git checkout develop
 git pull
-	echo ""
-	echo "Building the GUI with branch $SUBMODULE_BRANCH"
-	echo ""
-fi
+echo ""
+echo "Building the GUI with branch develop"
+echo ""
 
 echo "npm build"
 echo "npm install"
