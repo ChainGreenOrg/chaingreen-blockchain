@@ -38,8 +38,11 @@ cd .. || exit
 cd chaingreen-blockchain-gui || exit
 
 echo "npm build"
+echo "npm install"
 npm install
+echo "npm audit fix"
 npm audit fix
+echo "npm build"
 npm run build
 LAST_EXIT_CODE=$?
 if [ "$LAST_EXIT_CODE" -ne 0 ]; then
