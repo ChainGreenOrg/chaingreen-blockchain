@@ -84,7 +84,7 @@ fi
 
 if [ "$NOTARIZE" == true ]; then
   electron-osx-sign Chaingreen-darwin-x64/Chaingreen.app --platform=darwin \
-  --hardened-runtime=true --provisioning-profile=chiablockchain.provisionprofile \
+  --hardened-runtime=true --provisioning-profile=chaingreenblockchain.provisionprofile \
   --entitlements=entitlements.mac.plist --entitlements-inherit=entitlements.mac.plist \
   --no-gatekeeper-assess
 fi
