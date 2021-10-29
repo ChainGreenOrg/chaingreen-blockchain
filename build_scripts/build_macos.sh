@@ -35,9 +35,24 @@ if [ "$LAST_EXIT_CODE" -ne 0 ]; then
 fi
 cp -r dist/daemon ../chaingreen-blockchain-gui
 cd .. || exit
-cd chaingreen-blockchain-gui || exit
-echo "checkout develop"
-git checkout develop
+
+echo "Running git submodule update --init --recursive."
+echo ""
+git submodule update --init --recursive
+echo "Running git submodule update."
+echo ""
+git submodule update
+cd chaingreen-blockchain-gui
+
+if [ "$SUBMODULE_BRANCH" ];
+then
+git fetch
+	git checkout "$SUBMODULE_BRANCH"
+git pull
+	echo ""
+	echo "Building the GUI with branch $SUBMODULE_BRANCH"
+	echo ""
+fi
 
 echo "npm build"
 echo "npm install"
