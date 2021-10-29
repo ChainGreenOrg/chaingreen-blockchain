@@ -70,7 +70,7 @@ cp package.json package.json.orig
 jq --arg VER "$CHAINGREEN_INSTALLER_VERSION" '.version=$VER' package.json > temp.json && mv temp.json package.json
 
 electron-packager . Chaingreen --asar.unpack="**/daemon/**" --platform=darwin \
---icon=src/assets/img/Chaingreen.icns --overwrite --app-bundle-id=net.chaingreen.blockchain \
+--icon=src/assets/img/chia.icns --overwrite --app-bundle-id=net.chaingreen.blockchain \
 --appVersion=$CHAINGREEN_INSTALLER_VERSION
 LAST_EXIT_CODE=$?
 
