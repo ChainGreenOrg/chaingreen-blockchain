@@ -44,6 +44,7 @@ echo ""
 git submodule update
 cd chaingreen-blockchain-gui
 
+SUBMODULE_BRANCH=$1
 if [ "$SUBMODULE_BRANCH" ];
 then
 git fetch
