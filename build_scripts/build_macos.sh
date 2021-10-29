@@ -36,6 +36,8 @@ fi
 cp -r dist/daemon ../chaingreen-blockchain-gui
 cd .. || exit
 cd chaingreen-blockchain-gui || exit
+echo "checkout develop"
+git checkout develop
 
 echo "npm build"
 echo "npm install"
