@@ -108,15 +108,15 @@ if [ "$LAST_EXIT_CODE" -ne 0 ]; then
 	exit $LAST_EXIT_CODE
 fi
 
-if [ "$NOTARIZE" == true ]; then
-	echo "Notarize $DMG_NAME on ci"
-	cd final_installer || exit
-  notarize-cli --file=$DMG_NAME --bundle-id net.chaingreen.blockchain \
-	--username "$APPLE_NOTARIZE_USERNAME" --password "$APPLE_NOTARIZE_PASSWORD"
-  echo "Notarization step complete"
-else
-	echo "Not on ci or no secrets so skipping Notarize"
-fi
+# if [ "$NOTARIZE" == true ]; then
+# 	echo "Notarize $DMG_NAME on ci"
+# 	cd final_installer || exit
+#   notarize-cli --file=$DMG_NAME --bundle-id net.chaingreen.blockchain \
+# 	--username "$APPLE_NOTARIZE_USERNAME" --password "$APPLE_NOTARIZE_PASSWORD"
+#   echo "Notarization step complete"
+# else
+# 	echo "Not on ci or no secrets so skipping Notarize"
+# fi
 
 # Notes on how to manually notarize
 #
