@@ -10,7 +10,7 @@ GENERATOR_MOD = get_generator()
 
 DECOMPRESS_BLOCK = load_clvm("block_program_zero.clvm", package_or_requirement="chaingreen.wallet.puzzles")
 DECOMPRESS_PUZZLE = load_clvm("decompress_puzzle.clvm", package_or_requirement="chaingreen.wallet.puzzles")
-# DECOMPRESS_CSE = load_clvm("decompress_coin_spend_entry.clvm", package_or_requirement="chaingreen.wallet.puzzles")
+DECOMPRESS_CSE = load_clvm("decompress_coin_spend_entry.clvm", package_or_requirement="chaingreen.wallet.puzzles")
 
 DECOMPRESS_CSE_WITH_PREFIX = load_clvm(
     "decompress_coin_spend_entry_with_prefix.clvm", package_or_requirement="chaingreen.wallet.puzzles"
