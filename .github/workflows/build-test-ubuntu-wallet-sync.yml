@@ -1,6 +1,7 @@
 name: Ubuntu wallet-sync Test
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
