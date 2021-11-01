@@ -153,7 +153,7 @@ class TestConfig:
         assert (
             config["farmer"]["network_overrides"]["constants"]["mainnet"]["GENESIS_CHALLENGE"]
             == default_config_dict["farmer"]["network_overrides"]["constants"]["mainnet"]["GENESIS_CHALLENGE"]
-            == "ccd5bb71183532bff220ba46c268991a3ff07eb358e8255a65c30a2dce0e5fbb"
+            == "2cef93a2ebf7c0546609311684e484f08555d3c0e4336a30a044e1ba7f26f691"
         )
 
     def test_load_config_exit_on_error(self, tmpdir):
