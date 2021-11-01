@@ -28,7 +28,6 @@ wallet_program_files = set(
         "chaingreen/wallet/puzzles/did_innerpuz.clvm",
         "chaingreen/wallet/puzzles/decompress_puzzle.clvm",
         "chaingreen/wallet/puzzles/decompress_coin_spend_entry_with_prefix.clvm",
-        "chaingreen/wallet/puzzles/decompress_coin_spend_entry.clvm",
         "chaingreen/wallet/puzzles/block_program_zero.clvm",
         "chaingreen/wallet/puzzles/test_generator_deserialize.clvm",
         "chaingreen/wallet/puzzles/test_multiple_generator_input_arguments.clvm",

@@ -58,7 +58,7 @@ jobs:
     - name: Lint source with mypy
       run: |
         mypy --exclude config.py tests
-        mypy chia
+        mypy chaingreen
 
     - name: Build source distribution
       run: |

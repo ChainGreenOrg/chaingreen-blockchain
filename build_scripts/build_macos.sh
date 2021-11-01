@@ -111,8 +111,9 @@ fi
 if [ "$NOTARIZE" == true ]; then
 	echo "Notarize $DMG_NAME on ci"
 	cd final_installer || exit
-  notarize-cli --file=$DMG_NAME --bundle-id net.chaingreen.blockchain \
-	--username "$APPLE_NOTARIZE_USERNAME" --password "$APPLE_NOTARIZE_PASSWORD"
+	xcrun altool --notarize-app --file $DMG_NAME --primary-bundle-id net.chaingreen.blockchain \
+		--asc-provider $PROVIDER --username "$APPLE_NOTARIZE_USERNAME" -p "$APPLE_NOTARIZE_PASSWORD" \
+		--output-format json
   echo "Notarization step complete"
 else
 	echo "Not on ci or no secrets so skipping Notarize"
