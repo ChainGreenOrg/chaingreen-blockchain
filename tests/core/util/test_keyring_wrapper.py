@@ -162,6 +162,21 @@ class TestKeyringWrapper:
             is True
         )
 
+    # When: using a populated file keyring
+    @using_temp_file_keyring(populate=True)
+    def test_master_passphrase_is_valid(self):
+        """
+        The default master passphrase should unlock the populated keyring (without any keys)
+        """
+        # Expect: default master passphrase should validate
+        assert (
+            KeyringWrapper.get_shared_instance().master_passphrase_is_valid(DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE)
+            is True
+        )
+
+        # Expect: bogus passphrase should not validate
+        assert KeyringWrapper.get_shared_instance().master_passphrase_is_valid("foobarbaz") is False
+
     # When: creating a new file keyring
     @using_temp_file_keyring()
     def test_default_cached_master_passphrase(self):
@@ -174,27 +189,6 @@ class TestKeyringWrapper:
             False,
         )
         assert KeyringWrapper.get_shared_instance().has_cached_master_passphrase() is True
-
-    # When: using a populated file keyring
-    @using_temp_file_keyring(populate=True)
-    def test_master_passphrase_is_valid(self):
-        """
-        The default master passphrase should unlock the populated keyring (without any keys)
-        """
-        # Expect: default master passphrase is set
-        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == (
-            DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE,
-            True,
-        )
-
-        # Expect: default master passphrase should validate
-        assert (
-            KeyringWrapper.get_shared_instance().master_passphrase_is_valid(DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE)
-            is True
-        )
-
-        # Expect: bogus passphrase should not validate
-        assert KeyringWrapper.get_shared_instance().master_passphrase_is_valid("foobarbaz") is False
 
     # When: using a populated keyring
     @using_temp_file_keyring(populate=True)
@@ -239,6 +233,7 @@ class TestKeyringWrapper:
         the keyring. Using an old passphrase should not unlock the keyring.
         """
         # Expect: default master passphrase is set
+        print(KeyringWrapper.get_shared_instance().get_cached_master_passphrase())
         assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == (
             DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE,
             True,
