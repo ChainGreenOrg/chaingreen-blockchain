@@ -142,105 +142,6 @@ class TestKeyringWrapper:
         assert KeyringWrapper.get_shared_instance().using_legacy_keyring() is True
         assert KeyringWrapper.get_shared_instance().keyring_supports_master_passphrase() is False
 
-    # When: creating a new file keyring
-    @using_temp_file_keyring()
-    def test_default_cached_master_passphrase(self):
-        """
-        The default passphrase DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE is set
-        """
-        # Expect: cached passphrase set to DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE by default
-        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == (
-            DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE,
-            False,
-        )
-        assert KeyringWrapper.get_shared_instance().has_cached_master_passphrase() is True
-
-    # When: using a file keyring
-    @using_temp_file_keyring()
-    def test_set_cached_master_passphrase(self):
-        """
-        Setting and retrieving the cached master passphrase should work
-        """
-        # When: setting the cached master passphrase
-        KeyringWrapper.get_shared_instance().set_cached_master_passphrase("testing one two three")
-
-        # Expect: cached passphrase should match
-        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == ("testing one two three", False)
-
-        # When: setting a validated (successfully decrypted the content) master passphrase
-        KeyringWrapper.get_shared_instance().set_cached_master_passphrase("apple banana orange grape", validated=True)
-
-        # Expect: cached passphrase should match and be validated
-        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == (
-            "apple banana orange grape",
-            True,
-        )
-
-    # When: using a populated file keyring
-    @using_temp_file_keyring(populate=True)
-    def test_master_passphrase_is_valid(self):
-        """
-        The default master passphrase should unlock the populated keyring (without any keys)
-        """
-        # Expect: default master passphrase should validate
-        assert (
-            KeyringWrapper.get_shared_instance().master_passphrase_is_valid(DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE)
-            is True
-        )
-
-        # Expect: bogus passphrase should not validate
-        assert KeyringWrapper.get_shared_instance().master_passphrase_is_valid("foobarbaz") is False
-
-    # When: creating a new unpopulated keyring
-    @using_temp_file_keyring()
-    def test_set_master_passphrase_on_empty_keyring(self):
-        """
-        Setting a master passphrase should cache the passphrase and be usable to unlock
-        the keyring. Using an old passphrase should not unlock the keyring.
-        """
-        # When: setting the master passphrase
-        KeyringWrapper.get_shared_instance().set_master_passphrase(None, "testing one two three")
-
-        # Expect: the master passphrase is cached and can be validated
-        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == ("testing one two three", True)
-        assert KeyringWrapper.get_shared_instance().master_passphrase_is_valid("testing one two three") is True
-
-        # When: changing the master passphrase
-        KeyringWrapper.get_shared_instance().set_master_passphrase("testing one two three", "potato potato potato")
-
-        # Expect: the new master passphrase is cached and can be validated
-        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == ("potato potato potato", True)
-        assert KeyringWrapper.get_shared_instance().master_passphrase_is_valid("potato potato potato") is True
-
-        # Expect: old passphrase should not validate
-        assert KeyringWrapper.get_shared_instance().master_passphrase_is_valid("testing one two three") is False
-
-    # When: using a populated keyring
-    @using_temp_file_keyring(populate=True)
-    def test_set_master_passphrase_on_keyring(self):
-        """
-        Setting a master passphrase should cache the passphrase and be usable to unlock
-        the keyring. Using an old passphrase should not unlock the keyring.
-        """
-        # When: setting the master passphrase
-        KeyringWrapper.get_shared_instance().set_master_passphrase(
-            DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE, "testing one two three"
-        )
-
-        # Expect: the master passphrase is cached and can be validated
-        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == ("testing one two three", True)
-        assert KeyringWrapper.get_shared_instance().master_passphrase_is_valid("testing one two three") is True
-
-        # When: changing the master passphrase
-        KeyringWrapper.get_shared_instance().set_master_passphrase("testing one two three", "potato potato potato")
-
-        # Expect: the new master passphrase is cached and can be validated
-        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == ("potato potato potato", True)
-        assert KeyringWrapper.get_shared_instance().master_passphrase_is_valid("potato potato potato") is True
-
-        # Expect: old passphrase should not validate
-        assert KeyringWrapper.get_shared_instance().master_passphrase_is_valid("testing one two three") is False
-
     # When: using a new empty keyring
     @using_temp_file_keyring()
     def test_remove_master_passphrase_from_empty_keyring(self):
@@ -260,6 +161,34 @@ class TestKeyringWrapper:
             KeyringWrapper.get_shared_instance().master_passphrase_is_valid(DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE)
             is True
         )
+
+    # When: creating a new file keyring
+    @using_temp_file_keyring()
+    def test_default_cached_master_passphrase(self):
+        """
+        The default passphrase DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE is set
+        """
+        # Expect: cached passphrase set to DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE by default
+        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == (
+            DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE,
+            False,
+        )
+        assert KeyringWrapper.get_shared_instance().has_cached_master_passphrase() is True
+
+    # When: using a populated file keyring
+    @using_temp_file_keyring(populate=True)
+    def test_master_passphrase_is_valid(self):
+        """
+        The default master passphrase should unlock the populated keyring (without any keys)
+        """
+        # Expect: default master passphrase should validate
+        assert (
+            KeyringWrapper.get_shared_instance().master_passphrase_is_valid(DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE)
+            is True
+        )
+
+        # Expect: bogus passphrase should not validate
+        assert KeyringWrapper.get_shared_instance().master_passphrase_is_valid("foobarbaz") is False
 
     # When: using a populated keyring
     @using_temp_file_keyring(populate=True)
@@ -289,6 +218,77 @@ class TestKeyringWrapper:
             KeyringWrapper.get_shared_instance().master_passphrase_is_valid("It's dangerous to go alone, take this!")
             is False
         )
+    
+    # When: using a populated keyring
+    @using_temp_file_keyring(populate=True)
+    def test_set_master_passphrase_on_keyring(self):
+        """
+        Setting a master passphrase should cache the passphrase and be usable to unlock
+        the keyring. Using an old passphrase should not unlock the keyring.
+        """
+        # When: setting the master passphrase
+        KeyringWrapper.get_shared_instance().set_master_passphrase(
+            DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE, "testing one two three"
+        )
+
+        # Expect: the master passphrase is cached and can be validated
+        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == ("testing one two three", True)
+        assert KeyringWrapper.get_shared_instance().master_passphrase_is_valid("testing one two three") is True
+
+        # When: changing the master passphrase
+        KeyringWrapper.get_shared_instance().set_master_passphrase("testing one two three", "potato potato potato")
+
+        # Expect: the new master passphrase is cached and can be validated
+        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == ("potato potato potato", True)
+        assert KeyringWrapper.get_shared_instance().master_passphrase_is_valid("potato potato potato") is True
+
+        # Expect: old passphrase should not validate
+        assert KeyringWrapper.get_shared_instance().master_passphrase_is_valid("testing one two three") is False
+
+    # When: using a file keyring
+    @using_temp_file_keyring()
+    def test_set_cached_master_passphrase(self):
+        """
+        Setting and retrieving the cached master passphrase should work
+        """
+        # When: setting the cached master passphrase
+        KeyringWrapper.get_shared_instance().set_cached_master_passphrase("testing one two three")
+
+        # Expect: cached passphrase should match
+        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == ("testing one two three", False)
+
+        # When: setting a validated (successfully decrypted the content) master passphrase
+        KeyringWrapper.get_shared_instance().set_cached_master_passphrase("apple banana orange grape", validated=True)
+
+        # Expect: cached passphrase should match and be validated
+        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == (
+            "apple banana orange grape",
+            True,
+        )
+
+    # When: creating a new unpopulated keyring
+    @using_temp_file_keyring()
+    def test_set_master_passphrase_on_empty_keyring(self):
+        """
+        Setting a master passphrase should cache the passphrase and be usable to unlock
+        the keyring. Using an old passphrase should not unlock the keyring.
+        """
+        # When: setting the master passphrase
+        KeyringWrapper.get_shared_instance().set_master_passphrase(None, "testing one two three")
+
+        # Expect: the master passphrase is cached and can be validated
+        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == ("testing one two three", True)
+        assert KeyringWrapper.get_shared_instance().master_passphrase_is_valid("testing one two three") is True
+
+        # When: changing the master passphrase
+        KeyringWrapper.get_shared_instance().set_master_passphrase("testing one two three", "potato potato potato")
+
+        # Expect: the new master passphrase is cached and can be validated
+        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == ("potato potato potato", True)
+        assert KeyringWrapper.get_shared_instance().master_passphrase_is_valid("potato potato potato") is True
+
+        # Expect: old passphrase should not validate
+        assert KeyringWrapper.get_shared_instance().master_passphrase_is_valid("testing one two three") is False
 
     # When: using a new empty keyring
     @using_temp_file_keyring()
