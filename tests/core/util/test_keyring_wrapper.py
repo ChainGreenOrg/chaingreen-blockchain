@@ -181,6 +181,12 @@ class TestKeyringWrapper:
         """
         The default master passphrase should unlock the populated keyring (without any keys)
         """
+        # Expect: default master passphrase is set
+        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == (
+            DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE,
+            True,
+        )
+
         # Expect: default master passphrase should validate
         assert (
             KeyringWrapper.get_shared_instance().master_passphrase_is_valid(DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE)
@@ -197,6 +203,12 @@ class TestKeyringWrapper:
         A populated keyring will require a current passphrase when removing the master passphrase.
         Removing the master passphrase will set the default master passphrase on the keyring.
         """
+        # Expect: default master passphrase is set
+        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == (
+            DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE,
+            True,
+        )
+
         # When: the master passphrase is set
         KeyringWrapper.get_shared_instance().set_master_passphrase(
             DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE, "It's dangerous to go alone, take this!"
@@ -226,6 +238,12 @@ class TestKeyringWrapper:
         Setting a master passphrase should cache the passphrase and be usable to unlock
         the keyring. Using an old passphrase should not unlock the keyring.
         """
+        # Expect: default master passphrase is set
+        assert KeyringWrapper.get_shared_instance().get_cached_master_passphrase() == (
+            DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE,
+            True,
+        )
+
         # When: setting the master passphrase
         KeyringWrapper.get_shared_instance().set_master_passphrase(
             DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE, "testing one two three"
