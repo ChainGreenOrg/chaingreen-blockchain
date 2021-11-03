@@ -44,7 +44,21 @@ fi
 
 cp -r dist/daemon ../chaingreen-blockchain-gui
 cd .. || exit
-cd chaingreen-blockchain-gui || exit
+
+echo "Running git submodule update --init --recursive."
+echo ""
+git submodule update --init --recursive
+echo "Running git submodule update."
+echo ""
+git submodule update
+cd chaingreen-blockchain-gui
+
+git fetch
+git checkout develop
+git pull
+echo ""
+echo "Building the GUI with branch develop"
+echo ""
 
 echo "npm build"
 npm install
