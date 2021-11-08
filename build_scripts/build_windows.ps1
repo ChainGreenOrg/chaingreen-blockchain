@@ -77,6 +77,17 @@ Set-Location -Path "..\chaingreen-blockchain-gui" -PassThru
 
 git status
 
+Write-Output "   ---"
+Write-Output "Prepare Electron packager"
+Write-Output "   ---"
+$Env:NODE_OPTIONS = "--max-old-space-size=3000"
+npm install --save-dev electron-winstaller
+npm install -g electron-packager
+npm install
+npm audit fix
+
+git status
+
 echo "Running git submodule update."
 echo ""
 git submodule update
@@ -88,17 +99,6 @@ git pull
 echo ""
 echo "Building the GUI with branch develop"
 echo ""
-
-Write-Output "   ---"
-Write-Output "Prepare Electron packager"
-Write-Output "   ---"
-$Env:NODE_OPTIONS = "--max-old-space-size=3000"
-npm install --save-dev electron-winstaller
-npm install -g electron-packager
-npm install
-npm audit fix
-
-git status
 
 Write-Output "   ---"
 Write-Output "Electron package Windows Installer"
