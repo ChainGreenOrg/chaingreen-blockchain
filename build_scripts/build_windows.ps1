@@ -77,6 +77,18 @@ Set-Location -Path "..\chaingreen-blockchain-gui" -PassThru
 
 git status
 
+echo "Running git submodule update."
+echo ""
+git submodule update
+cd chaingreen-blockchain-gui
+
+git fetch
+git checkout develop
+git pull
+echo ""
+echo "Building the GUI with branch develop"
+echo ""
+
 Write-Output "   ---"
 Write-Output "Prepare Electron packager"
 Write-Output "   ---"
