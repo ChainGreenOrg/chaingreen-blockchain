@@ -69,6 +69,10 @@ Write-Output "   ---"
 $SPEC_FILE = (python -c 'import chaingreen; print(chaingreen.PYINSTALLER_SPEC_PATH)') -join "`n"
 pyinstaller --log-level INFO $SPEC_FILE
 
+echo "Running git submodule update."
+echo ""
+git submodule update
+
 Write-Output "   ---"
 Write-Output "Copy chaingreen executables to chaingreen-blockchain-gui\"
 Write-Output "   ---"
@@ -87,11 +91,6 @@ npm install
 npm audit fix
 
 git status
-
-echo "Running git submodule update."
-echo ""
-git submodule update
-cd chaingreen-blockchain-gui
 
 git fetch
 git checkout develop
