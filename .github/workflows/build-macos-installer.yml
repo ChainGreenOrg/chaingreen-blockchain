@@ -1,7 +1,6 @@
-name: MacOS installer on Catalina and Python 3.9
+name: MacOS installer on Catalina and Python 3.8
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
@@ -13,7 +12,7 @@ on:
 
 jobs:
   build:
-    name: MacOS installer on Catalina and Python 3.9
+    name: MacOS installer on Catalina and Python 3.8
     runs-on: ${{ matrix.os }}
     timeout-minutes: 40
     strategy:
@@ -45,7 +44,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Cache npm
-      uses: actions/cache@v2.1.5
+      uses: actions/cache@v2.1.6
       env:
         cache-name: cache-node-modules
       with:
@@ -56,21 +55,18 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
-
     - name: Get pip cache dir
       id: pip-cache
       run: |
         echo "::set-output name=dir::$(pip cache dir)"
-
     - name: Cache pip
-      uses: actions/cache@v2.1.5
+      uses: actions/cache@v2.1.6
       with:
         # Note that new runners may break this https://github.com/actions/cache/issues/292
         path: ${{ steps.pip-cache.outputs.dir }}
         key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-
     - name: Test for secrets access
       id: check_secrets
       shell: bash
@@ -88,31 +84,47 @@ jobs:
         p12-file-base64: ${{ secrets.APPLE_DEV_ID_APP }}
         p12-password: ${{ secrets.APPLE_DEV_ID_APP_PASS }}
 
+    # Get the most recent release from chia-plotter-madmax
+    - uses: actions/github-script@v4
+      id: 'latest-madmax'
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        result-encoding: string
+        script: |
+          const releases = await github.repos.listReleases({
+            owner: 'Chia-Network',
+            repo: 'chia-plotter-madmax',
+          });
+          return releases.data[0].tag_name;
+    - name: Get latest madmax plotter
+      run: |
+        mkdir "$GITHUB_WORKSPACE/madmax"
+        wget -O "$GITHUB_WORKSPACE/madmax/chia_plot" https://github.com/Chia-Network/chia-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/chia_plot-${{ steps.latest-madmax.outputs.result }}-macos-intel
+        wget -O "$GITHUB_WORKSPACE/madmax/chia_plot_k34" https://github.com/Chia-Network/chia-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/chia_plot_k34-${{ steps.latest-madmax.outputs.result }}-macos-intel
+        chmod +x "$GITHUB_WORKSPACE/madmax/chia_plot"
+        chmod +x "$GITHUB_WORKSPACE/madmax/chia_plot_k34"
     - name: Run install script
       env:
         INSTALL_PYTHON_VERSION: ${{ matrix.python-version }}
         BUILD_VDF_CLIENT: "N"
       run: |
         sh install.sh
-
-    - name: Setup Node 16.x
+    - name: Setup Node 14.x
       uses: actions/setup-node@v2.4.1
       with:
-        node-version: '16.x'
+        node-version: '14.x'
 
     - name: Build MacOS DMG in Catalina
       env:
         NOTARIZE: ${{ steps.check_secrets.outputs.HAS_SECRET }}
         APPLE_NOTARIZE_USERNAME: "${{ secrets.APPLE_NOTARIZE_USERNAME }}"
         APPLE_NOTARIZE_PASSWORD: "${{ secrets.APPLE_NOTARIZE_PASSWORD }}"
-        PROVIDER: "${{ secrets.PROVIDER }}"
       run: |
         . ./activate
         cd ./chaingreen-blockchain-gui
         git status
         cd ../build_scripts
         sh build_macos.sh
-
     - name: Upload MacOS artifacts
       uses: actions/upload-artifact@v2
       with:

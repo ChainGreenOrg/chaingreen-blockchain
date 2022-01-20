@@ -44,21 +44,7 @@ fi
 
 cp -r dist/daemon ../chaingreen-blockchain-gui
 cd .. || exit
-
-echo "Running git submodule update --init --recursive."
-echo ""
-git submodule update --init --recursive
-echo "Running git submodule update."
-echo ""
-git submodule update
-cd chaingreen-blockchain-gui
-
-git fetch
-git checkout develop
-git pull
-echo ""
-echo "Building the GUI with branch develop"
-echo ""
+cd chaingreen-blockchain-gui || exit
 
 echo "npm build"
 npm install
@@ -96,7 +82,7 @@ if [ "$REDHAT_PLATFORM" = "x86_64" ]; then
 	# shellcheck disable=SC2046
 	NODE_ROOT="$(dirname $(dirname $(which node)))"
 
-	# Disables build links from the generated rpm so that we dont conflict with other packages. See https://github.com/Chia-Network/chaingreen-blockchain/issues/3846
+	# Disables build links from the generated rpm so that we dont conflict with other packages. 
 	# shellcheck disable=SC2086
 	sed -i '1s/^/%define _build_id_links none\n%global _enable_debug_package 0\n%global debug_package %{nil}\n%global __os_install_post \/usr\/lib\/rpm\/brp-compress %{nil}\n/' "$NODE_ROOT/lib/node_modules/electron-installer-redhat/resources/spec.ejs"
 

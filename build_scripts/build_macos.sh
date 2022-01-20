@@ -35,28 +35,11 @@ if [ "$LAST_EXIT_CODE" -ne 0 ]; then
 fi
 cp -r dist/daemon ../chaingreen-blockchain-gui
 cd .. || exit
-
-echo "Running git submodule update --init --recursive."
-echo ""
-git submodule update --init --recursive
-echo "Running git submodule update."
-echo ""
-git submodule update
-cd chaingreen-blockchain-gui
-
-git fetch
-git checkout develop
-git pull
-echo ""
-echo "Building the GUI with branch develop"
-echo ""
+cd chaingreen-blockchain-gui || exit
 
 echo "npm build"
-echo "npm install"
 npm install
-# echo "npm audit fix"
-# npm audit fix
-echo "npm build"
+npm audit fix
 npm run build
 LAST_EXIT_CODE=$?
 if [ "$LAST_EXIT_CODE" -ne 0 ]; then
@@ -111,9 +94,8 @@ fi
 if [ "$NOTARIZE" == true ]; then
 	echo "Notarize $DMG_NAME on ci"
 	cd final_installer || exit
-	xcrun altool --notarize-app --file $DMG_NAME --primary-bundle-id net.chaingreen.blockchain \
-		--asc-provider $PROVIDER --username "$APPLE_NOTARIZE_USERNAME" -p "$APPLE_NOTARIZE_PASSWORD" \
-		--output-format json
+  notarize-cli --file=$DMG_NAME --bundle-id net.chaingreen.blockchain \
+	--username "$APPLE_NOTARIZE_USERNAME" --password "$APPLE_NOTARIZE_PASSWORD"
   echo "Notarization step complete"
 else
 	echo "Not on ci or no secrets so skipping Notarize"
