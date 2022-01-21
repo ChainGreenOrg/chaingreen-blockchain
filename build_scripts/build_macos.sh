@@ -17,7 +17,7 @@ echo "Chaingreen Installer Version is: $CHAINGREEN_INSTALLER_VERSION"
 echo "Installing npm and electron packagers"
 npm install electron-installer-dmg -g
 npm install electron-packager -g
-npm install electron/electron-osx-sign -g
+npm install electron/electron-osx-sign#main -g
 npm install notarize-cli -g
 
 echo "Create dist/"
