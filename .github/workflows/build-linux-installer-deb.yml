@@ -131,7 +131,7 @@ jobs:
       run: |
         sh install.sh
     - name: Setup Node 12.x
-      uses: actions/setup-node@v2.5.1
+      uses: actions/setup-node@v3.4.0
       with:
         node-version: '12.x'
 
