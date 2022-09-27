@@ -1,7 +1,7 @@
 blspy==1.0.5
 chiavdf==1.0.2
 chiabip158==1.0
-chiapos==1.0.4
+chiapos==1.0.11
 clvm==0.9.7
 clvm_rs==0.1.10
 clvm_tools==0.4.3
