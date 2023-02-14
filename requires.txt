@@ -5,7 +5,7 @@ chiapos==1.0.4
 clvm==0.9.7
 clvm_rs==0.1.10
 clvm_tools==0.4.3
-aiohttp==3.7.4
+aiohttp==3.8.4
 aiosqlite==0.17.0
 bitstring==3.1.9
 colorama==0.4.4
